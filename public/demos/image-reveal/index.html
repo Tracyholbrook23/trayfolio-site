@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Image Reveal Hero</title>
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden; /* standalone build: no page scroll */
+    background: #000;
+  }
+
+  .reveal-hero {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    /* cursor position, in pixels relative to the hero, updated by JS */
+    --reveal-x: 50%;
+    --reveal-y: 50%;
+    /* radius of the reveal window; also updated by JS on pointerleave */
+    --reveal-radius: 0px;
+  }
+
+  .reveal-hero img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* fills the viewport, cropping as needed */
+    /* object-fit: contain; */ /* swap in if you'd rather letterbox than crop */
+    display: block;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* bottom layer: the image that gets revealed */
+  .reveal-hero .reveal-image {
+    z-index: 1;
+  }
+
+  /* top layer: the image that gets wiped away */
+  .reveal-hero .front-image {
+    z-index: 2;
+    -webkit-mask-image: radial-gradient(
+      circle var(--reveal-radius) at var(--reveal-x) var(--reveal-y),
+      transparent 0%,
+      transparent 70%,
+      black 100%
+    );
+    mask-image: radial-gradient(
+      circle var(--reveal-radius) at var(--reveal-x) var(--reveal-y),
+      transparent 0%,
+      transparent 70%,
+      black 100%
+    );
+  }
+
+  /* respect reduced-motion: show the front image static, no mask tracking */
+  @media (prefers-reduced-motion: reduce) {
+    .reveal-hero .front-image {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+  }
+</style>
+</head>
+<body>
+<a href="/" style="position:fixed;top:14px;left:14px;z-index:99999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(20,16,12,0.72);backdrop-filter:blur(8px);color:#efe3cb;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;letter-spacing:0.02em;box-shadow:0 2px 10px rgba(0,0,0,0.25);">&larr; Back to Trayfolio</a>
+
+
+  <div class="reveal-hero" id="revealHero">
+    <img class="reveal-image" src="/demos/image-reveal/reveal.jpg" alt="" />
+    <img class="front-image" src="/demos/image-reveal/front.jpg" alt="" />
+  </div>
+
+  <script>
+    (function () {
+      var hero = document.getElementById('revealHero');
+      var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReducedMotion) return; // front image stays static, per CSS above
+
+      var REVEAL_RADIUS = 220; // px, size of the reveal window
+      var latestX = null;
+      var latestY = null;
+      var ticking = false;
+
+      // x, y, radius are complete CSS <length>/<percentage> strings (e.g. "50%" or "220px") —
+      // never concatenate a unit onto them here, or a value like "50%" becomes the invalid "50%px".
+      function applyReveal(x, y, radius) {
+        hero.style.setProperty('--reveal-x', x);
+        hero.style.setProperty('--reveal-y', y);
+        hero.style.setProperty('--reveal-radius', radius);
+      }
+
+      function onFrame() {
+        ticking = false;
+        if (latestX === null || latestY === null) return;
+        applyReveal(latestX + 'px', latestY + 'px', REVEAL_RADIUS + 'px');
+      }
+
+      function onMouseMove(e) {
+        var rect = hero.getBoundingClientRect();
+        latestX = e.clientX - rect.left;
+        latestY = e.clientY - rect.top;
+        if (!ticking) {
+          ticking = true;
+          requestAnimationFrame(onFrame);
+        }
+      }
+
+      function onPointerLeave() {
+        latestX = null;
+        latestY = null;
+        // close the mask so the front image is whole again
+        requestAnimationFrame(function () {
+          applyReveal('50%', '50%', '0px');
+        });
+      }
+
+      hero.addEventListener('mousemove', onMouseMove);
+      hero.addEventListener('pointerleave', onPointerLeave);
+
+      // start closed
+      applyReveal('50%', '50%', '0px');
+    })();
+  </script>
+
+</body>
+</html>

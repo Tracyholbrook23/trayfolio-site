@@ -275,6 +275,18 @@ export function CoverflowCarousel({
                   draggable={false}
                   className="h-full w-full select-none object-cover"
                 />
+                {/* The front-most card doubles as a link straight to the live demo —
+                    dragging still works from anywhere in the frame; only a real click
+                    (no pointer movement) follows the link. */}
+                {index === selected && slide.href && (
+                  <a
+                    href={slide.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={slide.linkLabel ?? `Open ${slide.title ?? "demo"}`}
+                    className="absolute inset-0 cursor-pointer"
+                  />
+                )}
               </div>
             ))}
           </div>

@@ -119,7 +119,7 @@ export default function Packages() {
   return (
     <div className="flex flex-col flex-1 bg-white text-stone-900">
       {/* Nav */}
-      <header className="sticky top-0 z-10 border-b border-stone-100 bg-white/80 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-stone-200/60 bg-peach/80 backdrop-blur">
         <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="text-lg font-semibold tracking-tight">
             Trayfolio
@@ -140,7 +140,7 @@ export default function Packages() {
           </div>
           <a
             href="mailto:tracyholbrook532@gmail.com?subject=Website%20project%20inquiry"
-            className="rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
+            className="rounded-full bg-terracotta px-4 py-2 text-sm font-medium text-white transition hover:bg-terracotta-light"
           >
             Get in touch
           </a>
@@ -170,30 +170,24 @@ export default function Packages() {
                 key={tier.name}
                 className={`relative flex flex-col rounded-3xl border p-8 ${
                   tier.highlight
-                    ? "border-terracotta bg-stone-950 text-white shadow-xl ring-1 ring-terracotta/40"
+                    ? "border-terracotta bg-peach shadow-xl ring-1 ring-terracotta/40"
                     : "border-stone-200 bg-white"
                 }`}
               >
                 {tier.highlight && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-3 py-1 text-xs font-semibold text-white">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-terracotta px-3 py-1 text-xs font-semibold text-white">
                     Most popular
                   </span>
                 )}
                 <h3 className="text-lg font-semibold">{tier.name}</h3>
                 <p className="mt-3 text-3xl font-semibold tracking-tight">{tier.price}</p>
-                <p
-                  className={`mt-3 text-sm leading-6 ${
-                    tier.highlight ? "text-stone-300" : "text-stone-600"
-                  }`}
-                >
+                <p className="mt-3 text-sm leading-6 text-stone-600">
                   {tier.tagline}
                 </p>
                 <ul className="mt-6 flex-1 space-y-3 text-sm">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <span className={tier.highlight ? "text-stone-400" : "text-stone-400"}>
-                        ✓
-                      </span>
+                      <span className="text-terracotta">✓</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -204,8 +198,8 @@ export default function Packages() {
                   )}`}
                   className={`mt-8 inline-block rounded-full px-6 py-3 text-center text-sm font-semibold transition ${
                     tier.highlight
-                      ? "bg-gradient-to-r from-terracotta via-gold to-olive text-white hover:brightness-110"
-                      : "bg-stone-950 text-white hover:bg-stone-800"
+                      ? "bg-terracotta text-white hover:bg-terracotta-light"
+                      : "bg-stone-900 text-white hover:bg-stone-800"
                   }`}
                 >
                   Get started
@@ -317,17 +311,17 @@ export default function Packages() {
 
         {/* Contact CTA */}
         <section className="mx-auto max-w-5xl px-6 py-20">
-          <div className="rounded-3xl bg-stone-950 px-8 py-14 text-center text-white sm:px-16">
+          <div className="rounded-3xl bg-peach px-8 py-14 text-center text-stone-900 sm:px-16">
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
               Not sure which package fits?
             </h2>
-            <p className="mx-auto mt-3 max-w-md text-stone-300">
+            <p className="mx-auto mt-3 max-w-md text-stone-600">
               Tell me about your business and I&apos;ll recommend the right option — no
               pressure, no obligation.
             </p>
             <a
               href="mailto:tracyholbrook532@gmail.com?subject=Which%20package%20is%20right%20for%20me%3F"
-              className="mt-8 inline-block rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+              className="mt-8 inline-block rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-terracotta-light"
             >
               Email tracyholbrook532@gmail.com
             </a>

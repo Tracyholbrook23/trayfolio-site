@@ -50,6 +50,42 @@ const demoSlides: CoverflowSlide[] = [
       { label: "Signature move", value: "Before/after scroll reveal" },
     ],
   },
+  {
+    src: "/demos/image-reveal/front.jpg",
+    alt: "Hover reveal effect demo — construction crew reviewing blueprints",
+    title: "Hover Reveal",
+    subtitle: "Interactive effect — click to try it live",
+    href: "/demos/image-reveal/",
+    linkLabel: "Try the live effect",
+    meta: [
+      { label: "Effect", value: "Radial image reveal" },
+      { label: "Trigger", value: "Mouse / touch" },
+    ],
+  },
+  {
+    src: "/demos/mouse-scrub/poster.jpg",
+    alt: "Mouse-driven video scrub effect demo — luxury apartment building at dusk",
+    title: "Mouse-Scrub Video",
+    subtitle: "Interactive effect — click to try it live",
+    href: "/demos/mouse-scrub/",
+    linkLabel: "Try the live effect",
+    meta: [
+      { label: "Effect", value: "Video scrubbing" },
+      { label: "Trigger", value: "Mouse movement" },
+    ],
+  },
+  {
+    src: "/demos/scroll-trigger-video/poster.jpg",
+    alt: "Scroll-triggered video playback effect demo — apartment balconies at sunset",
+    title: "Scroll-Triggered Video",
+    subtitle: "Interactive effect — click to try it live",
+    href: "/demos/scroll-trigger-video/",
+    linkLabel: "Try the live effect",
+    meta: [
+      { label: "Effect", value: "Scroll-locked playback" },
+      { label: "Trigger", value: "Scroll or swipe" },
+    ],
+  },
 ];
 
 const trustBadges = [
@@ -84,7 +120,7 @@ export default function Home() {
   return (
     <div className="flex flex-col flex-1 bg-white text-stone-900">
       {/* Nav */}
-      <header className="sticky top-0 z-40 border-b border-stone-100 bg-white/80 backdrop-blur">
+      <header className="sticky top-0 z-40 border-b border-stone-200/60 bg-peach/80 backdrop-blur">
         <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <span className="font-display text-lg font-semibold tracking-tight">Trayfolio</span>
           <div className="hidden gap-8 text-sm font-medium text-stone-600 sm:flex">
@@ -96,7 +132,7 @@ export default function Home() {
           </div>
           <a
             href="#contact"
-            className="rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-4 py-2 text-sm font-semibold text-white shadow-md shadow-terracotta/20 transition hover:brightness-110"
+            className="rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-light"
           >
             Get in touch
           </a>
@@ -105,63 +141,62 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section id="demos" className="relative overflow-hidden bg-stone-950 text-white">
+        <section id="demos" className="relative overflow-hidden bg-peach text-stone-900">
           <div className="pointer-events-none absolute inset-0 -z-10">
             <div
-              className="blob absolute left-[-10%] top-[-15%] h-[420px] w-[420px] rounded-full bg-terracotta/35 blur-3xl"
+              className="blob absolute left-[-10%] top-[-15%] h-[420px] w-[420px] rounded-full bg-white/50 blur-3xl"
               style={{ animation: "blob-float 16s ease-in-out infinite" }}
             />
             <div
-              className="blob absolute right-[-10%] top-[5%] h-[380px] w-[380px] rounded-full bg-gold/25 blur-3xl"
+              className="blob absolute right-[-10%] top-[5%] h-[380px] w-[380px] rounded-full bg-gold/20 blur-3xl"
               style={{ animation: "blob-float 20s ease-in-out infinite reverse" }}
             />
             <div
-              className="blob absolute bottom-[-20%] left-[25%] h-[360px] w-[360px] rounded-full bg-olive/30 blur-3xl"
+              className="blob absolute bottom-[-20%] left-[25%] h-[360px] w-[360px] rounded-full bg-white/40 blur-3xl"
               style={{ animation: "blob-float 22s ease-in-out infinite" }}
             />
             <div className="grain-overlay absolute inset-0" />
           </div>
 
-          <div className="mx-auto max-w-5xl px-6 pb-16 pt-20 sm:pt-28">
+          <div className="mx-auto max-w-5xl px-6 pb-8 pt-12 sm:pt-16">
             <Reveal>
-              <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-stone-400">
+              <p className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">
                 Websites for small businesses
               </p>
             </Reveal>
             <Reveal delay={100}>
-              <h1 className="font-display max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight sm:text-6xl">
+              <h1 className="font-display max-w-3xl text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">
                 A website that makes people <span className="gradient-text">stop scrolling</span>{" "}
                 and start clicking.
               </h1>
             </Reveal>
             <Reveal delay={200}>
-              <p className="mt-6 max-w-xl text-lg leading-8 text-stone-300">
+              <p className="mt-5 max-w-xl text-base leading-7 text-stone-600 sm:text-lg">
                 I design and build custom websites for small businesses — apparel, home
-                services, trades, sports, photography, and everything in between. Fast, clear,
-                and made to turn visitors into customers.
+                services, trades, sports, photography, and everything in between.
               </p>
             </Reveal>
             <Reveal delay={300}>
-              <div className="mt-8 flex flex-wrap gap-4">
+              <div className="mt-6 flex flex-wrap gap-4">
                 <a
                   href="#contact"
-                  className="rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-terracotta/20 transition hover:brightness-110 hover:shadow-terracotta/40"
+                  className="rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-light"
                 >
                   Start your project
                 </a>
                 <a
                   href="#demo-carousel"
-                  className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+                  className="rounded-full border border-stone-900/20 px-6 py-3 text-sm font-semibold text-stone-900 transition hover:border-stone-900/40 hover:bg-white/40"
                 >
                   See live demos
                 </a>
               </div>
             </Reveal>
-            <Reveal delay={400}>
-              <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/10 pt-6 text-sm text-stone-400">
+            <Reveal delay={350}>
+              <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-stone-600">
                 {trustBadges.map((badge) => (
-                  <span key={badge} className="flex items-center gap-2">
-                    <span className="text-terracotta-light">✓</span>
+                  <span key={badge} className="flex items-center gap-1.5">
+                    <span className="text-terracotta">✓</span>
                     {badge}
                   </span>
                 ))}
@@ -170,20 +205,20 @@ export default function Home() {
           </div>
 
           {/* Live demo carousel */}
-          <Reveal delay={200} id="demo-carousel" className="border-t border-white/10 pb-16 pt-14">
+          <Reveal delay={150} id="demo-carousel" className="pb-14 pt-2">
             <div className="mx-auto max-w-5xl px-6">
-              <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-400">
-                Drag through a couple of live builds
+              <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">
+                Drag through a few live builds
               </p>
-              <p className="mx-auto mt-2 max-w-md text-center text-sm text-stone-400">
-                Real, interactive demo sites — scroll or drag the cards, then open one to explore
+              <p className="mx-auto mt-1.5 max-w-md text-center text-sm text-stone-600">
+                Real, interactive demo sites and effects — drag the cards, then click one to try
                 it for real.
               </p>
             </div>
-            <div className="mt-10">
+            <div className="mt-6">
               <CoverflowCarousel
                 slides={demoSlides}
-                cardWidth="clamp(220px, 34vw, 420px)"
+                cardWidth="clamp(200px, 30vw, 360px)"
                 showCaption
                 showPagination
                 showNavigation
@@ -191,14 +226,6 @@ export default function Home() {
               />
             </div>
           </Reveal>
-
-          <a
-            href="#work"
-            aria-label="Scroll to see recent work"
-            className="absolute bottom-4 left-1/2 hidden -translate-x-1/2 animate-bounce text-2xl text-stone-500 transition hover:text-white sm:block"
-          >
-            ↓
-          </a>
         </section>
 
         {/* Recent work strip */}
@@ -261,21 +288,21 @@ export default function Home() {
         </section>
 
         {/* Packages teaser */}
-        <section className="border-t border-stone-100 bg-stone-950 text-white">
+        <section className="border-t border-stone-100 bg-peach text-stone-900">
           <div className="mx-auto max-w-5xl px-6 py-16 text-center">
             <Reveal>
-              <p className="text-sm font-semibold uppercase tracking-wider text-stone-400">
+              <p className="text-sm font-semibold uppercase tracking-wider text-stone-600">
                 Pricing, upfront
               </p>
               <p className="font-display mt-3 text-3xl font-semibold tracking-tight sm:text-4xl">
                 Sites from $700
               </p>
-              <p className="mt-3 text-stone-400">
+              <p className="mt-3 text-stone-600">
                 No hidden monthly fee if you don&apos;t want one.
               </p>
               <Link
                 href="/packages"
-                className="mt-6 inline-block rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
+                className="mt-6 inline-block rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white transition hover:bg-terracotta-light"
               >
                 See full pricing
               </Link>

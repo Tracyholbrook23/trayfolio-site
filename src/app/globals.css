@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbead9;
+  --foreground: #2a2118;
   --gradient-brand: linear-gradient(115deg, #b5541f 0%, #c9a227 50%, #6e7350 100%);
 }
 
@@ -21,18 +21,17 @@
   --color-olive-light: #9ba37a;
   --color-sand: #efe3cb;
 
+  /* Light, warm-orange page background used across banded sections */
+  --color-peach: #fbead9;
+  --color-peach-deep: #f3d6ae;
+
   /* Minimal semantic tokens (shadcn-style) so ported UI components read correctly */
   --color-muted: #efe3cb;
   --color-muted-foreground: #8a7f6c;
   --color-ring: #b5541f;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/* Light theme only, for now — no automatic dark-mode flip. */
 
 body {
   background: var(--background);
@@ -57,8 +56,8 @@ body {
 /* Soft grain texture overlay for the hero background */
 .grain-overlay {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
-  opacity: 0.05;
-  mix-blend-mode: overlay;
+  opacity: 0.045;
+  mix-blend-mode: multiply;
 }
 
 /* Scroll-reveal utility: elements fade + rise into place as they enter view */
