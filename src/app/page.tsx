@@ -9,12 +9,6 @@ const work = [
     href: "https://www.valtiermedia.com",
   },
   {
-    name: "Chill-WIL Air",
-    description: "Commercial HVAC & electrician, Austin/DFW",
-    image: "/work/chillwilair.jpg",
-    href: "https://www.chillwilair.com",
-  },
-  {
     name: "MØDE",
     description: "Custom membership platform",
     image: "/work/mode.jpg",
