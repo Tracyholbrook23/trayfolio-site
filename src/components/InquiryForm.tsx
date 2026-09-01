@@ -146,7 +146,7 @@ export default function InquiryForm() {
 
       <button
         type="submit"
-        className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-terracotta/20 transition hover:brightness-110 hover:shadow-terracotta/40"
+        className="inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-terracotta/20 transition hover:bg-terracotta-light"
       >
         Send inquiry
       </button>

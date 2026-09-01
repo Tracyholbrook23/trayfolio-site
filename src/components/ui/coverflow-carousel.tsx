@@ -340,7 +340,7 @@ export function CoverflowCarousel({
               href={active.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110"
+              className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:bg-terracotta-light"
             >
               {active.linkLabel ?? "View live demo"}
               <ChevronRight className="size-3.5" />
