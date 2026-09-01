@@ -52,7 +52,7 @@ const demoSlides: CoverflowSlide[] = [
   },
   {
     src: "/demos/image-reveal/front.jpg",
-    alt: "Hover reveal effect demo — construction crew reviewing blueprints",
+    alt: "Hover reveal effect demo — original armored hero, hover to reveal the stealth suit",
     title: "Hover Reveal",
     subtitle: "Interactive effect — click to try it live",
     href: "/demos/image-reveal/",
