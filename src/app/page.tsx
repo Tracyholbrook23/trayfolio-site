@@ -14,6 +14,12 @@ const work = [
     image: "/work/mode.jpg",
     href: "https://www.enterm0de.com",
   },
+  {
+    name: "Shawnie's Loc Lab",
+    description: "Loc & braid specialist, Lansing MI",
+    image: "/work/shawniesloclab.jpg",
+    href: "https://www.shawniesloclab.com",
+  },
 ];
 
 export default function Home() {
