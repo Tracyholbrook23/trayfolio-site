@@ -60,6 +60,22 @@
         video.pause();
       });
 
+      // iOS Safari (and some other mobile browsers) will not reliably seek
+      // a muted video via currentTime until it has actually been played
+      // once — until then, scrubbing silently no-ops and the frame never
+      // advances. A muted play()+immediate pause() is allowed without a
+      // user gesture and "primes" the decoder so mouse/touch-driven
+      // scrubbing below actually renders frames on mobile.
+      video.play().then(function () {
+        video.pause();
+      }).catch(function () {
+        var primeOnce = function () {
+          video.play().then(function () { video.pause(); }).catch(function () {});
+          window.removeEventListener('touchstart', primeOnce);
+        };
+        window.addEventListener('touchstart', primeOnce, { passive: true, once: true });
+      });
+
       video.addEventListener('loadedmetadata', function () {
         duration = video.duration || 0;
       });

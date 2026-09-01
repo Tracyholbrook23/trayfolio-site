@@ -847,6 +847,26 @@
           video.pause();
         });
 
+        // iOS Safari (and some other mobile browsers) will not reliably
+        // seek a muted video via currentTime until it has actually been
+        // played once — until then, scrubbing silently no-ops and the
+        // frame never advances. A muted play()+immediate pause() is
+        // allowed without a user gesture and "primes" the decoder so the
+        // scroll-driven scrub below actually renders frames on mobile.
+        video.play().then(function () {
+          video.pause();
+        }).catch(function () {
+          // Autoplay blocked outright — scrubbing will kick in on the
+          // first touch/scroll instead, which itself counts as a gesture.
+          var primeOnce = function () {
+            video.play().then(function () { video.pause(); }).catch(function () {});
+            window.removeEventListener('touchstart', primeOnce);
+            window.removeEventListener('scroll', primeOnce);
+          };
+          window.addEventListener('touchstart', primeOnce, { passive: true, once: true });
+          window.addEventListener('scroll', primeOnce, { passive: true, once: true });
+        });
+
         function handleMetadata() {
           var d = video.duration;
           if (!d || !isFinite(d)) return; // not ready yet, or duration not known (e.g. Infinity)

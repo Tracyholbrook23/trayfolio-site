@@ -68,9 +68,11 @@ export function CoverflowCarousel({
   const dragRef = React.useRef<{
     id: number;
     x: number;
+    y: number;
     pos: number;
     v: number;
     t: number;
+    downIndex: number | null;
   } | null>(null);
   const [selected, setSelected] = React.useState(0);
   /** Nearest whole card, folded back into 0..count-1. */
@@ -159,12 +161,17 @@ export function CoverflowCarousel({
     }
     event.currentTarget.setPointerCapture(event.pointerId);
     targetRef.current = posRef.current;
+    const pressedCard = (event.target as HTMLElement).closest<HTMLElement>(
+      "[data-card-index]",
+    );
     dragRef.current = {
       id: event.pointerId,
       x: event.clientX,
+      y: event.clientY,
       pos: posRef.current,
       v: 0,
       t: performance.now(),
+      downIndex: pressedCard ? Number(pressedCard.dataset.cardIndex) : null,
     };
   };
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -186,6 +193,18 @@ export function CoverflowCarousel({
     const drag = dragRef.current;
     if (!drag || drag.id !== event.pointerId) return;
     dragRef.current = null;
+    // A real click's mouseup (and therefore its click event) gets retargeted
+    // to whichever element called setPointerCapture, so the card's <a> never
+    // sees it — a near-zero-movement release is our only signal that this
+    // was a tap/click rather than a drag.
+    const moved =
+      Math.abs(event.clientX - drag.x) + Math.abs(event.clientY - drag.y);
+    if (moved < 6 && drag.downIndex !== null) {
+      const href = slides[drag.downIndex]?.href;
+      if (href) {
+        window.location.href = href;
+      }
+    }
     // Let a flick carry, but never more than two cards.
     const carried = Math.max(-2, Math.min(2, drag.v * 0.18));
     settle(clamp(Math.round(posRef.current + carried)));
@@ -259,6 +278,7 @@ export function CoverflowCarousel({
                 ref={(node) => {
                   cardRefs.current[index] = node;
                 }}
+                data-card-index={index}
                 role="group"
                 aria-roledescription="slide"
                 aria-label={`${index + 1} of ${count}`}
@@ -283,8 +303,6 @@ export function CoverflowCarousel({
                 {slide.href && (
                   <a
                     href={slide.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     aria-label={slide.linkLabel ?? `Open ${slide.title ?? "demo"}`}
                     className="absolute inset-0 cursor-pointer"
                   />
@@ -340,8 +358,6 @@ export function CoverflowCarousel({
           {active.href && (
             <a
               href={active.href}
-              target="_blank"
-              rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-terracotta px-4 py-2 text-xs font-semibold text-white transition hover:bg-terracotta-light"
             >
               {active.linkLabel ?? "View live demo"}
