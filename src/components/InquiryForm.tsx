@@ -28,11 +28,11 @@ export default function InquiryForm() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    const subject = `Website project inquiry — ${business || name || "New lead"}`;
+    const subject = `Website project inquiry: ${business || name || "New lead"}`;
     const body = [
       `Name: ${name}`,
       `Email: ${email}`,
-      `Business: ${business || "—"}`,
+      `Business: ${business || "N/A"}`,
       `Project type: ${projectType.length ? projectType.join(", ") : "Not specified"}`,
       `Budget: ${budget}`,
       "",
@@ -151,7 +151,7 @@ export default function InquiryForm() {
         Send inquiry
       </button>
       <p className="text-xs text-stone-500">
-        This opens your email app with everything pre-filled so nothing gets lost — nothing
+        This opens your email app with everything pre-filled so nothing gets lost. Nothing
         sends until you hit send there.
       </p>
     </form>

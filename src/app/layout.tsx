@@ -19,9 +19,9 @@ const bricolage = Bricolage_Grotesque({
 });
 
 export const metadata: Metadata = {
-  title: "Trayfolio — Websites for small businesses",
+  title: "Trayfolio: Websites for small businesses",
   description:
-    "Trayfolio builds fast, clean, professional websites for small businesses — from first draft to launch, with support after.",
+    "Trayfolio builds fast, clean, professional websites for small businesses, from first draft to launch, with support after.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

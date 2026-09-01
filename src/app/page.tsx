@@ -28,9 +28,9 @@ const work = [
 const demoSlides: CoverflowSlide[] = [
   {
     src: "/demos/construction/assets/construction-crane-modern-residential-complex-near-water-new-housing-by-lake.jpg",
-    alt: "STRUX construction demo site — modern residential build with crane",
+    alt: "STRUX construction demo site: modern residential build with crane",
     title: "STRUX",
-    subtitle: "Construction & infrastructure — live demo",
+    subtitle: "Construction & infrastructure demo",
     href: "/demos/construction/",
     linkLabel: "Scroll through the live demo",
     meta: [
@@ -40,9 +40,9 @@ const demoSlides: CoverflowSlide[] = [
   },
   {
     src: "/demos/holiday-lighting/christmas-lights/3-house-lights-on.png",
-    alt: "Evergreen Holiday Lighting demo site — before and after house lighting reveal",
+    alt: "Evergreen Holiday Lighting demo site: before and after house lighting reveal",
     title: "Evergreen Holiday Lighting",
-    subtitle: "Seasonal home services — live demo",
+    subtitle: "Seasonal home services demo",
     href: "/demos/holiday-lighting/",
     linkLabel: "Scroll through the live demo",
     meta: [
@@ -52,9 +52,9 @@ const demoSlides: CoverflowSlide[] = [
   },
   {
     src: "/demos/image-reveal/front.jpg",
-    alt: "Hover reveal effect demo — original armored hero, hover to reveal the stealth suit",
+    alt: "Hover reveal effect demo: original armored hero, hover to reveal the stealth suit",
     title: "Hover Reveal",
-    subtitle: "Interactive effect — click to try it live",
+    subtitle: "Interactive effect: click to try it live",
     href: "/demos/image-reveal/",
     linkLabel: "Try the live effect",
     meta: [
@@ -64,9 +64,9 @@ const demoSlides: CoverflowSlide[] = [
   },
   {
     src: "/demos/mouse-scrub/poster.jpg",
-    alt: "Mouse-driven video scrub effect demo — luxury apartment building at dusk",
+    alt: "Mouse-driven video scrub effect demo: luxury apartment building at dusk",
     title: "Mouse-Scrub Video",
-    subtitle: "Interactive effect — click to try it live",
+    subtitle: "Interactive effect: click to try it live",
     href: "/demos/mouse-scrub/",
     linkLabel: "Try the live effect",
     meta: [
@@ -76,9 +76,9 @@ const demoSlides: CoverflowSlide[] = [
   },
   {
     src: "/demos/scroll-trigger-video/poster.jpg",
-    alt: "Scroll-triggered video playback effect demo — apartment balconies at sunset",
+    alt: "Scroll-triggered video playback effect demo: apartment balconies at sunset",
     title: "Scroll-Triggered Video",
-    subtitle: "Interactive effect — click to try it live",
+    subtitle: "Interactive effect: click to try it live",
     href: "/demos/scroll-trigger-video/",
     linkLabel: "Try the live effect",
     meta: [
@@ -100,7 +100,7 @@ const services = [
     number: "01",
     title: "Website Creation",
     description:
-      "Built around your real business — your services, your photos, your customers — not a template with your logo dropped in.",
+      "Built around your real business: your services, your photos, your customers, not a template with your logo dropped in.",
   },
   {
     number: "02",
@@ -112,7 +112,7 @@ const services = [
     number: "03",
     title: "Care & Support",
     description:
-      "Ongoing edits, monitoring, and small changes after launch, billed month to month — cancel anytime.",
+      "Ongoing edits, monitoring, and small changes after launch, billed month to month. Cancel anytime.",
   },
 ];
 
@@ -172,7 +172,7 @@ export default function Home() {
             </Reveal>
             <Reveal delay={200}>
               <p className="mt-5 max-w-xl text-base leading-7 text-stone-600 sm:text-lg">
-                I design and build custom websites for small businesses — apparel, home
+                I design and build custom websites for small businesses: apparel, home
                 services, trades, sports, photography, and everything in between.
               </p>
             </Reveal>
@@ -211,7 +211,7 @@ export default function Home() {
                 Drag through a few live builds
               </p>
               <p className="mx-auto mt-1.5 max-w-md text-center text-sm text-stone-600">
-                Real, interactive demo sites and effects — drag the cards, then click one to try
+                Real, interactive demo sites and effects. Drag the cards, then click one to try
                 it for real.
               </p>
             </div>
@@ -326,7 +326,7 @@ export default function Home() {
               </p>
               <div className="mt-8 space-y-3 text-sm text-stone-600">
                 <p>
-                  <span className="font-semibold text-stone-900">Email — </span>
+                  <span className="font-semibold text-stone-900">Email: </span>
                   <a
                     href="mailto:tracyholbrook532@gmail.com"
                     className="underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
@@ -335,7 +335,7 @@ export default function Home() {
                   </a>
                 </p>
                 <p>
-                  <span className="font-semibold text-stone-900">Response time — </span>
+                  <span className="font-semibold text-stone-900">Response time: </span>
                   Within 1 business day
                 </p>
               </div>

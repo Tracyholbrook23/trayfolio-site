@@ -111,7 +111,7 @@ const faqs = [
   {
     question: "What if I need something not listed here?",
     answer:
-      "Every business is different — email me what you're looking for and I'll put together a custom quote.",
+      "Every business is different. Email me what you're looking for and I'll put together a custom quote.",
   },
 ];
 
@@ -316,7 +316,7 @@ export default function Packages() {
               Not sure which package fits?
             </h2>
             <p className="mx-auto mt-3 max-w-md text-stone-600">
-              Tell me about your business and I&apos;ll recommend the right option — no
+              Tell me about your business and I&apos;ll recommend the right option, no
               pressure, no obligation.
             </p>
             <a
