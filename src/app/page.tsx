@@ -27,8 +27,8 @@ const work = [
 
 const demoSlides: CoverflowSlide[] = [
   {
-    src: "/demos/construction/assets/frame-mid.jpg",
-    alt: "STRUX construction demo site — scroll-driven video hero",
+    src: "/demos/construction/assets/construction-crane-modern-residential-complex-near-water-new-housing-by-lake.jpg",
+    alt: "STRUX construction demo site — modern residential build with crane",
     title: "STRUX",
     subtitle: "Construction & infrastructure — live demo",
     href: "/demos/construction/",
