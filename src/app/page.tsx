@@ -219,6 +219,8 @@ export default function Home() {
               <CoverflowCarousel
                 slides={demoSlides}
                 cardWidth="clamp(200px, 30vw, 360px)"
+                autoRotate
+                autoRotateInterval={3800}
                 showCaption
                 showPagination
                 showNavigation

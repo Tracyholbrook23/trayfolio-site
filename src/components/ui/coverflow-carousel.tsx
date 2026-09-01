@@ -30,6 +30,10 @@ export interface CoverflowCarouselProps {
   /** Space between cards, as a fraction of card width. */
   gap?: number;
   loop?: boolean;
+  /** Auto-advance one card at a time while true. */
+  autoRotate?: boolean;
+  /** Milliseconds between auto-advances. */
+  autoRotateInterval?: number;
   showCaption?: boolean;
   showPagination?: boolean;
   showNavigation?: boolean;
@@ -48,6 +52,8 @@ export function CoverflowCarousel({
   cardWidth = "clamp(148px, 22vw, 260px)",
   gap = 0.05,
   loop = true,
+  autoRotate = false,
+  autoRotateInterval = 3800,
   showCaption = false,
   showPagination = false,
   showNavigation = false,
@@ -154,7 +160,46 @@ export function CoverflowCarousel({
     (by: number) => settle(clamp(Math.round(targetRef.current) + by)),
     [clamp, settle],
   );
+  // Auto-rotate: advances on a timer, but stays out of the way of anyone
+  // actually using the carousel. `pausedRef` is flipped on immediately by
+  // any interaction and only cleared after a quiet period, so a drag, a
+  // hover, or keyboard focus all suppress the next few ticks rather than
+  // fighting the person mid-gesture.
+  const pausedRef = React.useRef(false);
+  const resumeTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+  const pauseAutoRotate = React.useCallback(() => {
+    pausedRef.current = true;
+    if (resumeTimeoutRef.current !== null) {
+      clearTimeout(resumeTimeoutRef.current);
+      resumeTimeoutRef.current = null;
+    }
+  }, []);
+  const resumeAutoRotateSoon = React.useCallback(() => {
+    if (resumeTimeoutRef.current !== null) clearTimeout(resumeTimeoutRef.current);
+    resumeTimeoutRef.current = setTimeout(() => {
+      pausedRef.current = false;
+      resumeTimeoutRef.current = null;
+    }, 2600);
+  }, []);
+  React.useEffect(() => {
+    if (!autoRotate || count < 2) return;
+    const id = setInterval(() => {
+      if (pausedRef.current) return;
+      if (typeof document !== "undefined" && document.hidden) return;
+      nudge(1);
+    }, autoRotateInterval);
+    return () => clearInterval(id);
+  }, [autoRotate, autoRotateInterval, count, nudge]);
+  React.useEffect(
+    () => () => {
+      if (resumeTimeoutRef.current !== null) clearTimeout(resumeTimeoutRef.current);
+    },
+    [],
+  );
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    pauseAutoRotate();
     if (rafRef.current !== null) {
       cancelAnimationFrame(rafRef.current);
       rafRef.current = null;
@@ -208,6 +253,7 @@ export function CoverflowCarousel({
     // Let a flick carry, but never more than two cards.
     const carried = Math.max(-2, Math.min(2, drag.v * 0.18));
     settle(clamp(Math.round(posRef.current + carried)));
+    resumeAutoRotateSoon();
   };
   // Card width drives pitch, depth and perspective, so it is the only thing
   // worth measuring — and only when the box actually changes.
@@ -248,6 +294,10 @@ export function CoverflowCarousel({
           onPointerMove={onPointerMove}
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
+          onMouseEnter={pauseAutoRotate}
+          onMouseLeave={resumeAutoRotateSoon}
+          onFocus={pauseAutoRotate}
+          onBlur={resumeAutoRotateSoon}
           onKeyDown={(event) => {
             if (event.key === "ArrowLeft") {
               event.preventDefault();
