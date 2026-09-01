@@ -117,30 +117,30 @@ const faqs = [
 
 export default function Packages() {
   return (
-    <div className="flex flex-col flex-1 bg-white text-zinc-900">
+    <div className="flex flex-col flex-1 bg-white text-stone-900">
       {/* Nav */}
-      <header className="sticky top-0 z-10 border-b border-zinc-100 bg-white/80 backdrop-blur">
+      <header className="sticky top-0 z-10 border-b border-stone-100 bg-white/80 backdrop-blur">
         <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
           <Link href="/" className="text-lg font-semibold tracking-tight">
             Trayfolio
           </Link>
-          <div className="hidden gap-8 text-sm font-medium text-zinc-600 sm:flex">
-            <Link href="/#work" className="hover:text-zinc-900">
+          <div className="hidden gap-8 text-sm font-medium text-stone-600 sm:flex">
+            <Link href="/#work" className="hover:text-stone-900">
               Work
             </Link>
-            <Link href="/#services" className="hover:text-zinc-900">
+            <Link href="/#services" className="hover:text-stone-900">
               Services
             </Link>
-            <Link href="/packages" className="text-zinc-900">
+            <Link href="/packages" className="text-stone-900">
               Packages
             </Link>
-            <Link href="/#contact" className="hover:text-zinc-900">
+            <Link href="/#contact" className="hover:text-stone-900">
               Contact
             </Link>
           </div>
           <a
             href="mailto:tracyholbrook532@gmail.com?subject=Website%20project%20inquiry"
-            className="rounded-full bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-700"
+            className="rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-4 py-2 text-sm font-medium text-white transition hover:brightness-110"
           >
             Get in touch
           </a>
@@ -150,13 +150,13 @@ export default function Packages() {
       <main className="flex-1">
         {/* Header */}
         <section className="mx-auto max-w-5xl px-6 pb-12 pt-16 text-center sm:pt-24">
-          <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-zinc-500">
+          <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-stone-500">
             Packages & pricing
           </p>
           <h1 className="mx-auto max-w-2xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
             Flat, upfront pricing. No surprises.
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-zinc-600">
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-stone-600">
             Pick the package that fits your business, or email me and we&apos;ll figure out
             what makes sense together.
           </p>
@@ -170,12 +170,12 @@ export default function Packages() {
                 key={tier.name}
                 className={`relative flex flex-col rounded-3xl border p-8 ${
                   tier.highlight
-                    ? "border-zinc-900 bg-zinc-900 text-white shadow-xl"
-                    : "border-zinc-200 bg-white"
+                    ? "border-terracotta bg-stone-950 text-white shadow-xl ring-1 ring-terracotta/40"
+                    : "border-stone-200 bg-white"
                 }`}
               >
                 {tier.highlight && (
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-white px-3 py-1 text-xs font-semibold text-zinc-900">
+                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-3 py-1 text-xs font-semibold text-white">
                     Most popular
                   </span>
                 )}
@@ -183,7 +183,7 @@ export default function Packages() {
                 <p className="mt-3 text-3xl font-semibold tracking-tight">{tier.price}</p>
                 <p
                   className={`mt-3 text-sm leading-6 ${
-                    tier.highlight ? "text-zinc-300" : "text-zinc-600"
+                    tier.highlight ? "text-stone-300" : "text-stone-600"
                   }`}
                 >
                   {tier.tagline}
@@ -191,7 +191,7 @@ export default function Packages() {
                 <ul className="mt-6 flex-1 space-y-3 text-sm">
                   {tier.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <span className={tier.highlight ? "text-zinc-400" : "text-zinc-400"}>
+                      <span className={tier.highlight ? "text-stone-400" : "text-stone-400"}>
                         ✓
                       </span>
                       <span>{feature}</span>
@@ -202,10 +202,10 @@ export default function Packages() {
                   href={`mailto:tracyholbrook532@gmail.com?subject=${encodeURIComponent(
                     `${tier.name} package inquiry`
                   )}`}
-                  className={`mt-8 inline-block rounded-full px-6 py-3 text-center text-sm font-semibold ${
+                  className={`mt-8 inline-block rounded-full px-6 py-3 text-center text-sm font-semibold transition ${
                     tier.highlight
-                      ? "bg-white text-zinc-900 hover:bg-zinc-200"
-                      : "bg-zinc-900 text-white hover:bg-zinc-700"
+                      ? "bg-gradient-to-r from-terracotta via-gold to-olive text-white hover:brightness-110"
+                      : "bg-stone-950 text-white hover:bg-stone-800"
                   }`}
                 >
                   Get started
@@ -219,13 +219,13 @@ export default function Packages() {
             {addOns.map((addOn) => (
               <div
                 key={addOn.name}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-zinc-50 p-6"
+                className="flex items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-6"
               >
                 <div>
                   <h3 className="font-semibold">{addOn.name}</h3>
-                  <p className="mt-1 text-sm text-zinc-600">{addOn.description}</p>
+                  <p className="mt-1 text-sm text-stone-600">{addOn.description}</p>
                 </div>
-                <span className="whitespace-nowrap text-lg font-semibold text-zinc-900">
+                <span className="whitespace-nowrap text-lg font-semibold text-stone-900">
                   {addOn.price}
                 </span>
               </div>
@@ -234,31 +234,31 @@ export default function Packages() {
         </section>
 
         {/* Care plans */}
-        <section className="border-t border-zinc-100 bg-zinc-50">
+        <section className="border-t border-stone-100 bg-stone-50">
           <div className="mx-auto max-w-5xl px-6 py-20">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
               After launch
             </h2>
             <p className="mt-2 max-w-xl text-2xl font-semibold tracking-tight sm:text-3xl">
               Monthly care plans
             </p>
-            <p className="mt-3 max-w-xl text-zinc-600">
+            <p className="mt-3 max-w-xl text-stone-600">
               Optional, cancel anytime. Keep your site fast, secure, and up to date without
               lifting a finger.
             </p>
             <div className="mt-10 grid gap-6 sm:grid-cols-2">
               {carePlans.map((plan) => (
-                <div key={plan.name} className="rounded-2xl border border-zinc-200 bg-white p-6">
+                <div key={plan.name} className="rounded-2xl border border-stone-200 bg-white p-6">
                   <h3 className="font-semibold">{plan.name}</h3>
                   <p className="mt-2">
                     <span className="text-2xl font-semibold tracking-tight">{plan.price}</span>
-                    <span className="text-sm text-zinc-500">{plan.period}</span>
+                    <span className="text-sm text-stone-500">{plan.period}</span>
                   </p>
-                  <p className="mt-2 text-sm text-zinc-600">{plan.description}</p>
+                  <p className="mt-2 text-sm text-stone-600">{plan.description}</p>
                   <ul className="mt-4 space-y-2 text-sm">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2">
-                        <span className="text-zinc-400">✓</span>
+                        <span className="text-stone-400">✓</span>
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -271,7 +271,7 @@ export default function Packages() {
 
         {/* Marketing add-ons */}
         <section className="mx-auto max-w-5xl px-6 py-20">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
             Grow your reach
           </h2>
           <p className="mt-2 max-w-xl text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -281,13 +281,13 @@ export default function Packages() {
             {marketing.map((item) => (
               <div
                 key={item.name}
-                className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-6"
+                className="flex items-center justify-between gap-4 rounded-2xl border border-stone-200 bg-white p-6"
               >
                 <div>
                   <h3 className="font-semibold">{item.name}</h3>
-                  <p className="mt-1 text-sm text-zinc-600">{item.description}</p>
+                  <p className="mt-1 text-sm text-stone-600">{item.description}</p>
                 </div>
-                <span className="whitespace-nowrap text-lg font-semibold text-zinc-900">
+                <span className="whitespace-nowrap text-lg font-semibold text-stone-900">
                   {item.price}
                 </span>
               </div>
@@ -296,9 +296,9 @@ export default function Packages() {
         </section>
 
         {/* FAQ */}
-        <section className="border-t border-zinc-100 bg-zinc-50">
+        <section className="border-t border-stone-100 bg-stone-50">
           <div className="mx-auto max-w-5xl px-6 py-20">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
               Questions
             </h2>
             <p className="mt-2 max-w-xl text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -308,7 +308,7 @@ export default function Packages() {
               {faqs.map((faq) => (
                 <div key={faq.question}>
                   <h3 className="font-semibold">{faq.question}</h3>
-                  <p className="mt-2 text-sm leading-6 text-zinc-600">{faq.answer}</p>
+                  <p className="mt-2 text-sm leading-6 text-stone-600">{faq.answer}</p>
                 </div>
               ))}
             </div>
@@ -317,17 +317,17 @@ export default function Packages() {
 
         {/* Contact CTA */}
         <section className="mx-auto max-w-5xl px-6 py-20">
-          <div className="rounded-3xl bg-zinc-900 px-8 py-14 text-center text-white sm:px-16">
+          <div className="rounded-3xl bg-stone-950 px-8 py-14 text-center text-white sm:px-16">
             <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
               Not sure which package fits?
             </h2>
-            <p className="mx-auto mt-3 max-w-md text-zinc-300">
+            <p className="mx-auto mt-3 max-w-md text-stone-300">
               Tell me about your business and I&apos;ll recommend the right option — no
               pressure, no obligation.
             </p>
             <a
               href="mailto:tracyholbrook532@gmail.com?subject=Which%20package%20is%20right%20for%20me%3F"
-              className="mt-8 inline-block rounded-full bg-white px-6 py-3 text-sm font-semibold text-zinc-900 hover:bg-zinc-200"
+              className="mt-8 inline-block rounded-full bg-gradient-to-r from-terracotta via-gold to-olive px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
             >
               Email tracyholbrook532@gmail.com
             </a>
@@ -335,20 +335,20 @@ export default function Packages() {
         </section>
       </main>
 
-      <footer className="border-t border-zinc-100 py-10 text-sm text-zinc-500">
+      <footer className="border-t border-stone-100 py-10 text-sm text-stone-500">
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 sm:flex-row sm:justify-between">
           <span>© {new Date().getFullYear()} Trayfolio. Built by Tracy Holbrook.</span>
           <div className="flex gap-6">
-            <Link href="/#work" className="hover:text-zinc-900">
+            <Link href="/#work" className="hover:text-stone-900">
               Work
             </Link>
-            <Link href="/#services" className="hover:text-zinc-900">
+            <Link href="/#services" className="hover:text-stone-900">
               Services
             </Link>
-            <Link href="/packages" className="hover:text-zinc-900">
+            <Link href="/packages" className="hover:text-stone-900">
               Packages
             </Link>
-            <Link href="/#contact" className="hover:text-zinc-900">
+            <Link href="/#contact" className="hover:text-stone-900">
               Contact
             </Link>
           </div>

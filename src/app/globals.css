@@ -3,7 +3,7 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
-  --gradient-brand: linear-gradient(115deg, #7c3aed 0%, #d946ef 45%, #fb923c 100%);
+  --gradient-brand: linear-gradient(115deg, #b5541f 0%, #c9a227 50%, #6e7350 100%);
 }
 
 @theme inline {
@@ -12,6 +12,19 @@
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
   --font-display: var(--font-bricolage);
+
+  /* Earthy accent palette */
+  --color-terracotta: #b5541f;
+  --color-terracotta-light: #e08d4b;
+  --color-gold: #c9a227;
+  --color-olive: #6e7350;
+  --color-olive-light: #9ba37a;
+  --color-sand: #efe3cb;
+
+  /* Minimal semantic tokens (shadcn-style) so ported UI components read correctly */
+  --color-muted: #efe3cb;
+  --color-muted-foreground: #8a7f6c;
+  --color-ring: #b5541f;
 }
 
 @media (prefers-color-scheme: dark) {

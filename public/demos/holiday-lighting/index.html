@@ -1,0 +1,957 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Evergreen Holiday Lighting</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+  :root {
+    --gold: #e8c07d;
+    --gold-bright: #f5d68f;
+    --ink: #0b0c0e;
+    --paper: #f7f3ec;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, .brand {
+    font-family: 'Fraunces', Georgia, serif;
+  }
+
+  a { color: inherit; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);
+    pointer-events: none;
+  }
+  .nav * { pointer-events: auto; }
+
+  .brand {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: var(--paper);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .brand::before {
+    content: "✦";
+    color: var(--gold);
+    font-size: 16px;
+  }
+
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .nav-links a {
+    text-decoration: none;
+    opacity: 0.85;
+    transition: opacity 0.15s ease;
+  }
+  .nav-links a:hover { opacity: 1; }
+
+  .btn {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 999px;
+    background: var(--gold);
+    color: #26210f;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+    transition: transform 0.15s ease, background 0.15s ease;
+    border: none;
+    cursor: pointer;
+  }
+  .btn:hover {
+    background: var(--gold-bright);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(247,243,236,0.4);
+    color: var(--paper);
+  }
+  .btn-ghost:hover {
+    background: rgba(247,243,236,0.08);
+  }
+
+  /* ---------- Hero overlay (sits on top of the first house's video,
+     fades out via JS as the user scrolls into that section) ---------- */
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 24px;
+    /* opacity + pointer-events are set from JS, tied to scroll progress */
+  }
+
+  .hero-overlay-scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 45%, rgba(11,12,14,0.05), rgba(11,12,14,0.45) 75%),
+      rgba(11,12,14,0.16);
+  }
+
+  .hero-overlay-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hero-eyebrow {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+
+  .hero-overlay h1 {
+    font-size: clamp(34px, 5.5vw, 68px);
+    font-weight: 500;
+    line-height: 1.05;
+    margin: 0 0 24px;
+    max-width: 900px;
+    text-shadow: 0 2px 16px rgba(0,0,0,0.55);
+  }
+
+  .hero-overlay p {
+    font-size: clamp(15px, 1.4vw, 18px);
+    line-height: 1.6;
+    color: rgba(247,243,236,0.85);
+    max-width: 560px;
+    margin: 0 0 36px;
+    text-shadow: 0 1px 8px rgba(0,0,0,0.5);
+  }
+
+  .scroll-cue {
+    margin-top: 64px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(247,243,236,0.55);
+  }
+  .scroll-cue .arrow {
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(to bottom, rgba(247,243,236,0.7), transparent);
+    animation: pulse-down 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse-down {
+    0%, 100% { opacity: 0.3; transform: translateY(0); }
+    50% { opacity: 1; transform: translateY(6px); }
+  }
+
+  /* ---------- Scroll-scrub sections ---------- */
+  .scroll-track {
+    position: relative;
+    height: 400vh;
+  }
+
+  .scrub-stage {
+    position: sticky;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .scrub-stage video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .scrim-top {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 45%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.65), transparent);
+    pointer-events: none;
+  }
+  .scrim-bottom {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 55%;
+    background: linear-gradient(to top, rgba(0,0,0,0.75), transparent);
+    pointer-events: none;
+  }
+
+  .section-copy {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 72px;
+    padding: 0 48px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .section-copy .tag {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  .section-copy h2 {
+    font-size: clamp(30px, 4vw, 52px);
+    font-weight: 500;
+    margin: 0 0 12px;
+    line-height: 1.08;
+  }
+
+  .section-copy p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(247,243,236,0.8);
+    max-width: 420px;
+    margin: 0;
+  }
+
+  .section-copy .cta {
+    flex-shrink: 0;
+  }
+
+  .hint {
+    position: absolute;
+    left: 50%;
+    top: 32px;
+    transform: translateX(-50%);
+    color: rgba(247,243,236,0.75);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  /* ---------- Closing CTA ---------- */
+  .closing {
+    min-height: 70vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 100px 24px;
+    background: var(--ink);
+  }
+
+  .closing h2 {
+    font-size: clamp(30px, 4.5vw, 54px);
+    font-weight: 500;
+    margin: 0 0 20px;
+    max-width: 760px;
+  }
+
+  .closing p {
+    font-size: 16px;
+    color: rgba(247,243,236,0.7);
+    margin: 0 0 36px;
+  }
+
+  .closing .btn {
+    padding: 16px 36px;
+    font-size: 15px;
+  }
+
+  /* ---------- Shared section head ---------- */
+  .section-head {
+    text-align: center;
+    max-width: 640px;
+    margin: 0 auto 64px;
+    padding: 0 24px;
+  }
+
+  .section-head .eyebrow {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  .section-head h2 {
+    font-size: clamp(28px, 3.6vw, 44px);
+    font-weight: 500;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  /* ---------- Gallery — pinned scroll collage ----------
+     Same mechanic as the construction site's "Client Cases" section:
+     a tall wrapper pins a sticky stage while GSAP ScrollTrigger scrubs
+     each overlapping card up into place at a staggered offset. */
+  .gallery-wrapper { height: 340vh; position: relative; background: var(--ink); }
+
+  .gallery-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .gallery-heading {
+    position: absolute;
+    z-index: 1;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(40px, 8vw, 130px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    text-align: center;
+    color: rgba(232,192,125,0.18);
+    white-space: nowrap;
+    pointer-events: none;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .gallery-intro {
+    position: absolute;
+    z-index: 5;
+    left: 6%;
+    bottom: 8%;
+    max-width: 300px;
+  }
+  .gallery-intro .eyebrow {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+  }
+  .gallery-intro p {
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgba(247,243,236,0.7);
+    margin: 0 0 20px;
+  }
+
+  .gallery-card {
+    position: absolute;
+    will-change: transform;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  }
+  .gallery-card__img { overflow: hidden; }
+  .gallery-card__img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .gallery-card__label {
+    padding: 10px 14px;
+    background: rgba(11,12,14,0.92);
+  }
+  .gallery-card__name { font-size: 13px; font-weight: 600; color: var(--paper); margin: 0 0 2px; font-family: 'Fraunces', Georgia, serif; }
+  .gallery-card__type { font-size: 10px; color: var(--gold); letter-spacing: 0.08em; text-transform: uppercase; margin: 0; }
+
+  .gallery-card--1 { left: 5%;  top: 10vh; width: 27%; z-index: 2; }
+  .gallery-card--1 .gallery-card__img { aspect-ratio: 4/5; }
+
+  .gallery-card--2 { right: 32%; top: 4vh;  width: 18%; z-index: 1; }
+  .gallery-card--2 .gallery-card__img { aspect-ratio: 3/4; }
+
+  .gallery-card--3 { left: 33%; top: 16vh; width: 24%; z-index: 3; }
+  .gallery-card--3 .gallery-card__img { aspect-ratio: 4/5; }
+
+  .gallery-card--4 { right: 5%;  top: 8vh;  width: 22%; z-index: 2; }
+  .gallery-card--4 .gallery-card__img { aspect-ratio: 3/4; }
+
+  .gallery-card--5 { left: 12%; top: 52vh; width: 20%; z-index: 4; }
+  .gallery-card--5 .gallery-card__img { aspect-ratio: 4/5; }
+
+  .gallery-card--6 { right: 14%; top: 48vh; width: 24%; z-index: 3; }
+  .gallery-card--6 .gallery-card__img { aspect-ratio: 3/4; }
+
+  /* Mobile: the pinned collage doesn't translate well to small screens —
+     fall back to a plain static stack (the JS also skips the pin/GSAP
+     animation below this breakpoint, matching the reference site). */
+  @media (max-width: 768px) {
+    .gallery-wrapper { height: auto; padding: 100px 20px; }
+    .gallery-sticky { position: static; height: auto; overflow: visible; }
+    .gallery-heading { display: none; }
+    .gallery-intro { position: static; max-width: none; margin-bottom: 32px; }
+    .gallery-card {
+      position: static !important;
+      width: 100% !important;
+      margin-bottom: 20px;
+      transform: none !important;
+    }
+  }
+
+  /* ---------- How it works ---------- */
+  .how-it-works {
+    padding: 120px 24px;
+    background: var(--ink);
+  }
+
+  .steps {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 48px;
+  }
+
+  .step {
+    text-align: center;
+    padding: 0 16px;
+  }
+
+  .step-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(232,192,125,0.4);
+    color: var(--gold);
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+
+  .step h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 20px;
+    font-weight: 500;
+    margin: 0 0 12px;
+  }
+
+  .step p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(247,243,236,0.7);
+    margin: 0;
+  }
+
+  /* ---------- Pricing ---------- */
+  .pricing {
+    padding: 120px 24px 140px;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(232,192,125,0.06), transparent 55%),
+      var(--ink);
+  }
+
+  .price-cards {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 28px;
+    align-items: stretch;
+  }
+
+  .price-card {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 32px;
+    border-radius: 20px;
+    border: 1px solid rgba(247,243,236,0.12);
+    background: rgba(247,243,236,0.03);
+  }
+
+  .price-card.featured {
+    border-color: rgba(232,192,125,0.55);
+    background: rgba(232,192,125,0.06);
+    position: relative;
+    transform: translateY(-8px);
+  }
+
+  .price-card .badge {
+    align-self: flex-start;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #26210f;
+    background: var(--gold);
+    padding: 5px 12px;
+    border-radius: 999px;
+    margin-bottom: 20px;
+  }
+
+  .price-card h3 {
+    font-family: 'Fraunces', Georgia, serif;
+    font-size: 24px;
+    font-weight: 500;
+    margin: 0 0 6px;
+  }
+
+  .price-card .price {
+    font-size: 15px;
+    color: var(--gold);
+    font-weight: 600;
+    margin: 0 0 24px;
+  }
+
+  .price-card .price strong {
+    font-size: 32px;
+    font-family: 'Fraunces', Georgia, serif;
+    font-weight: 500;
+    color: var(--paper);
+    margin-right: 4px;
+  }
+
+  .price-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 32px;
+    flex-grow: 1;
+  }
+
+  .price-card li {
+    font-size: 14px;
+    line-height: 1.7;
+    color: rgba(247,243,236,0.75);
+    padding-left: 22px;
+    position: relative;
+  }
+
+  .price-card li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-weight: 600;
+  }
+
+  .price-card .btn {
+    text-align: center;
+  }
+
+  .pricing-note {
+    max-width: 1080px;
+    margin: 32px auto 0;
+    padding: 0 32px;
+    font-size: 13px;
+    color: rgba(247,243,236,0.45);
+    text-align: center;
+  }
+
+  @media (max-width: 860px) {
+    .steps, .price-cards {
+      grid-template-columns: 1fr;
+    }
+    .price-card.featured {
+      transform: none;
+    }
+  }
+
+  footer {
+    padding: 32px 40px;
+    text-align: center;
+    font-size: 13px;
+    color: rgba(247,243,236,0.4);
+    background: var(--ink);
+    border-top: 1px solid rgba(247,243,236,0.08);
+  }
+</style>
+</head>
+<body>
+<a href="/" style="position:fixed;top:14px;left:14px;z-index:99999;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:rgba(20,16,12,0.72);backdrop-filter:blur(8px);color:#efe3cb;font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;letter-spacing:0.02em;box-shadow:0 2px 10px rgba(0,0,0,0.25);">&larr; Back to Trayfolio</a>
+
+
+  <nav class="nav">
+    <a class="brand" href="#">Evergreen Holiday Lighting</a>
+    <div class="nav-links">
+      <a href="#how-it-works">Services</a>
+      <a href="#gallery">Gallery</a>
+      <a href="#contact">Contact</a>
+      <a class="btn" href="#contact">Get a Quote</a>
+    </div>
+  </nav>
+
+  <!-- Section 1: two-story house — hero copy lives on top of this video
+       and fades away as you scroll into it (see .hero-overlay below) -->
+  <div class="scroll-track">
+    <div class="scrub-stage">
+      <video class="scrub-video" src="christmas-lights/christmas-lights-hero-scrub.mp4" muted playsinline preload="auto"></video>
+      <div class="scrim-top"></div>
+      <div class="scrim-bottom"></div>
+      <div class="hero-overlay" id="heroOverlay">
+        <div class="hero-overlay-scrim"></div>
+        <div class="hero-overlay-content">
+          <span class="hero-eyebrow">Residential Holiday Lighting</span>
+          <h1>Your Home, Beautifully Lit</h1>
+          <p>We design, install, and take down professional-grade holiday lighting, so your home glows all season without you touching a ladder. Scroll to see two of our packages in action.</p>
+          <div class="scroll-cue">
+            <span>Scroll</span>
+            <div class="arrow"></div>
+          </div>
+        </div>
+      </div>
+      <div class="hint">Scroll to scrub</div>
+      <div class="section-copy">
+        <div>
+          <span class="tag">Package · Two-Story</span>
+          <h2>The Colonial Package</h2>
+          <p>Full roofline, gable peaks, and porch coverage, built for larger two-story homes that want maximum impact.</p>
+        </div>
+        <a class="btn cta" href="#">Get a Free Quote</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: one-story house -->
+  <div class="scroll-track">
+    <div class="scrub-stage">
+      <video class="scrub-video" src="christmas-lights-one-story/christmas-lights-one-story-hero-scrub.mp4" muted playsinline preload="auto"></video>
+      <div class="scrim-top"></div>
+      <div class="scrim-bottom"></div>
+      <div class="hint">Scroll to scrub</div>
+      <div class="section-copy">
+        <div>
+          <span class="tag">Package · One-Story</span>
+          <h2>The Ranch Package</h2>
+          <p>Complete roofline and garage trim coverage, sized right for single-level homes. Clean, classic, and quick to install.</p>
+        </div>
+        <a class="btn cta" href="#">Get a Free Quote</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="gallery-wrapper" id="gallery-wrapper">
+    <div class="gallery-sticky" id="gallery">
+      <h2 class="gallery-heading">Our Work</h2>
+
+      <div class="gallery-intro">
+        <span class="eyebrow">Gallery</span>
+        <p>A few of the homes we've lit up this season, from cozy ranches to full-roofline colonials.</p>
+      </div>
+
+      <div class="gallery-card gallery-card--1" id="gallery-card-1">
+        <div class="gallery-card__img">
+          <img src="gallery/house-1-farmhouse.jpg" alt="Modern farmhouse with warm white roofline lighting" loading="lazy" />
+        </div>
+        <div class="gallery-card__label">
+          <p class="gallery-card__name">The Hargrove Residence</p>
+          <p class="gallery-card__type">Modern Farmhouse</p>
+        </div>
+      </div>
+
+      <div class="gallery-card gallery-card--2" id="gallery-card-2">
+        <div class="gallery-card__img">
+          <img src="gallery/house-2-tudor.jpg" alt="Brick Tudor home with multicolor holiday lighting" loading="lazy" />
+        </div>
+        <div class="gallery-card__label">
+          <p class="gallery-card__name">The Whitfield Estate</p>
+          <p class="gallery-card__type">Tudor Colonial</p>
+        </div>
+      </div>
+
+      <div class="gallery-card gallery-card--3" id="gallery-card-3">
+        <div class="gallery-card__img">
+          <img src="gallery/house-3-bungalow.jpg" alt="Craftsman bungalow with warm string lighting" loading="lazy" />
+        </div>
+        <div class="gallery-card__label">
+          <p class="gallery-card__name">The Alder Bungalow</p>
+          <p class="gallery-card__type">Craftsman</p>
+        </div>
+      </div>
+
+      <div class="gallery-card gallery-card--4" id="gallery-card-4">
+        <div class="gallery-card__img">
+          <img src="gallery/house-4-colonial.jpg" alt="Red brick colonial with elegant roofline lighting" loading="lazy" />
+        </div>
+        <div class="gallery-card__label">
+          <p class="gallery-card__name">The Ashford House</p>
+          <p class="gallery-card__type">Classic Colonial</p>
+        </div>
+      </div>
+
+      <div class="gallery-card gallery-card--5" id="gallery-card-5">
+        <div class="gallery-card__img">
+          <img src="gallery/house-5-capecod.jpg" alt="Cape Cod cottage with icicle lighting" loading="lazy" />
+        </div>
+        <div class="gallery-card__label">
+          <p class="gallery-card__name">The Dunmore Cottage</p>
+          <p class="gallery-card__type">Cape Cod</p>
+        </div>
+      </div>
+
+      <div class="gallery-card gallery-card--6" id="gallery-card-6">
+        <div class="gallery-card__img">
+          <img src="gallery/house-6-modern.jpg" alt="Contemporary home with minimalist roofline lighting" loading="lazy" />
+        </div>
+        <div class="gallery-card__label">
+          <p class="gallery-card__name">The Birchwood Home</p>
+          <p class="gallery-card__type">Modern Contemporary</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="how-it-works" id="how-it-works">
+    <div class="section-head">
+      <span class="eyebrow">How It Works</span>
+      <h2>Three Steps to a Beautifully Lit Home</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-number">01</span>
+        <h3>Free Design Consultation</h3>
+        <p>We look at your home and put together a custom lighting plan that fits your style, your roofline, and your budget.</p>
+      </div>
+      <div class="step">
+        <span class="step-number">02</span>
+        <h3>Professional Installation</h3>
+        <p>Our crew installs everything safely and on schedule, timed so your home is glowing well before the holidays.</p>
+      </div>
+      <div class="step">
+        <span class="step-number">03</span>
+        <h3>Takedown & Storage</h3>
+        <p>When the season ends, we take everything down and store your lights so they're ready to go again next year.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="pricing">
+    <div class="section-head">
+      <span class="eyebrow">Packages</span>
+      <h2>Simple, Transparent Pricing</h2>
+    </div>
+    <div class="price-cards">
+      <div class="price-card">
+        <h3>The Ranch Package</h3>
+        <p class="price"><strong>$399</strong>starting price</p>
+        <ul>
+          <li>Roofline and gutter lighting</li>
+          <li>Best for one-story homes</li>
+          <li>Warm white or single color</li>
+          <li>Takedown included</li>
+        </ul>
+        <a class="btn btn-ghost" href="#">Get a Free Quote</a>
+      </div>
+      <div class="price-card featured">
+        <span class="badge">Most Popular</span>
+        <h3>The Colonial Package</h3>
+        <p class="price"><strong>$699</strong>starting price</p>
+        <ul>
+          <li>Full roofline, gables, and porch columns</li>
+          <li>Best for two-story homes</li>
+          <li>Choice of warm white, multicolor, or custom</li>
+          <li>Takedown included</li>
+        </ul>
+        <a class="btn" href="#">Get a Free Quote</a>
+      </div>
+      <div class="price-card">
+        <h3>The Estate Package</h3>
+        <p class="price"><strong>$1,199</strong>starting price</p>
+        <ul>
+          <li>Full custom design for larger properties</li>
+          <li>Roofline, trees, and landscape lighting</li>
+          <li>Color-changing and smart control options</li>
+          <li>Priority scheduling, takedown, and storage</li>
+        </ul>
+        <a class="btn btn-ghost" href="#">Get a Free Quote</a>
+      </div>
+    </div>
+    <p class="pricing-note">Final pricing depends on home size and design. Every quote is free and comes with no obligation.</p>
+  </section>
+
+  <section class="closing" id="contact">
+    <h2>Ready to light up your home this season?</h2>
+    <p>Serving [Your City] and surrounding areas. Free on-site quotes.</p>
+    <a class="btn" href="#">Request a Free Quote</a>
+  </section>
+
+  <footer>
+    © 2026 Evergreen Holiday Lighting. All rights reserved.
+  </footer>
+
+  <script>
+    (function () {
+      var tracks = document.querySelectorAll('.scroll-track');
+
+      tracks.forEach(function (track) {
+        var video = track.querySelector('.scrub-video');
+        var heroOverlay = track.querySelector('.hero-overlay');
+
+        var duration = 0;
+        var targetTime = 0;
+        var displayedTime = 0;
+        var rafId = null;
+
+        // How much of this track's scroll range the hero text fades out
+        // over — 0.22 means it's fully gone by 22% of the way through.
+        var HERO_FADE_END = 0.22;
+
+        function updateHero(ratio) {
+          if (!heroOverlay) return;
+          var opacity = 1 - Math.min(1, ratio / HERO_FADE_END);
+          heroOverlay.style.opacity = opacity;
+          heroOverlay.style.pointerEvents = opacity > 0.05 ? 'auto' : 'none';
+        }
+
+        video.addEventListener('play', function () {
+          video.pause();
+        });
+
+        function handleMetadata() {
+          var d = video.duration;
+          if (!d || !isFinite(d)) return; // not ready yet, or duration not known (e.g. Infinity)
+          if (duration) return; // already have it
+          duration = d;
+          onScroll(); // sync immediately instead of waiting for the next scroll event
+        }
+
+        // Cover the race where metadata finishes loading (very likely on a
+        // fast local server) before this listener gets attached — without
+        // this check, `duration` would stay 0 forever and every scroll
+        // event would silently no-op.
+        if (video.readyState >= 1) {
+          handleMetadata();
+        }
+        video.addEventListener('loadedmetadata', handleMetadata);
+        video.addEventListener('durationchange', handleMetadata);
+
+        function computeProgress() {
+          var rect = track.getBoundingClientRect();
+          var trackHeight = track.offsetHeight;
+          var maxScroll = trackHeight - window.innerHeight;
+          if (maxScroll <= 0) return 0;
+          var scrolledIntoTrack = -rect.top;
+          var ratio = scrolledIntoTrack / maxScroll;
+          return Math.min(1, Math.max(0, ratio));
+        }
+
+        function onScroll() {
+          var ratio = computeProgress();
+          updateHero(ratio); // tied directly to raw scroll, not the eased video time — feels crisp
+          if (!duration) return;
+          targetTime = ratio * duration;
+          startLoop();
+        }
+
+        // Set correct initial state in case the page loads already
+        // scrolled (e.g. a refresh mid-page), rather than waiting for
+        // the first scroll event.
+        onScroll();
+
+        function startLoop() {
+          if (rafId !== null) return;
+          rafId = requestAnimationFrame(tick);
+        }
+
+        function tick() {
+          rafId = null;
+
+          var delta = targetTime - displayedTime;
+          if (Math.abs(delta) < 0.004) {
+            displayedTime = targetTime;
+          } else {
+            displayedTime += delta * 0.2;
+          }
+
+          if (Math.abs(video.currentTime - displayedTime) > 0.004) {
+            video.currentTime = displayedTime;
+          }
+
+          if (Math.abs(targetTime - displayedTime) >= 0.004) {
+            rafId = requestAnimationFrame(tick);
+          }
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+      });
+    })();
+  </script>
+
+  <script>
+    // Gallery — pinned scroll collage. Same mechanic as the reference
+    // construction site's "Client Cases" section: cards start stacked
+    // off-screen below, then scrub up into an overlapping arrangement as
+    // the pinned wrapper is scrolled through. Desktop only; mobile falls
+    // back to the plain static stack defined in the CSS.
+    (function () {
+      if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+      if (window.innerWidth <= 768) return;
+
+      gsap.registerPlugin(ScrollTrigger);
+
+      gsap.set('#gallery-card-2', { y: '95vh' });
+      gsap.set('#gallery-card-3', { y: '115vh' });
+      gsap.set('#gallery-card-4', { y: '100vh' });
+      gsap.set('#gallery-card-5', { y: '120vh' });
+      gsap.set('#gallery-card-6', { y: '105vh' });
+
+      var galleryTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: '#gallery-wrapper',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.8
+        }
+      });
+
+      galleryTimeline
+        .to('#gallery-card-2', { y: 0, ease: 'none', duration: 1 }, 0)
+        .to('#gallery-card-3', { y: 0, ease: 'none', duration: 1 }, 0.2)
+        .to('#gallery-card-4', { y: 0, ease: 'none', duration: 1 }, 0.4)
+        .to('#gallery-card-5', { y: 0, ease: 'none', duration: 1 }, 0.6)
+        .to('#gallery-card-6', { y: 0, ease: 'none', duration: 1 }, 0.8);
+    })();
+  </script>
+
+</body>
+</html>
