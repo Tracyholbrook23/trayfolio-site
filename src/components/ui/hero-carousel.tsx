@@ -38,6 +38,18 @@ export interface HeroCarouselItem {
    * @default "#8a8a8a"
    */
   accent?: string
+  /**
+   * Which built-in background treatment plays over this slide's photo, so a
+   * few signature slides show a taste of the live site's own motion instead
+   * of the plain Ken Burns zoom every other slide gets.
+   * - "gradient": a soft diagonal light sweep, for hero sections built on a
+   *   gradient background.
+   * - "gate": a slow breathing glow, for a "tap/click to enter" landing screen.
+   * - "scroll-scrub": a continuous slow vertical pan, standing in for a
+   *   scroll-driven reveal.
+   * @default "zoom"
+   */
+  effect?: "zoom" | "gradient" | "gate" | "scroll-scrub"
 }
 
 export interface HeroCarouselProps {
@@ -206,6 +218,17 @@ export function HeroCarousel({
 
   const lines = active.title.split("\n")
 
+  // Trayfolio addition: a handful of slides show a taste of their own site's
+  // motion instead of the default zoom — see HeroCarouselItem["effect"].
+  const scrub = active.effect === "scroll-scrub" && !reduced
+  const bgInitial = scrub ? { scale: 1.15, y: "-4%" } : { scale: reduced ? 1.04 : 1.08 }
+  const bgAnimate = scrub ? { scale: 1.15, y: ["-4%", "4%", "-4%"] } : { scale: 1 }
+  const bgTransition = reduced
+    ? { duration: 0 }
+    : scrub
+      ? { duration: 7, repeat: Infinity, ease: "easeInOut" as const }
+      : { duration: 6, ease: "linear" as const }
+
   return (
     <div
       ref={stageRef}
@@ -250,10 +273,39 @@ export function HeroCarousel({
             aria-hidden
             draggable={false}
             className="absolute inset-0 h-full w-full object-cover"
-            initial={{ scale: reduced ? 1.04 : 1.08 }}
-            animate={{ scale: 1 }}
-            transition={reduced ? { duration: 0 } : { duration: 6, ease: "linear" }}
+            initial={bgInitial}
+            animate={bgAnimate}
+            transition={bgTransition}
           />
+
+          {active.effect === "gradient" && !reduced ? (
+            // A soft diagonal shine sweeping across the frame — a nod to a
+            // gradient-built hero, without recolouring the photo underneath.
+            <motion.div
+              aria-hidden
+              className="absolute inset-0 mix-blend-overlay"
+              style={{
+                backgroundImage:
+                  "linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.55) 45%, transparent 70%)",
+                backgroundSize: "260% 260%",
+              }}
+              animate={{ backgroundPosition: ["0% 50%", "100% 50%"] }}
+              transition={{ duration: 3.6, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+            />
+          ) : null}
+
+          {active.effect === "gate" && !reduced ? (
+            // A slow breathing glow, echoing a "tap/click to enter" gate screen.
+            <motion.div
+              aria-hidden
+              className="absolute inset-0"
+              style={{
+                background: "radial-gradient(circle at 50% 55%, rgba(255,255,255,0.35), transparent 60%)",
+              }}
+              animate={{ opacity: [0.35, 0.85, 0.35], scale: [1, 1.08, 1] }}
+              transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+            />
+          ) : null}
         </motion.div>
       </AnimatePresence>
 

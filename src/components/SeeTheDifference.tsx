@@ -70,12 +70,14 @@ const PREMIUM_LOOKS: HeroCarouselItem[] = [
     image: "/hero-previews/valtier-media.jpg",
     credit: "BUILT BY TRAYFOLIO.",
     meta: ["AUSTIN, TX", "LIVE SITE"],
+    effect: "gradient",
   },
   {
     title: "Custom\nMembership",
     image: "/hero-previews/mode.jpg",
     credit: "BUILT BY TRAYFOLIO.",
     meta: ["MØDE", "LIVE SITE"],
+    effect: "gate",
   },
   {
     title: "Shawnie's\nLoc Lab",
@@ -88,6 +90,7 @@ const PREMIUM_LOOKS: HeroCarouselItem[] = [
     image: "/hero-previews/strux-construction.jpg",
     credit: "INTERACTIVE DEMO.",
     meta: ["CONSTRUCTION", "SCROLL DEMO"],
+    effect: "scroll-scrub",
   },
   {
     title: "Evergreen\nLighting",

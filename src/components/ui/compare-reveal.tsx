@@ -139,6 +139,20 @@ export interface CompareRevealProps extends Omit<React.HTMLAttributes<HTMLDivEle
   reducedMotion?: boolean;
   /** Stop the rAF loop while scrolled offscreen or the tab is hidden. */
   pauseWhenHidden?: boolean;
+  /**
+   * Trayfolio addition (not from Motiq): once settled, gently auto-oscillate
+   * the divider left/right so first-time visitors notice it's draggable.
+   * Stops the instant a visitor touches it and only resumes after
+   * `idleOscillateDelay` seconds of no interaction.
+   * @default true
+   */
+  idleOscillate?: boolean;
+  /** How far the idle oscillation swings from its center, in percentage points. @default 16 */
+  idleOscillateAmplitude?: number;
+  /** Seconds for one full idle back-and-forth cycle. @default 3.2 */
+  idleOscillatePeriod?: number;
+  /** Seconds of inactivity before idle oscillation (re)starts. @default 3.5 */
+  idleOscillateDelay?: number;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -204,6 +218,10 @@ function CompareRevealBase({
   snapOnDoubleClick = 50,
   reducedMotion,
   pauseWhenHidden = true,
+  idleOscillate = true,
+  idleOscillateAmplitude = 16,
+  idleOscillatePeriod = 3.2,
+  idleOscillateDelay = 3.5,
   className,
   ...props
 }: CompareRevealProps) {
@@ -240,10 +258,33 @@ function CompareRevealBase({
     introActive: false,
     introDone: false,
     introStart: 0,
+    // Trayfolio addition: idle auto-oscillation state.
+    idleActive: false,
+    idleCenter: initialPct,
+    idleStart: 0,
+    lastInteraction: 0,
   });
 
-  const params = React.useRef({ stiffness, damping, still, introSweep });
-  params.current = { stiffness, damping, still, introSweep };
+  const params = React.useRef({
+    stiffness,
+    damping,
+    still,
+    introSweep,
+    idleOscillate,
+    idleOscillateAmplitude,
+    idleOscillatePeriod,
+    idleOscillateDelay,
+  });
+  params.current = {
+    stiffness,
+    damping,
+    still,
+    introSweep,
+    idleOscillate,
+    idleOscillateAmplitude,
+    idleOscillatePeriod,
+    idleOscillateDelay,
+  };
 
   /** Latest committed percentage, read by the loop without re-subscribing. */
   const pctRef = React.useRef(pct);
@@ -283,6 +324,9 @@ function CompareRevealBase({
     if (params.current.introSweep && !sim.current.introDone) {
       sim.current.introActive = true;
       sim.current.introStart = performance.now() / 1000;
+    } else if (sim.current.lastInteraction === 0) {
+      // No sweep to wait on — start the idle countdown from right now.
+      sim.current.lastInteraction = performance.now() / 1000;
     }
 
     let raf = 0;
@@ -300,9 +344,29 @@ function CompareRevealBase({
           s.introActive = false;
           s.introDone = true;
           s.target = clamp(pctRef.current, 0, 100);
+          s.lastInteraction = now;
         } else {
           s.target = sweepAt(u);
         }
+      } else if (!s.dragging && p.idleOscillate) {
+        // Trayfolio addition: gentle idle wiggle once settled, so the
+        // divider itself demonstrates that it's draggable.
+        const idleFor = now - s.lastInteraction;
+        if (idleFor >= p.idleOscillateDelay) {
+          if (!s.idleActive) {
+            s.idleActive = true;
+            s.idleCenter = clamp(pctRef.current, 0, 100);
+            s.idleStart = now;
+          }
+          const period = Math.max(0.5, p.idleOscillatePeriod);
+          const theta = ((now - s.idleStart) / period) * Math.PI * 2;
+          const amp = Math.min(p.idleOscillateAmplitude, s.idleCenter, 100 - s.idleCenter);
+          s.target = clamp(s.idleCenter + Math.sin(theta) * amp, 0, 100);
+        } else {
+          s.idleActive = false;
+        }
+      } else {
+        s.idleActive = false;
       }
       s.v += ((s.target - s.x) * p.stiffness - s.v * p.damping) * dt;
       s.x += s.v * dt;
@@ -336,6 +400,8 @@ function CompareRevealBase({
       const s = sim.current;
       s.introActive = false;
       s.introDone = true;
+      s.idleActive = false;
+      s.lastInteraction = performance.now() / 1000;
       setPct(clamp(next, 0, 100));
     },
     [setPct],
@@ -379,6 +445,7 @@ function CompareRevealBase({
   const endDrag = () => {
     sim.current.dragging = false;
     sim.current.pointerId = null;
+    sim.current.lastInteraction = performance.now() / 1000;
   };
 
   const onKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
