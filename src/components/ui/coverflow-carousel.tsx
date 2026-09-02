@@ -263,22 +263,12 @@ export function CoverflowCarousel({
   };
   // Mobile scrub bar: a full-width track with a vertical-line handle that
   // starts at the left edge (card 0) and slides to the right edge (the
-  // last card). Unlike the 3D cards' own drag, this maps directly onto
-  // the folded 0..count-1 index — a simple, finite "progress" reading
-  // that stays sane even after the ring above has wrapped around.
+  // last card). Dragging is relative — like the 3D cards' own drag — so
+  // wherever you press, moving your finger N px moves the handle by the
+  // matching share of the track, instead of snapping to the touch point.
   const scrubTrackRef = React.useRef<HTMLDivElement>(null);
-  const scrubDragRef = React.useRef<{ id: number } | null>(null);
-  const scrubPosFromEvent = React.useCallback(
-    (clientX: number) => {
-      const track = scrubTrackRef.current;
-      if (!track || count < 2) return 0;
-      const rect = track.getBoundingClientRect();
-      const fraction = rect.width
-        ? (clientX - rect.left) / rect.width
-        : 0;
-      return Math.max(0, Math.min(1, fraction)) * (count - 1);
-    },
-    [count],
+  const scrubDragRef = React.useRef<{ id: number; x: number; pos: number } | null>(
+    null,
   );
   const onScrubPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     pauseAutoRotate();
@@ -287,17 +277,21 @@ export function CoverflowCarousel({
       rafRef.current = null;
     }
     event.currentTarget.setPointerCapture(event.pointerId);
-    scrubDragRef.current = { id: event.pointerId };
-    posRef.current = scrubPosFromEvent(event.clientX);
     targetRef.current = posRef.current;
-    const index = indexAt(posRef.current);
-    if (index !== selected) setSelected(index);
-    paint();
+    scrubDragRef.current = {
+      id: event.pointerId,
+      x: event.clientX,
+      pos: posRef.current,
+    };
   };
   const onScrubPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const drag = scrubDragRef.current;
     if (!drag || drag.id !== event.pointerId) return;
-    posRef.current = scrubPosFromEvent(event.clientX);
+    const track = scrubTrackRef.current;
+    const trackWidth = track ? track.getBoundingClientRect().width : 0;
+    if (!trackWidth || count < 2) return;
+    const deltaPos = ((event.clientX - drag.x) / trackWidth) * (count - 1);
+    posRef.current = Math.max(0, Math.min(count - 1, drag.pos + deltaPos));
     const index = indexAt(posRef.current);
     if (index !== selected) setSelected(index);
     paint();
