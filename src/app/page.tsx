@@ -62,30 +62,6 @@ const demoSlides: CoverflowSlide[] = [
       { label: "Trigger", value: "Mouse / touch" },
     ],
   },
-  {
-    src: "/demos/mouse-scrub/poster.jpg",
-    alt: "Mouse-driven video scrub effect demo: luxury apartment building at dusk",
-    title: "Mouse-Scrub Video",
-    subtitle: "Interactive effect: click to try it live",
-    href: "/demos/mouse-scrub/",
-    linkLabel: "Try the live effect",
-    meta: [
-      { label: "Effect", value: "Video scrubbing" },
-      { label: "Trigger", value: "Mouse movement" },
-    ],
-  },
-  {
-    src: "/demos/scroll-trigger-video/poster.jpg",
-    alt: "Scroll-triggered video playback effect demo: apartment balconies at sunset",
-    title: "Scroll-Triggered Video",
-    subtitle: "Interactive effect: click to try it live",
-    href: "/demos/scroll-trigger-video/",
-    linkLabel: "Try the live effect",
-    meta: [
-      { label: "Effect", value: "Scroll-locked playback" },
-      { label: "Trigger", value: "Scroll or swipe" },
-    ],
-  },
 ];
 
 const trustBadges = [
