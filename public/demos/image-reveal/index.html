@@ -107,6 +107,28 @@
     to { opacity: 1; transform: translateY(0) scale(1); }
   }
 
+  .hero-title .hint {
+    display: block;
+    margin: 22px 0 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    opacity: 0;
+    animation: heroHintIn 0.8s ease-out 0.9s forwards;
+  }
+
+  @keyframes heroHintIn {
+    to { opacity: 1; }
+  }
+
+  /* Hovering is a desktop/mouse gesture -- hide the hint on touch-first
+     narrow screens where there's no cursor to move across the suit. */
+  @media (max-width: 720px) {
+    .hero-title .hint { display: none; }
+  }
+
   .reveal-hero {
     position: relative;
     width: 100vw;
@@ -250,6 +272,7 @@
 
 <div class="hero-title">
   <h1>THE X1 EXOSUIT</h1>
+  <p class="hint">Hover over the suit to see the operator inside</p>
 </div>
 
 <div class="reveal-hero" id="revealHero">
