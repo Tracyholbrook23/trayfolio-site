@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Aetos Robotics &mdash; X1 Exosuit</title>
+<title>Aetos Robotics: X1 Exosuit</title>
 <style>
   :root {
     --chrome: #cfe0f5;
@@ -191,11 +191,14 @@
     to { opacity: 1; }
   }
 
-  /* Hovering is a desktop/mouse gesture -- hide the hint on touch-first
-     narrow screens where there's no cursor to move across the suit. */
+  /* Hovering is a desktop/mouse gesture. On touch-first narrow screens
+     there's no cursor to move across the suit, so swap the hint for one
+     that says so instead of just hiding it. */
+  .hero-title .hint-mobile { display: none; }
   @media (max-width: 720px) {
     .hero-title { padding-top: 76px; }
-    .hero-title .hint { display: none; }
+    .hero-title .hint-desktop { display: none; }
+    .hero-title .hint-mobile { display: block; }
   }
 
   /* ---------- protocols section ---------- */
@@ -324,7 +327,8 @@
       <h1 class="title-back">THE X1 EXOSUIT</h1>
       <canvas class="title-canvas" id="titleCanvas" aria-hidden="true"></canvas>
     </div>
-    <p class="hint">Hover over the suit to see the operator inside</p>
+    <p class="hint hint-desktop">Hover over the suit to see the operator inside</p>
+    <p class="hint hint-mobile">Best viewed on desktop. Hover isn&rsquo;t available on touchscreens.</p>
   </div>
 </div>
 
@@ -340,7 +344,7 @@
     <div class="protocol-card dark">
       <span class="tag">THE OPERATOR</span>
       <h3>Built Around a Person</h3>
-      <p>Every joint, strap, and pressure point is fitted to the person inside &mdash; full range of motion, real-time vitals monitoring, and a HUD that keeps the operator in control at all times.</p>
+      <p>Every joint, strap, and pressure point is fitted to the person inside, with full range of motion, real-time vitals monitoring, and a HUD that keeps the operator in control at all times.</p>
     </div>
   </div>
 </section>

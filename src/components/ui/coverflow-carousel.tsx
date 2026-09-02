@@ -4,6 +4,44 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? React.useLayoutEffect : React.useEffect;
+
+/**
+ * True on devices that can genuinely hover (a mouse/trackpad), false on
+ * touch-only devices, null until known. Checked with a media feature
+ * rather than viewport width, so it's correct for e.g. a touchscreen
+ * laptop with a trackpad. Starts null (renders nothing extra) so the
+ * server-rendered markup and the client's first render always match --
+ * the real answer fills in a moment after mount.
+ */
+const HOVER_QUERY = "(hover: hover) and (pointer: fine)";
+
+function subscribeHoverCapable(onChange: () => void) {
+  const mq = window.matchMedia(HOVER_QUERY);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+}
+
+function getHoverCapableSnapshot() {
+  return window.matchMedia(HOVER_QUERY).matches;
+}
+
+function getHoverCapableServerSnapshot() {
+  // Unknown during SSR -- callers treat null as "don't know yet".
+  return null;
+}
+
+function useHoverCapable() {
+  // useSyncExternalStore (rather than state + effect) is the pattern
+  // React ships specifically for reading a browser API like matchMedia
+  // safely: it renders the server snapshot (null) through hydration, then
+  // swaps to the real value right after, with no hand-rolled setState.
+  return React.useSyncExternalStore(
+    subscribeHoverCapable,
+    getHoverCapableSnapshot,
+    getHoverCapableServerSnapshot,
+  );
+}
+
 export interface CoverflowSlide {
   src: string;
   alt: string;
@@ -12,6 +50,14 @@ export interface CoverflowSlide {
   href?: string;
   linkLabel?: string;
   meta?: { label: string; value: string }[];
+  /**
+   * For a demo whose signature effect only works with a mouse (a hover
+   * reveal, for example): shown as a small instruction line under the
+   * caption, swapped automatically for whichever is true on the
+   * visitor's device. Omit for demos that work the same on touch
+   * (scroll-driven effects, taps, etc.) -- no instruction needed there.
+   */
+  interactionHint?: { desktop: string; mobile: string };
 }
 export interface CoverflowCarouselProps {
   slides: CoverflowSlide[];
@@ -68,6 +114,7 @@ export function CoverflowCarousel({
   cardClassName,
 }: CoverflowCarouselProps) {
   const count = slides.length;
+  const hoverCapable = useHoverCapable();
   const frameRef = React.useRef<HTMLDivElement>(null);
   const cardRefs = React.useRef<(HTMLDivElement | null)[]>([]);
   /** Fractional card index at the centre. The single source of truth. */
@@ -441,6 +488,13 @@ export function CoverflowCarousel({
           {active.subtitle && (
             <p className="mt-1 text-[13px] text-muted-foreground">
               {active.subtitle}
+            </p>
+          )}
+          {active.interactionHint && hoverCapable !== null && (
+            <p className="mt-3 max-w-[230px] text-center text-[12px] font-medium text-terracotta">
+              {hoverCapable
+                ? active.interactionHint.desktop
+                : active.interactionHint.mobile}
             </p>
           )}
           {active.meta && active.meta.length > 0 && (

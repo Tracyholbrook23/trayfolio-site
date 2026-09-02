@@ -59,17 +59,21 @@ body {
   mix-blend-mode: multiply;
 }
 
-/* Scroll-reveal utility: elements fade + rise into place as they enter view */
+/* Scroll-reveal utility: initial hidden state before GSAP (Reveal.tsx)
+   animates opacity/transform in. Keeping this in CSS (rather than only
+   inline styles) avoids a flash of visible content before JS hydrates. */
 .reveal {
   opacity: 0;
   transform: translateY(18px);
-  transition: opacity 0.7s ease, transform 0.7s ease;
   will-change: opacity, transform;
 }
 
-.reveal.is-visible {
-  opacity: 1;
-  transform: translateY(0);
+/* Word-mask reveal utility (WordReveal.tsx): each word's outer span clips
+   its inner span, which GSAP animates up into view from below the mask. */
+.reveal-word-inner {
+  transform: translateY(110%);
+  opacity: 0;
+  will-change: opacity, transform;
 }
 
 @keyframes gradient-shift {

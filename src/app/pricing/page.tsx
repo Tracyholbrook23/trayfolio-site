@@ -1,4 +1,5 @@
-import Link from "next/link";
+import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
 
 const buildTiers = [
   {
@@ -115,43 +116,16 @@ const faqs = [
   },
 ];
 
-export default function Packages() {
+export default function Pricing() {
   return (
     <div className="flex flex-col flex-1 bg-white text-stone-900">
-      {/* Nav */}
-      <header className="sticky top-0 z-10 border-b border-stone-200/60 bg-peach/80 backdrop-blur">
-        <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/" className="text-lg font-semibold tracking-tight">
-            Trayfolio
-          </Link>
-          <div className="hidden gap-8 text-sm font-medium text-stone-600 sm:flex">
-            <Link href="/#work" className="hover:text-stone-900">
-              Work
-            </Link>
-            <Link href="/#services" className="hover:text-stone-900">
-              Services
-            </Link>
-            <Link href="/packages" className="text-stone-900">
-              Packages
-            </Link>
-            <Link href="/#contact" className="hover:text-stone-900">
-              Contact
-            </Link>
-          </div>
-          <a
-            href="mailto:tracyholbrook532@gmail.com?subject=Website%20project%20inquiry"
-            className="rounded-full bg-terracotta px-4 py-2 text-sm font-medium text-white transition hover:bg-terracotta-light"
-          >
-            Get in touch
-          </a>
-        </nav>
-      </header>
+      <SiteHeader />
 
       <main className="flex-1">
         {/* Header */}
         <section className="mx-auto max-w-5xl px-6 pb-12 pt-16 text-center sm:pt-24">
           <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-stone-500">
-            Packages & pricing
+            Pricing
           </p>
           <h1 className="mx-auto max-w-2xl text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
             Flat, upfront pricing. No surprises.
@@ -290,7 +264,7 @@ export default function Packages() {
         </section>
 
         {/* FAQ */}
-        <section className="border-t border-stone-100 bg-stone-50">
+        <section id="faq" className="border-t border-stone-100 bg-stone-50 scroll-mt-20">
           <div className="mx-auto max-w-5xl px-6 py-20">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
               Questions
@@ -329,25 +303,7 @@ export default function Packages() {
         </section>
       </main>
 
-      <footer className="border-t border-stone-100 py-10 text-sm text-stone-500">
-        <div className="mx-auto flex max-w-5xl flex-col items-center gap-4 px-6 sm:flex-row sm:justify-between">
-          <span>© {new Date().getFullYear()} Trayfolio. Built by Tracy Holbrook.</span>
-          <div className="flex gap-6">
-            <Link href="/#work" className="hover:text-stone-900">
-              Work
-            </Link>
-            <Link href="/#services" className="hover:text-stone-900">
-              Services
-            </Link>
-            <Link href="/packages" className="hover:text-stone-900">
-              Packages
-            </Link>
-            <Link href="/#contact" className="hover:text-stone-900">
-              Contact
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

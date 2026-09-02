@@ -10,7 +10,7 @@ const projectTypes = [
   "Something else",
 ];
 
-const budgets = ["Under $1,000", "$1,000–$2,500", "$2,500–$5,000", "$5,000+", "Not sure yet"];
+const budgets = ["Under $1,000", "$1,000 to $2,500", "$2,500 to $5,000", "$5,000+", "Not sure yet"];
 
 export default function InquiryForm() {
   const [name, setName] = useState("");
