@@ -36,6 +36,11 @@ export interface CoverflowCarouselProps {
   autoRotateInterval?: number;
   showCaption?: boolean;
   showPagination?: boolean;
+  /** Mobile-only horizontal drag bar (a vertical-line handle you slide
+      left to right) as an easier-to-hit alternative to dragging the
+      3D cards directly on a touchscreen. Dot pagination stays for
+      larger screens. */
+  showScrubber?: boolean;
   showNavigation?: boolean;
   /** Names the carousel for assistive tech. */
   label?: string;
@@ -56,6 +61,7 @@ export function CoverflowCarousel({
   autoRotateInterval = 3800,
   showCaption = false,
   showPagination = false,
+  showScrubber = false,
   showNavigation = false,
   label = "Cover carousel",
   className,
@@ -255,6 +261,54 @@ export function CoverflowCarousel({
     settle(clamp(Math.round(posRef.current + carried)));
     resumeAutoRotateSoon();
   };
+  // Mobile scrub bar: a full-width track with a vertical-line handle that
+  // starts at the left edge (card 0) and slides to the right edge (the
+  // last card). Unlike the 3D cards' own drag, this maps directly onto
+  // the folded 0..count-1 index — a simple, finite "progress" reading
+  // that stays sane even after the ring above has wrapped around.
+  const scrubTrackRef = React.useRef<HTMLDivElement>(null);
+  const scrubDragRef = React.useRef<{ id: number } | null>(null);
+  const scrubPosFromEvent = React.useCallback(
+    (clientX: number) => {
+      const track = scrubTrackRef.current;
+      if (!track || count < 2) return 0;
+      const rect = track.getBoundingClientRect();
+      const fraction = rect.width
+        ? (clientX - rect.left) / rect.width
+        : 0;
+      return Math.max(0, Math.min(1, fraction)) * (count - 1);
+    },
+    [count],
+  );
+  const onScrubPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    pauseAutoRotate();
+    if (rafRef.current !== null) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
+    event.currentTarget.setPointerCapture(event.pointerId);
+    scrubDragRef.current = { id: event.pointerId };
+    posRef.current = scrubPosFromEvent(event.clientX);
+    targetRef.current = posRef.current;
+    const index = indexAt(posRef.current);
+    if (index !== selected) setSelected(index);
+    paint();
+  };
+  const onScrubPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = scrubDragRef.current;
+    if (!drag || drag.id !== event.pointerId) return;
+    posRef.current = scrubPosFromEvent(event.clientX);
+    const index = indexAt(posRef.current);
+    if (index !== selected) setSelected(index);
+    paint();
+  };
+  const endScrubDrag = (event: React.PointerEvent<HTMLDivElement>) => {
+    const drag = scrubDragRef.current;
+    if (!drag || drag.id !== event.pointerId) return;
+    scrubDragRef.current = null;
+    settle(clamp(Math.round(posRef.current)));
+    resumeAutoRotateSoon();
+  };
   // Card width drives pitch, depth and perspective, so it is the only thing
   // worth measuring — and only when the box actually changes.
   useIsoLayoutEffect(() => {
@@ -416,8 +470,39 @@ export function CoverflowCarousel({
           )}
         </div>
       )}
+      {showScrubber && count > 1 && (
+        <div
+          ref={scrubTrackRef}
+          role="slider"
+          aria-label="Scroll through slides"
+          aria-valuemin={0}
+          aria-valuemax={count - 1}
+          aria-valuenow={selected}
+          tabIndex={0}
+          onPointerDown={onScrubPointerDown}
+          onPointerMove={onScrubPointerMove}
+          onPointerUp={endScrubDrag}
+          onPointerCancel={endScrubDrag}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowLeft") {
+              event.preventDefault();
+              nudge(-1);
+            } else if (event.key === "ArrowRight") {
+              event.preventDefault();
+              nudge(1);
+            }
+          }}
+          className="relative mx-6 mt-6 flex h-8 cursor-pointer touch-none items-center outline-none ring-ring focus-visible:ring-2 sm:hidden"
+        >
+          <div className="h-px w-full rounded-full bg-foreground/15" />
+          <div
+            className="absolute top-1/2 h-5 w-[3px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-terracotta transition-[left] duration-150 ease-out"
+            style={{ left: `${(selected / (count - 1)) * 100}%` }}
+          />
+        </div>
+      )}
       {showPagination && (
-        <div className="mt-6 flex items-center justify-center gap-2">
+        <div className="mt-6 hidden items-center justify-center gap-2 sm:flex">
           {slides.map((_, index) => (
             <button
               key={index}

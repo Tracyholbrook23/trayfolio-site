@@ -223,6 +223,7 @@ export default function Home() {
                 autoRotateInterval={3800}
                 showCaption
                 showPagination
+                showScrubber
                 showNavigation
                 label="Live website demos"
               />
