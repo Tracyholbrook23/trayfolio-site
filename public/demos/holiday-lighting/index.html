@@ -277,17 +277,33 @@
     flex-shrink: 0;
   }
 
-  .hint {
+  /* Standalone scroll cue for a scrub section that has no hero-overlay
+     of its own (section 2) — same look as `.scroll-cue`, just not nested
+     in a flex column, so it needs its own centering. Faded by the same
+     scroll-ratio logic that fades `.hero-overlay`, so it clears out of
+     the way as soon as the visitor starts scrolling instead of lingering
+     and colliding with `.section-copy` underneath. */
+  .scroll-hint {
     position: absolute;
     left: 50%;
-    top: 32px;
-    transform: translateX(-50%);
-    color: rgba(247,243,236,0.75);
+    top: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
     font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
+    color: rgba(247,243,236,0.75);
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
     pointer-events: none;
+  }
+  .scroll-hint .arrow {
+    width: 1px;
+    height: 36px;
+    background: linear-gradient(to bottom, rgba(247,243,236,0.7), transparent);
+    animation: pulse-down 1.8s ease-in-out infinite;
   }
 
   /* ---------- Closing CTA ---------- */
@@ -649,14 +665,13 @@
         <div class="hero-overlay-content">
           <span class="hero-eyebrow">Residential Holiday Lighting</span>
           <h1>Your Home, Beautifully Lit</h1>
-          <p>We design, install, and take down professional-grade holiday lighting, so your home glows all season without you touching a ladder. Scroll to see two of our packages in action.</p>
+          <p>We design, install, and take down professional-grade holiday lighting, so your home glows all season without you touching a ladder.</p>
           <div class="scroll-cue">
             <span>Scroll</span>
             <div class="arrow"></div>
           </div>
         </div>
       </div>
-      <div class="hint">Scroll to scrub</div>
       <div class="section-copy">
         <div>
           <span class="tag">Package · Two-Story</span>
@@ -674,7 +689,10 @@
       <video class="scrub-video" src="/demos/holiday-lighting/christmas-lights-one-story/christmas-lights-one-story-hero-scrub.mp4" muted playsinline preload="auto"></video>
       <div class="scrim-top"></div>
       <div class="scrim-bottom"></div>
-      <div class="hint">Scroll to scrub</div>
+      <div class="scroll-hint">
+        <span>Scroll</span>
+        <div class="arrow"></div>
+      </div>
       <div class="section-copy">
         <div>
           <span class="tag">Package · One-Story</span>
@@ -843,20 +861,33 @@
         var video = track.querySelector('.scrub-video');
         var heroOverlay = track.querySelector('.hero-overlay');
 
+        var scrollHint = track.querySelector('.scroll-hint');
+        var sectionCopy = track.querySelector('.section-copy');
+
         var duration = 0;
         var targetTime = 0;
         var displayedTime = 0;
         var rafId = null;
 
         // How much of this track's scroll range the hero text fades out
-        // over — 0.22 means it's fully gone by 22% of the way through.
+        // (and the section copy fades in) over — 0.22 means the handoff
+        // is done by 22% of the way through, so the two never show at once.
         var HERO_FADE_END = 0.22;
 
         function updateHero(ratio) {
-          if (!heroOverlay) return;
-          var opacity = 1 - Math.min(1, ratio / HERO_FADE_END);
-          heroOverlay.style.opacity = opacity;
-          heroOverlay.style.pointerEvents = opacity > 0.05 ? 'auto' : 'none';
+          var introOpacity = 1 - Math.min(1, ratio / HERO_FADE_END);
+          if (heroOverlay) {
+            heroOverlay.style.opacity = introOpacity;
+            heroOverlay.style.pointerEvents = introOpacity > 0.05 ? 'auto' : 'none';
+          }
+          if (scrollHint) {
+            scrollHint.style.opacity = introOpacity;
+          }
+          if (sectionCopy) {
+            var revealOpacity = Math.min(1, ratio / HERO_FADE_END);
+            sectionCopy.style.opacity = revealOpacity;
+            sectionCopy.style.pointerEvents = revealOpacity > 0.5 ? 'auto' : 'none';
+          }
         }
 
         video.addEventListener('play', function () {
