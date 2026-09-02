@@ -250,8 +250,8 @@ export function HeroCarousel({
             aria-hidden
             draggable={false}
             className="absolute inset-0 h-full w-full object-cover"
-            initial={{ scale: reduced ? 1.28 : 1.42 }}
-            animate={{ scale: 1.28 }}
+            initial={{ scale: reduced ? 1.04 : 1.08 }}
+            animate={{ scale: 1 }}
             transition={reduced ? { duration: 0 } : { duration: 6, ease: "linear" }}
           />
         </motion.div>

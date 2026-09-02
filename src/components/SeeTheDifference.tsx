@@ -67,39 +67,33 @@ function TemplateSitePanel() {
 const PREMIUM_LOOKS: HeroCarouselItem[] = [
   {
     title: "Valtier\nMedia",
-    image: "/work/valtiermedia.jpg",
+    image: "/hero-previews/valtier-media.jpg",
     credit: "BUILT BY TRAYFOLIO.",
     meta: ["AUSTIN, TX", "LIVE SITE"],
-    accent: "#b5541f",
   },
   {
     title: "Custom\nMembership",
-    image: "/work/mode.jpg",
+    image: "/hero-previews/mode.jpg",
     credit: "BUILT BY TRAYFOLIO.",
     meta: ["MØDE", "LIVE SITE"],
-    accent: "#c9a227",
   },
   {
     title: "Shawnie's\nLoc Lab",
-    image: "/work/shawniesloclab.jpg",
+    image: "/hero-previews/shawnies-loc-lab.jpg",
     credit: "BUILT BY TRAYFOLIO.",
     meta: ["LANSING, MI", "LIVE SITE"],
-    accent: "#6e7350",
   },
   {
     title: "STRUX\nConstruction",
-    image:
-      "/demos/construction/assets/construction-crane-modern-residential-complex-near-water-new-housing-by-lake.jpg",
+    image: "/hero-previews/strux-construction.jpg",
     credit: "INTERACTIVE DEMO.",
     meta: ["CONSTRUCTION", "SCROLL DEMO"],
-    accent: "#3b5169",
   },
   {
     title: "Evergreen\nLighting",
-    image: "/demos/holiday-lighting/christmas-lights/3-house-lights-on.png",
+    image: "/hero-previews/evergreen-lighting.jpg",
     credit: "INTERACTIVE DEMO.",
     meta: ["HOME SERVICES", "BEFORE/AFTER"],
-    accent: "#e08d4b",
   },
 ];
 
