@@ -5,6 +5,7 @@ import { RevealText } from "@/components/ui/reveal-text";
 import { CoverflowCarousel, type CoverflowSlide } from "@/components/ui/coverflow-carousel";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+import SeeTheDifference from "@/components/SeeTheDifference";
 import { ShaderAnimation } from "@/components/ui/shader-animation";
 
 const work = [
@@ -190,6 +191,8 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <SeeTheDifference />
 
         {/* Services */}
         <section id="services" className="border-t border-stone-100 bg-white">
