@@ -205,7 +205,6 @@ export function HeroCarousel({
   if (!active) return null
 
   const lines = active.title.split("\n")
-  const accent = active.accent ?? "#8a8a8a"
 
   return (
     <div
@@ -235,7 +234,7 @@ export function HeroCarousel({
         className
       )}
     >
-      {/* ── Background: the focused photo, blown up and re-hued to its accent ── */}
+      {/* ── Background: the focused photo, at its real color ── */}
       <AnimatePresence initial={false}>
         <motion.div
           key={index}
@@ -254,15 +253,6 @@ export function HeroCarousel({
             initial={{ scale: reduced ? 1.28 : 1.42 }}
             animate={{ scale: 1.28 }}
             transition={reduced ? { duration: 0 } : { duration: 6, ease: "linear" }}
-          />
-          {/* Keep the photo's luminance, take the accent's hue. */}
-          <div
-            className="absolute inset-0"
-            style={{ backgroundColor: accent, mixBlendMode: "color" }}
-          />
-          <div
-            className="absolute inset-0 opacity-55"
-            style={{ backgroundColor: accent, mixBlendMode: "multiply" }}
           />
         </motion.div>
       </AnimatePresence>
