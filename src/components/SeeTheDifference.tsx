@@ -1,8 +1,9 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import Reveal from "@/components/Reveal";
 import { CompareReveal } from "@/components/ui/compare-reveal";
-import { ShaderAnimation } from "@/components/ui/shader-animation";
+import { HeroCarousel, type HeroCarouselItem } from "@/components/ui/hero-carousel";
 
 /**
  * The "template" side: a generic, dated small-business layout — default
@@ -56,37 +57,62 @@ function TemplateSitePanel() {
 }
 
 /**
- * The "custom build" side: dark, brand-driven, animated. Reuses the site's
- * own ShaderAnimation background and gradient-text utility so this half
- * reads as an actual Trayfolio build, not a stock template.
- *
- * NOTE: this is the panel Tracy wants to art-direct further — swap in the
- * specific effects she asks for here (parallax, cursor glow, etc).
+ * The "custom build" side: a moving, autoplaying showcase reel built from
+ * real Trayfolio work and demo builds, instead of a static mockup. It sits
+ * underneath the compare-reveal's clipped "before" layer and keeps playing
+ * on its own — `pointer-events-none` so dragging anywhere on the frame
+ * always moves the compare divider rather than fighting the carousel's own
+ * drag-to-scroll.
  */
+const PREMIUM_LOOKS: HeroCarouselItem[] = [
+  {
+    title: "Valtier\nMedia",
+    image: "/work/valtiermedia.jpg",
+    credit: "BUILT BY TRAYFOLIO.",
+    meta: ["AUSTIN, TX", "LIVE SITE"],
+    accent: "#b5541f",
+  },
+  {
+    title: "Custom\nMembership",
+    image: "/work/mode.jpg",
+    credit: "BUILT BY TRAYFOLIO.",
+    meta: ["MØDE", "LIVE SITE"],
+    accent: "#c9a227",
+  },
+  {
+    title: "Shawnie's\nLoc Lab",
+    image: "/work/shawniesloclab.jpg",
+    credit: "BUILT BY TRAYFOLIO.",
+    meta: ["LANSING, MI", "LIVE SITE"],
+    accent: "#6e7350",
+  },
+  {
+    title: "STRUX\nConstruction",
+    image:
+      "/demos/construction/assets/construction-crane-modern-residential-complex-near-water-new-housing-by-lake.jpg",
+    credit: "INTERACTIVE DEMO.",
+    meta: ["CONSTRUCTION", "SCROLL DEMO"],
+    accent: "#3b5169",
+  },
+  {
+    title: "Evergreen\nLighting",
+    image: "/demos/holiday-lighting/christmas-lights/3-house-lights-on.png",
+    credit: "INTERACTIVE DEMO.",
+    meta: ["HOME SERVICES", "BEFORE/AFTER"],
+    accent: "#e08d4b",
+  },
+];
+
 function PremiumSitePanel() {
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden bg-stone-950 px-6 py-8 text-center text-white sm:px-10">
-      <ShaderAnimation className="opacity-90" />
-      <div className="relative z-10 flex flex-col items-center gap-2.5 sm:gap-3">
-        <p className="text-[9.5px] font-semibold uppercase tracking-[0.2em] text-peach/70 sm:text-xs">
-          GreenLeaf Landscaping
-        </p>
-        <h3 className="font-display text-xl font-semibold tracking-tight sm:text-4xl">
-          Grow Something <span className="gradient-text">Beautiful</span>
-        </h3>
-        <p className="max-w-[15rem] text-[10.5px] text-stone-300 sm:max-w-sm sm:text-sm">
-          Custom landscaping designed around your property, your budget, and how you actually
-          live outside.
-        </p>
-        <span className="mt-0.5 flex items-center gap-1.5 text-[9.5px] font-medium text-olive-light sm:text-xs">
-          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-olive-light" />
-          Now booking spring projects
-        </span>
-        <button className="mt-1.5 rounded-full bg-terracotta px-4 py-2 text-[10.5px] font-semibold text-white shadow-sm transition hover:bg-terracotta-light sm:px-6 sm:py-2.5 sm:text-sm">
-          Get a Free Quote →
-        </button>
-      </div>
-    </div>
+    <HeroCarousel
+      items={PREMIUM_LOOKS}
+      defaultIndex={0}
+      brand="TRAYFOLIO"
+      autoplay
+      autoplayDelay={3200}
+      className="pointer-events-none h-full w-full"
+    />
   );
 }
 
@@ -121,7 +147,7 @@ export default function SeeTheDifference() {
                 "--motiq-signature": "#b5541f",
                 "--motiq-border": "#e7ded0",
                 "--motiq-bg-elevated": "#efe3cb",
-              } as React.CSSProperties
+              } as CSSProperties
             }
           />
         </Reveal>
