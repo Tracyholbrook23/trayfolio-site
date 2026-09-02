@@ -18,6 +18,7 @@
     width: 100vw;
     height: 100vh;
     overflow: hidden;
+    touch-action: none; /* let a finger drag scrub the video instead of scrolling/zooming the page */
   }
 
   .scrub-stage video {
@@ -80,7 +81,7 @@
         duration = video.duration || 0;
       });
 
-      function onMouseMove(e) {
+      function onScrubPointer(e) {
         if (!duration) return; // wait for metadata before computing target
         var rect = stage.getBoundingClientRect();
         var ratio = (e.clientX - rect.left) / rect.width;
@@ -116,7 +117,13 @@
         }
       }
 
-      stage.addEventListener('mousemove', onMouseMove);
+      // Pointer events unify mouse and touch: a mouse continuously hovers and
+      // scrubs, while a finger only fires move events while actually pressed
+      // down — which is exactly a drag/slide gesture, the touch equivalent
+      // of moving the mouse. pointerdown is wired too so a first tap/press
+      // scrubs immediately instead of waiting for the first bit of motion.
+      stage.addEventListener('pointerdown', onScrubPointer);
+      stage.addEventListener('pointermove', onScrubPointer);
     })();
   </script>
 
