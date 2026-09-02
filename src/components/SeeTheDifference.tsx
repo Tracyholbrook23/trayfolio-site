@@ -74,10 +74,17 @@ const PREMIUM_LOOKS: HeroCarouselItem[] = [
   },
   {
     title: "Custom\nMembership",
-    image: "/hero-previews/mode.jpg",
+    image: "/hero-previews/mode-1-gate.jpg",
     credit: "BUILT BY TRAYFOLIO.",
     meta: ["MØDE", "LIVE SITE"],
-    effect: "gate",
+    // Real captured frames from the live tap-to-enter gate: the landing
+    // screen, the tap flash, then the revealed homepage.
+    sequence: [
+      "/hero-previews/mode-1-gate.jpg",
+      "/hero-previews/mode-2-tap.jpg",
+      "/hero-previews/mode-3-enter.jpg",
+    ],
+    sequenceFrameMs: [1300, 450, 1450],
   },
   {
     title: "Shawnie's\nLoc Lab",

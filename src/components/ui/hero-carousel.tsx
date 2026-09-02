@@ -50,6 +50,20 @@ export interface HeroCarouselItem {
    * @default "zoom"
    */
   effect?: "zoom" | "gradient" | "gate" | "scroll-scrub"
+  /**
+   * Real captured frames to cycle through while this slide is focused — e.g.
+   * a "before tap → tap → revealed" moment — shown as hard cuts instead of
+   * the single `image` and any zoom/`effect` treatment. Loops for as long as
+   * the slide stays focused. Needs at least 2 frames to take effect.
+   * @default undefined
+   */
+  sequence?: string[]
+  /**
+   * Per-frame duration in ms while cycling `sequence` — either one number
+   * applied to every frame, or an array the same length as `sequence`.
+   * @default 1000
+   */
+  sequenceFrameMs?: number | number[]
 }
 
 export interface HeroCarouselProps {
@@ -218,17 +232,6 @@ export function HeroCarousel({
 
   const lines = active.title.split("\n")
 
-  // Trayfolio addition: a handful of slides show a taste of their own site's
-  // motion instead of the default zoom — see HeroCarouselItem["effect"].
-  const scrub = active.effect === "scroll-scrub" && !reduced
-  const bgInitial = scrub ? { scale: 1.15, y: "-4%" } : { scale: reduced ? 1.04 : 1.08 }
-  const bgAnimate = scrub ? { scale: 1.15, y: ["-4%", "4%", "-4%"] } : { scale: 1 }
-  const bgTransition = reduced
-    ? { duration: 0 }
-    : scrub
-      ? { duration: 7, repeat: Infinity, ease: "easeInOut" as const }
-      : { duration: 6, ease: "linear" as const }
-
   return (
     <div
       ref={stageRef}
@@ -267,45 +270,10 @@ export function HeroCarousel({
           exit={{ opacity: 0 }}
           transition={swing}
         >
-          <motion.img
-            src={active.image}
-            alt=""
-            aria-hidden
-            draggable={false}
-            className="absolute inset-0 h-full w-full object-cover"
-            initial={bgInitial}
-            animate={bgAnimate}
-            transition={bgTransition}
-          />
-
-          {active.effect === "gradient" && !reduced ? (
-            // A soft diagonal shine sweeping across the frame — a nod to a
-            // gradient-built hero, without recolouring the photo underneath.
-            <motion.div
-              aria-hidden
-              className="absolute inset-0 mix-blend-overlay"
-              style={{
-                backgroundImage:
-                  "linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.55) 45%, transparent 70%)",
-                backgroundSize: "260% 260%",
-              }}
-              animate={{ backgroundPosition: ["0% 50%", "100% 50%"] }}
-              transition={{ duration: 3.6, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
-            />
-          ) : null}
-
-          {active.effect === "gate" && !reduced ? (
-            // A slow breathing glow, echoing a "tap/click to enter" gate screen.
-            <motion.div
-              aria-hidden
-              className="absolute inset-0"
-              style={{
-                background: "radial-gradient(circle at 50% 55%, rgba(255,255,255,0.35), transparent 60%)",
-              }}
-              animate={{ opacity: [0.35, 0.85, 0.35], scale: [1, 1.08, 1] }}
-              transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-            />
-          ) : null}
+          {/* Keyed by index so a slide change remounts it fresh — that's
+              what resets its internal sequence-frame state, with no
+              ref/effect reset trickery needed. */}
+          <HeroCarouselBackground key={index} item={active} reduced={!!reduced} />
         </motion.div>
       </AnimatePresence>
 
@@ -509,3 +477,98 @@ export function HeroCarousel({
     </div>
   )
 }
+
+/**
+ * Trayfolio addition: the focused slide's background photo, plus whichever
+ * built-in motion treatment it asks for (a zoom, a scroll-scrub pan, a
+ * gradient shine, a breathing gate glow, or — when the slide carries real
+ * captured frames — a hard-cut sequence, e.g. a "before tap → tap →
+ * revealed" moment). Mounted fresh per slide (see the `key={index}` at the
+ * call site), so its own sequence-frame state always starts at frame 0
+ * without any manual reset.
+ */
+function HeroCarouselBackground({
+  item,
+  reduced,
+}: {
+  item: HeroCarouselItem
+  reduced: boolean
+}) {
+  const sequence = item.sequence && item.sequence.length > 1 ? item.sequence : undefined
+  const [seqIndex, setSeqIndex] = React.useState(0)
+
+  React.useEffect(() => {
+    if (!sequence || reduced) return
+    const frameMs = item.sequenceFrameMs
+    const duration = Array.isArray(frameMs) ? (frameMs[seqIndex] ?? 1000) : (frameMs ?? 1000)
+    const id = window.setTimeout(() => {
+      setSeqIndex((i) => (i + 1) % sequence.length)
+    }, duration)
+    return () => window.clearTimeout(id)
+  }, [item.sequenceFrameMs, reduced, seqIndex, sequence])
+
+  const bgSrc = sequence ? sequence[seqIndex] : item.image
+  const scrub = !sequence && item.effect === "scroll-scrub" && !reduced
+  const bgInitial = sequence
+    ? { scale: 1 }
+    : scrub
+      ? { scale: 1.15, y: "-4%" }
+      : { scale: reduced ? 1.04 : 1.08 }
+  const bgAnimate = sequence
+    ? { scale: 1 }
+    : scrub
+      ? { scale: 1.15, y: ["-4%", "4%", "-4%"] }
+      : { scale: 1 }
+  const bgTransition = sequence
+    ? { duration: 0 }
+    : reduced
+      ? { duration: 0 }
+      : scrub
+        ? { duration: 7, repeat: Infinity, ease: "easeInOut" as const }
+        : { duration: 6, ease: "linear" as const }
+
+  return (
+    <>
+      <motion.img
+        src={bgSrc}
+        alt=""
+        aria-hidden
+        draggable={false}
+        className="absolute inset-0 h-full w-full object-cover"
+        initial={bgInitial}
+        animate={bgAnimate}
+        transition={bgTransition}
+      />
+
+      {!sequence && item.effect === "gradient" && !reduced ? (
+        // A soft diagonal shine sweeping across the frame — a nod to a
+        // gradient-built hero, without recolouring the photo underneath.
+        <motion.div
+          aria-hidden
+          className="absolute inset-0 mix-blend-overlay"
+          style={{
+            backgroundImage:
+              "linear-gradient(115deg, transparent 20%, rgba(255,255,255,0.55) 45%, transparent 70%)",
+            backgroundSize: "260% 260%",
+          }}
+          animate={{ backgroundPosition: ["0% 50%", "100% 50%"] }}
+          transition={{ duration: 3.6, repeat: Infinity, repeatType: "mirror", ease: "easeInOut" }}
+        />
+      ) : null}
+
+      {!sequence && item.effect === "gate" && !reduced ? (
+        // A slow breathing glow, echoing a "tap/click to enter" gate screen.
+        <motion.div
+          aria-hidden
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(circle at 50% 55%, rgba(255,255,255,0.35), transparent 60%)",
+          }}
+          animate={{ opacity: [0.35, 0.85, 0.35], scale: [1, 1.08, 1] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
+        />
+      ) : null}
+    </>
+  )
+}
+
