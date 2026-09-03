@@ -327,6 +327,85 @@ async function emailDepositReceipt(
   return false;
 }
 
+/**
+ * Tells Tracy a sale happened. Without this a successful order is silent:
+ * the buyer gets their email and the seller finds out by checking Stripe.
+ * Reply-to is the buyer, so replying to the notification reaches them --
+ * which also covers the case where they mistyped their own address and
+ * their copy went nowhere.
+ */
+async function notifyOwner(order: {
+  kind: "demo" | "project";
+  buyer: string;
+  code?: string;
+  paid: number;
+  total?: number;
+  balance?: number;
+  summary?: string;
+  buyerEmailDelivered: boolean;
+}): Promise<void> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.DEMO_EMAIL_FROM;
+  const to = process.env.ALERT_EMAIL;
+  if (!apiKey || !from || !to) return;
+
+  const lines: string[] = [`Buyer: ${order.buyer}`, `Paid: ${formatUSD(order.paid)}`];
+  if (order.kind === "demo") {
+    lines.push(`Credit code: ${order.code ?? "none"}`);
+  } else {
+    if (order.summary) lines.push(`Ordered: ${order.summary}`);
+    if (typeof order.total === "number") lines.push(`Project total: ${formatUSD(order.total)}`);
+    if (typeof order.balance === "number") {
+      lines.push(`Balance due at launch: ${formatUSD(order.balance)}`);
+    }
+  }
+  lines.push(
+    order.buyerEmailDelivered
+      ? "Their confirmation email was sent."
+      : "WARNING: their confirmation email did NOT send. Follow up by hand."
+  );
+
+  const subject =
+    order.kind === "demo"
+      ? `New demo order — ${order.buyer}`
+      : `New project deposit ${formatUSD(order.paid)} — ${order.buyer}`;
+
+  const message: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string;
+    text: string;
+    reply_to?: string;
+  } = {
+    from,
+    to,
+    subject,
+    html: `
+      <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:520px;color:#2a2118;line-height:1.6">
+        <p style="margin:0 0 16px">${
+          order.kind === "demo" ? "Someone ordered a demo." : "Someone paid a project deposit."
+        }</p>
+        <p style="margin:0 0 16px">${lines.join("<br>")}</p>
+        <p style="margin:0;font-size:14px;color:#6b6154">Reply to this email to reach them directly.</p>
+      </div>`,
+    text: [
+      order.kind === "demo" ? "Someone ordered a demo." : "Someone paid a project deposit.",
+      "",
+      ...lines,
+      "",
+      "Reply to this email to reach them directly.",
+    ].join("\n"),
+    // Replying to the notification goes to the buyer, not to yourself.
+    reply_to: order.buyer,
+  };
+
+  const result = await sendViaResend(apiKey, message);
+  if (!result.ok) {
+    console.error(`Owner notification failed: ${result.detail}`);
+  }
+}
+
 export async function POST(request: Request) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -371,15 +450,20 @@ export async function POST(request: Request) {
       const paid = Number(session.amount_total ?? 0);
       const total = Number(metadata.project_total ?? 0);
       const balance = Number(metadata.balance_due ?? 0);
-      const sent = await emailDepositReceipt(email, {
-        paid,
-        total,
-        balance,
-        summary: metadata.summary ?? "Website project",
-      });
+      const summary = metadata.summary ?? "Website project";
+      const sent = await emailDepositReceipt(email, { paid, total, balance, summary });
       if (!sent) {
         console.error(`Deposit confirmation for ${email} did not send`);
       }
+      await notifyOwner({
+        kind: "project",
+        buyer: email,
+        paid,
+        total,
+        balance,
+        summary,
+        buyerEmailDelivered: sent,
+      });
     } catch (error) {
       console.error("Deposit confirmation failed", error);
     }
@@ -404,6 +488,14 @@ export async function POST(request: Request) {
       // Not fatal: the code exists in Stripe and can be sent by hand.
       console.error(`Demo credit ${code} created for ${email} but the email did not send`);
     }
+
+    await notifyOwner({
+      kind: "demo",
+      buyer: email,
+      code,
+      paid: Number(session.amount_total ?? 0),
+      buyerEmailDelivered: sent,
+    });
   } catch (error) {
     console.error("Demo fulfillment failed", error);
   }
