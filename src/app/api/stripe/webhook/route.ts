@@ -90,10 +90,70 @@ async function createCreditCode(secretKey: string, couponId: string): Promise<st
   return code;
 }
 
+const RESEND_ENDPOINT = "https://api.resend.com/emails";
+
+type SendResult = { ok: true } | { ok: false; detail: string };
+
+async function sendViaResend(
+  apiKey: string,
+  message: { from: string; to: string; subject: string; html: string }
+): Promise<SendResult> {
+  try {
+    const response = await fetch(RESEND_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(message),
+    });
+    if (response.ok) return { ok: true };
+    return { ok: false, detail: `${response.status} ${await response.text()}` };
+  } catch (error) {
+    return { ok: false, detail: String(error) };
+  }
+}
+
+/** If the buyer's email fails, tell Tracy, because otherwise a paying
+ *  customer just gets silence and nobody finds out for weeks. Needs
+ *  ALERT_EMAIL set; without it this is a no-op and the console is the
+ *  only record. */
+async function alertOwner(
+  apiKey: string,
+  from: string,
+  customer: string,
+  code: string,
+  detail: string
+): Promise<void> {
+  const alertTo = process.env.ALERT_EMAIL;
+  if (!alertTo) return;
+
+  const result = await sendViaResend(apiKey, {
+    from,
+    to: alertTo,
+    subject: `Action needed: demo credit ${code} did not reach ${customer}`,
+    html: `
+      <div style="font-family:system-ui,sans-serif;line-height:1.6">
+        <p><strong>${customer}</strong> paid for a demo, but the credit email did not send.</p>
+        <p>Their code is <strong>${code}</strong> — it exists in Stripe and is valid. Send it to them by hand.</p>
+        <p style="color:#6b6154;font-size:13px">Resend said: ${detail}</p>
+      </div>`,
+  });
+
+  if (!result.ok) {
+    console.error(`Alert email also failed: ${result.detail}`);
+  }
+}
+
 async function emailCredit(to: string, code: string): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.DEMO_EMAIL_FROM;
-  if (!apiKey || !from) return false;
+  if (!apiKey || !from) {
+    console.error(
+      "Credit email skipped: RESEND_API_KEY or DEMO_EMAIL_FROM is not set"
+    );
+    return false;
+  }
 
   const html = `
     <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:520px;color:#2a2118;line-height:1.6">
@@ -105,20 +165,28 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
       <p style="margin:0">Tracy<br><span style="color:#6b6154">Trayfolio</span></p>
     </div>`;
 
-  const response = await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from,
-      to,
-      subject: "Your Trayfolio demo, and your $50 credit code",
-      html,
-    }),
-  });
-  return response.ok;
+  const message = {
+    from,
+    to,
+    subject: "Your Trayfolio demo, and your $50 credit code",
+    html,
+  };
+
+  // Two attempts: a failure here is usually a transient blip rather than a
+  // bad config, and the customer has already paid.
+  let detail = "unknown error";
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const result = await sendViaResend(apiKey, message);
+    if (result.ok) return true;
+    detail = result.detail;
+    if (attempt === 1) {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+    }
+  }
+
+  console.error(`Credit email to ${to} failed after 2 attempts: ${detail}`);
+  await alertOwner(apiKey, from, to, code, detail);
+  return false;
 }
 
 export async function POST(request: Request) {
