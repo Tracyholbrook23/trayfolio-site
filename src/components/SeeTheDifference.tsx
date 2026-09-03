@@ -1,57 +1,116 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import Reveal from "@/components/Reveal";
 import StackLayer from "@/components/StackLayer";
 import { CompareReveal } from "@/components/ui/compare-reveal";
 
 /**
- * The "template" side: a generic, dated small-business layout — default
- * blue header, stock copy, Arial, a cramped card grid. Nothing here is a
- * copy of any real client site; it's the DIY-template look this section
- * is contrasting against.
+ * The "template" side: a generic, dated real-estate agent layout, matched
+ * to the luxury property reel on the other side so the two panels are the
+ * same business told two different ways. Default blue header, stock copy,
+ * Arial, a cramped listings row. Nothing here is a copy of any real
+ * brokerage site; it's the DIY-template look this section is contrasting
+ * against.
  */
 function TemplateSitePanel() {
+  const listings = [
+    {
+      price: "$285,000",
+      detail: "3 bd  2 ba  1,540 sqft",
+      place: "412 Oakwood Dr",
+      photo: "/demos/holiday-lighting/gallery/house-1-farmhouse.jpg",
+    },
+    {
+      price: "$349,900",
+      detail: "4 bd  3 ba  2,110 sqft",
+      place: "88 Ridgeline Ct",
+      photo: "/demos/holiday-lighting/gallery/house-4-colonial.jpg",
+    },
+    {
+      price: "$219,000",
+      detail: "2 bd  2 ba  1,180 sqft",
+      place: "27 Fairview Ave",
+      photo: "/demos/holiday-lighting/gallery/house-2-tudor.jpg",
+    },
+  ];
+
   return (
     <div className="flex h-full w-full flex-col overflow-hidden bg-white text-[#333333]" style={{ fontFamily: "Arial, Helvetica, sans-serif" }}>
       <div className="flex items-center justify-between border-b border-stone-200 px-4 py-2.5 sm:px-6">
-        <span className="text-[13px] font-bold text-[#2b4a6b] sm:text-sm">GreenLeaf Landscaping</span>
+        <div className="min-w-0">
+          <p className="truncate text-[13px] font-bold text-[#2b4a6b] sm:text-sm">
+            Maple Grove Realty
+          </p>
+          <p className="hidden text-[9px] text-[#777777] sm:block">
+            Call today: (555) 014-2288
+          </p>
+        </div>
         <nav className="hidden gap-4 text-[11px] text-[#444444] sm:flex">
           <span>Home</span>
           <span>About</span>
-          <span>Services</span>
+          <span>Listings</span>
           <span>Contact</span>
         </nav>
       </div>
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-2.5 bg-[#5b84ad] px-6 py-8 text-center text-white sm:gap-3">
-        <h3 className="text-base font-bold sm:text-2xl">Welcome to GreenLeaf Landscaping</h3>
-        <p className="max-w-xs text-[10.5px] text-white/90 sm:text-sm">
-          Your trusted lawn care company since 2010.
+      <div className="relative flex flex-1 flex-col items-center justify-center gap-2.5 overflow-hidden px-6 py-8 text-center text-white sm:gap-3">
+        {/* The obligatory flat stock house shot behind a heavy blue wash. */}
+        <Image
+          src="/demos/holiday-lighting/christmas-lights/1-house-before.jpg"
+          alt=""
+          fill
+          aria-hidden="true"
+          className="object-cover saturate-[0.7]"
+        />
+        <div className="absolute inset-0 bg-[#5b84ad]/80" />
+
+        <h3 className="relative text-base font-bold sm:text-2xl">
+          Welcome to Maple Grove Realty
+        </h3>
+        <p className="relative max-w-xs text-[10.5px] text-white/90 sm:text-sm">
+          Your trusted local real estate agent since 2004.
         </p>
-        <button className="rounded-sm bg-white px-3 py-1.5 text-[10.5px] font-semibold text-[#2b4a6b] sm:text-xs">
-          Learn More
+        <button className="relative rounded-sm bg-white px-3 py-1.5 text-[10.5px] font-semibold text-[#2b4a6b] sm:text-xs">
+          Search Homes
         </button>
       </div>
 
-      <div className="grid grid-cols-2 gap-px bg-stone-200 text-[9.5px] sm:text-xs">
-        <div className="bg-white p-2.5 sm:p-3">
-          <p className="border-b-2 border-[#5b84ad] pb-1 font-bold text-[#2b4a6b]">Our Services</p>
-          <p className="mt-1.5 leading-snug text-[#555555]">
-            Mowing, trimming, and seasonal cleanup for homes and businesses.
-          </p>
-        </div>
-        <div className="bg-white p-2.5 sm:p-3">
-          <p className="border-b-2 border-[#5b84ad] pb-1 font-bold text-[#2b4a6b]">Why Choose Us</p>
-          <p className="mt-1.5 leading-snug text-[#555555]">
-            15+ years experience. Reliable, affordable, on time.
-          </p>
+      <div className="border-t border-stone-200 px-3 pb-2 pt-2 sm:px-4">
+        <p className="border-b-2 border-[#5b84ad] pb-1 text-[9.5px] font-bold text-[#2b4a6b] sm:text-xs">
+          Featured Listings
+        </p>
+        <div className="mt-2 grid grid-cols-3 gap-2">
+          {listings.map((listing) => (
+            <div key={listing.place} className="border border-stone-200">
+              <div className="relative h-7 w-full overflow-hidden bg-stone-200 sm:h-10">
+                <Image
+                  src={listing.photo}
+                  alt=""
+                  fill
+                  aria-hidden="true"
+                  sizes="120px"
+                  className="object-cover saturate-[0.75] brightness-95"
+                />
+              </div>
+              <div className="p-1.5">
+                <p className="text-[9px] font-bold text-[#2b4a6b] sm:text-[11px]">{listing.price}</p>
+                <p className="mt-0.5 truncate text-[7.5px] leading-tight text-[#555555] sm:text-[9px]">
+                  {listing.detail}
+                </p>
+                <p className="truncate text-[7.5px] leading-tight text-[#888888] sm:text-[9px]">
+                  {listing.place}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 
       <div className="border-t border-stone-200 bg-stone-50 px-4 py-2 text-center text-[8.5px] text-stone-400 sm:text-[10px]">
-        © 2019 GreenLeaf Landscaping. All rights reserved.
+        © 2019 Maple Grove Realty. All rights reserved.
       </div>
     </div>
   );

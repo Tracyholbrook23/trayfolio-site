@@ -101,9 +101,16 @@ export default function Home() {
         <StackLayer first noPad className="bg-peach text-stone-900">
           <div className="grain-overlay pointer-events-none absolute inset-0 -z-10" />
 
-          <div className="mx-auto flex min-h-[calc(100svh-73px)] max-w-5xl flex-col items-center justify-center px-6 py-20 text-center">
+          <div className="mx-auto flex min-h-[calc(100svh-73px)] w-full flex-col items-center justify-center px-2 py-16 text-center sm:px-4">
             <h1 className="sr-only">Trayfolio: websites for small businesses</h1>
-            <RevealText text="TRAYFOLIO" />
+            {/* Sized in vw so the wordmark spans almost the full viewport.
+                "TRAYFOLIO" in Clash Display Bold measures 5.875em wide, so
+                15vw fills about 88% of a phone screen and 15.8vw about 93%
+                of a desktop one, with room to spare at both ends. */}
+            <RevealText
+              text="TRAYFOLIO"
+              fontSize="text-[clamp(3rem,15vw,26rem)] md:text-[clamp(3rem,15.8vw,26rem)] leading-[0.9]"
+            />
             <Reveal delay={200}>
               <p className="mx-auto mt-8 max-w-md text-lg leading-7 text-stone-600">
                 Custom sites for small businesses, built by one person from

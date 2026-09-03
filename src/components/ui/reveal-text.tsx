@@ -12,6 +12,12 @@ interface RevealTextProps {
   overlayDelay?: number;
   overlayDuration?: number;
   springDuration?: number;
+  /** Pause between the orange sweep ending and the photo preview starting. */
+  introRevealGap?: number;
+  /** Per-letter offset for the photo preview wave. */
+  introRevealStagger?: number;
+  /** How long each letter holds its photo during the preview. */
+  introRevealDuration?: number;
   letterImages?: string[];
   className?: string;
 }
@@ -48,20 +54,48 @@ export function RevealText({
   overlayDelay = 0.05,
   overlayDuration = 0.4,
   springDuration = 600,
+  introRevealGap = 260,
+  introRevealStagger = 0.07,
+  introRevealDuration = 1.5,
   letterImages = DEFAULT_LETTER_IMAGES,
   className = "",
 }: RevealTextProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
+  const [showIntroReveal, setShowIntroReveal] = useState(false);
 
   useEffect(() => {
-    // Fire the color-sweep overlay once the last letter's spring-in has
-    // had time to settle.
-    const lastLetterDelay = (text.length - 1) * letterDelay;
-    const totalDelay = lastLetterDelay * 1000 + springDuration;
-    const timer = setTimeout(() => setShowOverlay(true), totalDelay);
-    return () => clearTimeout(timer);
-  }, [text.length, letterDelay, springDuration]);
+    // The intro plays itself out in two beats so people see the effect
+    // without having to find it, which matters most on touch screens where
+    // there is no hover at all:
+    //   1. the orange sweep runs across the word
+    //   2. each letter briefly shows the photo underneath, then settles
+    //      back to solid text until someone hovers it
+    const sweepStart = (text.length - 1) * letterDelay * 1000 + springDuration;
+    const sweepEnd = sweepStart + (text.length - 1) * overlayDelay * 1000 + overlayDuration * 1000;
+
+    const sweepTimer = setTimeout(() => setShowOverlay(true), sweepStart);
+
+    const reduceMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const revealTimer = reduceMotion
+      ? undefined
+      : setTimeout(() => setShowIntroReveal(true), sweepEnd + introRevealGap);
+
+    return () => {
+      clearTimeout(sweepTimer);
+      if (revealTimer) clearTimeout(revealTimer);
+    };
+  }, [
+    text.length,
+    letterDelay,
+    springDuration,
+    overlayDelay,
+    overlayDuration,
+    introRevealGap,
+  ]);
 
   return (
     <div className={`flex items-center justify-center ${className}`}>
@@ -121,6 +155,30 @@ export function RevealText({
                 duration: overlayDuration,
                 times: [0, 0.1, 0.7, 1],
                 ease: "easeInOut",
+              }}
+            >
+              {letter}
+            </motion.span>
+          )}
+
+          {/* One-time photo preview: the same fill the hover shows, played
+              through the word once so the effect announces itself, then
+              faded back out to solid text. */}
+          {showIntroReveal && (
+            <motion.span
+              className="pointer-events-none absolute inset-0 bg-cover bg-no-repeat bg-clip-text text-transparent"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0, 1, 1, 0] }}
+              transition={{
+                delay: index * introRevealStagger,
+                duration: introRevealDuration,
+                times: [0, 0.18, 0.6, 1],
+                ease: "easeInOut",
+              }}
+              style={{
+                backgroundImage: `url('${letterImages[index % letterImages.length]}')`,
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
               }}
             >
               {letter}
