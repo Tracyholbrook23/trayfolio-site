@@ -2,6 +2,12 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import ScrollProgress from "@/components/ScrollProgress";
 import SmoothScroll from "@/components/SmoothScroll";
+// Required by Lenis. Without it html keeps the `h-full` height below
+// (100% = viewport), so Lenis measures the page as one screen tall and
+// caps scrolling short of the real bottom. Its stylesheet sets
+// `html.lenis, html.lenis body { height: auto }`, which lets Lenis see
+// the true content height and re-measure when the page grows.
+import "lenis/dist/lenis.css";
 import "./globals.css";
 
 const clashDisplay = localFont({
