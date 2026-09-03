@@ -57,15 +57,15 @@ function TemplateSitePanel() {
       </div>
 
       <div className="relative flex flex-1 flex-col items-center justify-center gap-2.5 overflow-hidden px-6 py-8 text-center text-white sm:gap-3">
-        {/* The obligatory flat stock house shot behind a heavy blue wash. */}
+        {/* The obligatory flat stock house shot behind a plain dark scrim. */}
         <Image
           src="/demos/holiday-lighting/christmas-lights/1-house-before.jpg"
           alt=""
           fill
           aria-hidden="true"
-          className="object-cover saturate-[0.7]"
+          className="object-cover"
         />
-        <div className="absolute inset-0 bg-[#5b84ad]/80" />
+        <div className="absolute inset-0 bg-black/45" />
 
         <h3 className="relative text-base font-bold sm:text-2xl">
           Welcome to Maple Grove Realty
