@@ -4,6 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
 import LayeredWord from "@/components/LayeredWord";
+import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 
 export const metadata: Metadata = {
   title: "Pricing | Trayfolio",
@@ -158,16 +159,13 @@ export default function Pricing() {
                   comes straight off the price.
                 </p>
                 <p className="mt-3 text-sm text-stone-600">
-                  The demo fee is non-refundable and applies as credit toward a build. It
-                  is not a deposit.
+                  You&apos;ll get your $50 credit code by email straight away, and
+                  I&apos;ll be in touch within 24 hours to start building. The demo fee is
+                  non-refundable and applies as credit toward a build. It is not a
+                  deposit.
                 </p>
               </div>
-              <Link
-                href="/contact"
-                className="shrink-0 self-start rounded-full bg-terracotta px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-light sm:self-auto"
-              >
-                Get a $50 demo
-              </Link>
+              <DemoCheckoutButton className="shrink-0 self-start sm:self-auto" />
             </div>
           </Reveal>
         </section>
@@ -225,7 +223,7 @@ export default function Pricing() {
                       ))}
                     </ul>
                     <Link
-                      href="/contact"
+                      href={`/start?package=${pkg.name.toLowerCase()}`}
                       className={`mt-8 inline-block px-6 py-3 text-center text-sm font-semibold transition ${
                         pkg.recommended
                           ? "bg-terracotta text-white hover:bg-terracotta-light"
