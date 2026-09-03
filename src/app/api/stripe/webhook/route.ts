@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { DEMO_COUPON_NAME } from "@/lib/pricing";
+import { DEMO_COUPON_NAME, formatUSD } from "@/lib/pricing";
 import { STRIPE_API_VERSION, stripeHeaders } from "@/lib/stripe";
 
 export const runtime = "nodejs";
@@ -234,6 +234,99 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
   return false;
 }
 
+/**
+ * The deposit confirmation. Nothing was sent for project deposits at all:
+ * the success page told the buyer Stripe had emailed a receipt, Stripe's
+ * receipt emails were switched off, and this webhook ignored anything that
+ * was not a demo. Someone could pay a four-figure deposit and hear nothing.
+ */
+async function emailDepositReceipt(
+  to: string,
+  amounts: { paid: number; total: number; balance: number; summary: string }
+): Promise<boolean> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const from = process.env.DEMO_EMAIL_FROM;
+  if (!apiKey || !from) {
+    console.error(
+      "Deposit email skipped: RESEND_API_KEY or DEMO_EMAIL_FROM is not set"
+    );
+    return false;
+  }
+
+  const steps = [
+    "I email you to ask about your business, your photos, and what you want the site to do.",
+    "I build the first version and send you a link.",
+    "We adjust it until it's right.",
+    "You pay the balance and it goes live on your domain.",
+  ];
+
+  const html = `
+    <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:520px;color:#2a2118;line-height:1.6">
+      <p style="margin:0 0 16px">Thanks — your deposit came through and your project is booked in.</p>
+      <p style="margin:0 0 16px">
+        ${amounts.summary}<br>
+        Deposit paid: <strong>${formatUSD(amounts.paid)}</strong><br>
+        Project total: ${formatUSD(amounts.total)}<br>
+        Balance due at launch: ${formatUSD(amounts.balance)}
+      </p>
+      <p style="margin:0 0 8px">What happens next:</p>
+      <ol style="margin:0 0 16px;padding-left:20px">
+        ${steps.map((step) => `<li style="margin:0 0 4px">${step}</li>`).join("")}
+      </ol>
+      <p style="margin:0 0 16px">I'll be in touch within one business day. Just reply to this email if anything looks wrong.</p>
+      <p style="margin:0">Tracy<br>Trayfolio</p>
+    </div>`;
+
+  const text = [
+    "Thanks - your deposit came through and your project is booked in.",
+    "",
+    amounts.summary,
+    `Deposit paid: ${formatUSD(amounts.paid)}`,
+    `Project total: ${formatUSD(amounts.total)}`,
+    `Balance due at launch: ${formatUSD(amounts.balance)}`,
+    "",
+    "What happens next:",
+    ...steps.map((step, i) => `${i + 1}. ${step}`),
+    "",
+    "I'll be in touch within one business day. Just reply to this email if",
+    "anything looks wrong.",
+    "",
+    "Tracy",
+    "Trayfolio",
+  ].join("\n");
+
+  const message: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string;
+    text: string;
+    reply_to?: string;
+  } = {
+    from,
+    to,
+    subject: "Your Trayfolio project deposit",
+    html,
+    text,
+  };
+
+  const replyTo = process.env.REPLY_TO_EMAIL ?? process.env.ALERT_EMAIL;
+  if (replyTo) message.reply_to = replyTo;
+
+  let detail = "unknown error";
+  for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const result = await sendViaResend(apiKey, message);
+    if (result.ok) return true;
+    detail = result.detail;
+    if (attempt === 1) {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+    }
+  }
+
+  console.error(`Deposit email to ${to} failed after 2 attempts: ${detail}`);
+  return false;
+}
+
 export async function POST(request: Request) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -262,14 +355,34 @@ export async function POST(request: Request) {
 
   const session = event.data?.object ?? {};
   const metadata = (session.metadata ?? {}) as Record<string, string>;
-  if (metadata.kind !== "demo") {
+  if (metadata.kind !== "demo" && metadata.kind !== "project") {
     return new Response("Ignored", { status: 200 });
   }
 
   const details = session.customer_details as { email?: string } | undefined;
   const email = details?.email;
   if (!email) {
-    console.error("Demo purchase had no email on the session");
+    console.error(`${metadata.kind} purchase had no email on the session`);
+    return new Response("OK", { status: 200 });
+  }
+
+  if (metadata.kind === "project") {
+    try {
+      const paid = Number(session.amount_total ?? 0);
+      const total = Number(metadata.project_total ?? 0);
+      const balance = Number(metadata.balance_due ?? 0);
+      const sent = await emailDepositReceipt(email, {
+        paid,
+        total,
+        balance,
+        summary: metadata.summary ?? "Website project",
+      });
+      if (!sent) {
+        console.error(`Deposit confirmation for ${email} did not send`);
+      }
+    } catch (error) {
+      console.error("Deposit confirmation failed", error);
+    }
     return new Response("OK", { status: 200 });
   }
 
