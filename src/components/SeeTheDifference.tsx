@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import type { CSSProperties } from "react";
 import Reveal from "@/components/Reveal";
 import { CompareReveal } from "@/components/ui/compare-reveal";
@@ -65,9 +66,27 @@ function TemplateSitePanel() {
  * video.
  */
 function PremiumSitePanel() {
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const [showTitle, setShowTitle] = React.useState(false);
+
+  // Pop the title card up over the final beat of the loop — the way a real
+  // business site's hero video settles on its wordmark before it repeats.
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    const REVEAL_BEFORE_END = 2.4; // seconds of held title before the loop restarts
+    const onTimeUpdate = () => {
+      if (!video.duration) return;
+      setShowTitle(video.currentTime >= video.duration - REVEAL_BEFORE_END);
+    };
+    video.addEventListener("timeupdate", onTimeUpdate);
+    return () => video.removeEventListener("timeupdate", onTimeUpdate);
+  }, []);
+
   return (
     <div className="pointer-events-none relative h-full w-full overflow-hidden bg-black">
       <video
+        ref={videoRef}
         className="h-full w-full object-cover"
         src="/hero-previews/luxury-realestate-drone.mp4"
         autoPlay
@@ -76,10 +95,17 @@ function PremiumSitePanel() {
         playsInline
         preload="auto"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/40" />
-      <div className="absolute inset-x-0 top-0 flex items-center justify-center pt-4">
-        <span className="text-xs font-semibold tracking-[0.14em] text-white/90">
-          TRAYFOLIO
+      <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/45" />
+
+      <div
+        className="absolute inset-0 flex items-center justify-center transition-all duration-700 ease-out"
+        style={{
+          opacity: showTitle ? 1 : 0,
+          transform: showTitle ? "translateY(0)" : "translateY(10px)",
+        }}
+      >
+        <span className="font-display text-3xl font-light tracking-[0.02em] text-white sm:text-4xl">
+          Elevate Properties
         </span>
       </div>
     </div>
