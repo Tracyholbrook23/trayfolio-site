@@ -96,7 +96,14 @@ type SendResult = { ok: true } | { ok: false; detail: string };
 
 async function sendViaResend(
   apiKey: string,
-  message: { from: string; to: string; subject: string; html: string }
+  message: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string;
+    text?: string;
+    reply_to?: string;
+  }
 ): Promise<SendResult> {
   try {
     const response = await fetch(RESEND_ENDPOINT, {
@@ -155,22 +162,60 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
     return false;
   }
 
+  // Deliberately plain. Gmail filed the earlier, prettier version under
+  // Promotions -- big coloured code block, "$50", buy-a-site language all
+  // read as marketing. This is a receipt for something already paid for,
+  // so it is written and styled like one.
   const html = `
     <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:520px;color:#2a2118;line-height:1.6">
-      <p style="font-size:18px;font-weight:600;margin:0 0 16px">Thanks for ordering a demo.</p>
-      <p style="margin:0 0 16px">I'll be in touch within 24 hours to ask about your business and get started on it.</p>
-      <p style="margin:0 0 8px">Here's your $50 credit code. It comes straight off the price if you decide to buy a site:</p>
-      <p style="font-size:24px;font-weight:700;letter-spacing:2px;background:#fbead9;padding:14px 18px;margin:0 0 16px;display:inline-block">${code}</p>
-      <p style="margin:0 0 16px;font-size:14px;color:#6b6154">Enter it at checkout on trayfolio.net. It works once and is good for 90 days.</p>
-      <p style="margin:0">Tracy<br><span style="color:#6b6154">Trayfolio</span></p>
+      <p style="margin:0 0 16px">Thanks for your order. Your demo landing page is paid for and I've started on it.</p>
+      <p style="margin:0 0 16px">I'll email you within 24 hours to ask about your business and what you want the page to do.</p>
+      <p style="margin:0 0 16px">
+        Order reference: <strong>${code}</strong><br>
+        This is also your $50 credit toward a full site. Enter it at checkout on
+        trayfolio.net &mdash; it works once, and is good for 90 days.
+      </p>
+      <p style="margin:0 0 16px">Just reply to this email if you have any questions.</p>
+      <p style="margin:0">Tracy<br>Trayfolio</p>
     </div>`;
 
-  const message = {
+  // A plain-text alternative alongside the HTML. Mail with only an HTML part
+  // looks more like bulk mail to filters than a real one-to-one message.
+  const text = [
+    "Thanks for your order. Your demo landing page is paid for and I've started on it.",
+    "",
+    "I'll email you within 24 hours to ask about your business and what you want the page to do.",
+    "",
+    `Order reference: ${code}`,
+    "This is also your $50 credit toward a full site. Enter it at checkout on",
+    "trayfolio.net - it works once, and is good for 90 days.",
+    "",
+    "Just reply to this email if you have any questions.",
+    "",
+    "Tracy",
+    "Trayfolio",
+  ].join("\n");
+
+  const message: {
+    from: string;
+    to: string;
+    subject: string;
+    html: string;
+    text: string;
+    reply_to?: string;
+  } = {
     from,
     to,
-    subject: "Your Trayfolio demo, and your $50 credit code",
+    // No price or offer language in the subject: this is an order confirmation.
+    subject: `Your Trayfolio demo order (${code})`,
     html,
+    text,
   };
+
+  // The sending domain has no mailbox, so without this a customer's reply
+  // bounces. Falls back to the alert address, which is already set.
+  const replyTo = process.env.REPLY_TO_EMAIL ?? process.env.ALERT_EMAIL;
+  if (replyTo) message.reply_to = replyTo;
 
   // Two attempts: a failure here is usually a transient blip rather than a
   // bad config, and the customer has already paid.
