@@ -3,7 +3,6 @@
 import type { CSSProperties } from "react";
 import Reveal from "@/components/Reveal";
 import { CompareReveal } from "@/components/ui/compare-reveal";
-import { HeroCarousel, type HeroCarouselItem } from "@/components/ui/hero-carousel";
 
 /**
  * The "template" side: a generic, dated small-business layout — default
@@ -57,66 +56,33 @@ function TemplateSitePanel() {
 }
 
 /**
- * The "custom build" side: a moving, autoplaying showcase reel built from
- * real Trayfolio work and demo builds, instead of a static mockup. It sits
- * underneath the compare-reveal's clipped "before" layer and keeps playing
- * on its own — `pointer-events-none` so dragging anywhere on the frame
- * always moves the compare divider rather than fighting the carousel's own
- * drag-to-scroll.
+ * The "custom build" side: a single continuous cinematic drone shot
+ * (generated with Higgsfield) gliding through the front doors of a luxury
+ * home, touring the interior, and gliding back out to the exterior — a
+ * real-estate-style hero reel standing in for the kind of custom build
+ * Trayfolio delivers. `pointer-events-none` so dragging anywhere on the
+ * frame always moves the compare divider instead of interacting with the
+ * video.
  */
-const PREMIUM_LOOKS: HeroCarouselItem[] = [
-  {
-    title: "Valtier\nMedia",
-    image: "/hero-previews/valtier-media.jpg",
-    credit: "BUILT BY TRAYFOLIO.",
-    meta: ["AUSTIN, TX", "LIVE SITE"],
-    effect: "gradient",
-  },
-  {
-    title: "Custom\nMembership",
-    image: "/hero-previews/mode-1-gate.jpg",
-    credit: "BUILT BY TRAYFOLIO.",
-    meta: ["MØDE", "LIVE SITE"],
-    // Real captured frames from the live tap-to-enter gate: the landing
-    // screen, the tap flash, then the revealed homepage.
-    sequence: [
-      "/hero-previews/mode-1-gate.jpg",
-      "/hero-previews/mode-2-tap.jpg",
-      "/hero-previews/mode-3-enter.jpg",
-    ],
-    sequenceFrameMs: [1300, 450, 1450],
-  },
-  {
-    title: "Shawnie's\nLoc Lab",
-    image: "/hero-previews/shawnies-loc-lab.jpg",
-    credit: "BUILT BY TRAYFOLIO.",
-    meta: ["LANSING, MI", "LIVE SITE"],
-  },
-  {
-    title: "STRUX\nConstruction",
-    image: "/hero-previews/strux-construction.jpg",
-    credit: "INTERACTIVE DEMO.",
-    meta: ["CONSTRUCTION", "SCROLL DEMO"],
-    effect: "scroll-scrub",
-  },
-  {
-    title: "Evergreen\nLighting",
-    image: "/hero-previews/evergreen-lighting.jpg",
-    credit: "INTERACTIVE DEMO.",
-    meta: ["HOME SERVICES", "BEFORE/AFTER"],
-  },
-];
-
 function PremiumSitePanel() {
   return (
-    <HeroCarousel
-      items={PREMIUM_LOOKS}
-      defaultIndex={0}
-      brand="TRAYFOLIO"
-      autoplay
-      autoplayDelay={3200}
-      className="pointer-events-none h-full w-full"
-    />
+    <div className="pointer-events-none relative h-full w-full overflow-hidden bg-black">
+      <video
+        className="h-full w-full object-cover"
+        src="/hero-previews/luxury-realestate-drone.mp4"
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+      />
+      <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/40" />
+      <div className="absolute inset-x-0 top-0 flex items-center justify-center pt-4">
+        <span className="text-xs font-semibold tracking-[0.14em] text-white/90">
+          TRAYFOLIO
+        </span>
+      </div>
+    </div>
   );
 }
 
