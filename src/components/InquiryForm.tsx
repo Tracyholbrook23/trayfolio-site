@@ -10,14 +10,12 @@ const projectTypes = [
   "Something else",
 ];
 
-const budgets = ["Under $1,000", "$1,000 to $2,500", "$2,500 to $5,000", "$5,000+", "Not sure yet"];
 
 export default function InquiryForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [business, setBusiness] = useState("");
   const [projectType, setProjectType] = useState<string[]>([]);
-  const [budget, setBudget] = useState(budgets[0]);
   const [message, setMessage] = useState("");
 
   function toggleType(type: string) {
@@ -34,7 +32,6 @@ export default function InquiryForm() {
       `Email: ${email}`,
       `Business: ${business || "N/A"}`,
       `Project type: ${projectType.length ? projectType.join(", ") : "Not specified"}`,
-      `Budget: ${budget}`,
       "",
       "Message:",
       message,
@@ -109,24 +106,6 @@ export default function InquiryForm() {
             </button>
           ))}
         </div>
-      </div>
-
-      <div>
-        <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-budget">
-          Budget range
-        </label>
-        <select
-          id="inquiry-budget"
-          value={budget}
-          onChange={(e) => setBudget(e.target.value)}
-          className="mt-1.5 w-full rounded-xl border border-stone-300 bg-white px-4 py-2.5 text-sm outline-none transition focus:border-stone-900"
-        >
-          {budgets.map((b) => (
-            <option key={b} value={b}>
-              {b}
-            </option>
-          ))}
-        </select>
       </div>
 
       <div>
