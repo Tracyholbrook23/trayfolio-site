@@ -121,7 +121,7 @@ export default function Pricing() {
     <div className="flex flex-col flex-1 bg-white text-stone-900">
       <SiteHeader />
 
-      <main className="flex-1">
+      <main className="flex-1 pb-[var(--stack-overlap)]">
         {/* Header */}
         <section className="mx-auto max-w-5xl px-6 pb-12 pt-16 text-center sm:pt-24">
           <p className="mb-4 text-sm font-semibold uppercase tracking-wider text-stone-500">

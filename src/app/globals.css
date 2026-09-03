@@ -112,3 +112,72 @@ body {
     animation: none !important;
   }
 }
+
+/* ------------------------------------------------------------------
+   Scroll layering (StackLayer.tsx)
+
+   Each section is a "card" that rides up over the one before it: rounded
+   top corners, a negative top margin so it physically overlaps, and an
+   upward shadow so you can feel the edge of the layer underneath.
+   ------------------------------------------------------------------ */
+
+:root {
+  --stack-radius: 2rem;
+  --stack-overlap: 4.5rem;
+  --stack-shadow: 0 -28px 56px -16px rgba(42, 33, 24, 0.45);
+}
+
+@media (min-width: 640px) {
+  :root {
+    --stack-radius: 3rem;
+    --stack-overlap: 6rem;
+  }
+}
+
+.stack-layer {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  margin-top: calc(var(--stack-overlap) * -1);
+  border-top-left-radius: var(--stack-radius);
+  border-top-right-radius: var(--stack-radius);
+  box-shadow: var(--stack-shadow);
+}
+
+/* Nothing sits under the first layer, so it stays flush with the header. */
+.stack-layer--first {
+  margin-top: 0;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  box-shadow: none;
+}
+
+/* Keeps a layer's content clear of the next layer riding over its bottom. */
+.stack-layer--pad {
+  padding-bottom: var(--stack-overlap);
+}
+
+.stack-layer-rise,
+.stack-layer-sink {
+  will-change: transform;
+}
+
+/* The shadow cast by the layer sliding over this one. */
+.stack-layer-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  background: #1c1409;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stack-layer-rise,
+  .stack-layer-sink {
+    will-change: auto;
+  }
+  .stack-layer-scrim {
+    display: none;
+  }
+}

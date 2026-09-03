@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { RevealText } from "@/components/ui/reveal-text";
+import StackLayer from "@/components/StackLayer";
 
 const columns: {
   heading: string;
@@ -61,7 +62,7 @@ export default function SiteFooter() {
   }, []);
 
   return (
-    <footer className="border-t border-stone-100 bg-peach/40">
+    <StackLayer as="footer" last noRise className="bg-peach">
       <div className="mx-auto max-w-5xl px-6 py-16">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
           {columns.map((col) => (
@@ -102,6 +103,6 @@ export default function SiteFooter() {
           {showWordmark && <RevealText text="Trayfolio" />}
         </div>
       </div>
-    </footer>
+    </StackLayer>
   );
 }

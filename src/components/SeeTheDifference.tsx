@@ -3,6 +3,7 @@
 import * as React from "react";
 import type { CSSProperties } from "react";
 import Reveal from "@/components/Reveal";
+import StackLayer from "@/components/StackLayer";
 import { CompareReveal } from "@/components/ui/compare-reveal";
 
 /**
@@ -114,7 +115,7 @@ function PremiumSitePanel() {
 
 export default function SeeTheDifference() {
   return (
-    <section id="see-the-difference" className="border-t border-stone-100 bg-stone-50">
+    <StackLayer id="see-the-difference" className="bg-white">
       <div className="mx-auto max-w-5xl px-6 py-24">
         <Reveal>
           <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">
@@ -148,6 +149,6 @@ export default function SeeTheDifference() {
           />
         </Reveal>
       </div>
-    </section>
+    </StackLayer>
   );
 }

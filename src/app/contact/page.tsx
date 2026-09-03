@@ -14,7 +14,7 @@ export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-stone-900">
       <SiteHeader />
-      <main className="flex-1">
+      <main className="flex-1 pb-[var(--stack-overlap)]">
         <section className="mx-auto max-w-5xl px-6 py-24 sm:py-28">
           <div className="grid gap-12 lg:grid-cols-5">
             <Reveal className="lg:col-span-2">

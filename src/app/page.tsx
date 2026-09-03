@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import StackLayer from "@/components/StackLayer";
 import { RevealText } from "@/components/ui/reveal-text";
 import { CoverflowCarousel, type CoverflowSlide } from "@/components/ui/coverflow-carousel";
 import SiteHeader from "@/components/SiteHeader";
@@ -97,7 +98,7 @@ export default function Home() {
 
       <main className="flex-1">
         {/* Hero */}
-        <section className="relative overflow-hidden bg-peach text-stone-900">
+        <StackLayer first noPad className="bg-peach text-stone-900">
           <div className="grain-overlay pointer-events-none absolute inset-0 -z-10" />
 
           <div className="mx-auto flex min-h-[calc(100svh-73px)] max-w-5xl flex-col items-center justify-center px-6 py-20 text-center">
@@ -126,10 +127,10 @@ export default function Home() {
               </div>
             </Reveal>
           </div>
-        </section>
+        </StackLayer>
 
         {/* Live demo carousel */}
-        <section id="demos" className="border-t border-stone-100 bg-white">
+        <StackLayer id="demos" className="bg-white">
           <div className="mx-auto max-w-5xl px-6 py-24">
             <Reveal>
               <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">
@@ -154,10 +155,10 @@ export default function Home() {
               />
             </Reveal>
           </div>
-        </section>
+        </StackLayer>
 
         {/* Recent work strip */}
-        <section id="work" className="border-t border-stone-100 bg-stone-50">
+        <StackLayer id="work" className="bg-stone-50">
           <div className="mx-auto max-w-5xl px-6 py-24">
             <Reveal>
               <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
@@ -190,12 +191,12 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </section>
+        </StackLayer>
 
         <SeeTheDifference />
 
         {/* Services */}
-        <section id="services" className="border-t border-stone-100 bg-white">
+        <StackLayer id="services" className="bg-peach">
           <div className="mx-auto max-w-5xl px-6 py-28">
             <Reveal>
               <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
@@ -215,10 +216,10 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </section>
+        </StackLayer>
 
         {/* Your site, your way */}
-        <section className="relative overflow-hidden bg-stone-950 text-white">
+        <StackLayer className="bg-stone-950 text-white">
           <ShaderAnimation />
           <div className="relative z-10 mx-auto max-w-3xl px-6 py-28 text-center sm:py-36">
             <Reveal>
@@ -245,10 +246,10 @@ export default function Home() {
               </div>
             </Reveal>
           </div>
-        </section>
+        </StackLayer>
 
         {/* Contact CTA */}
-        <section id="contact" className="border-t border-stone-100 bg-white">
+        <StackLayer id="contact" className="bg-white">
           <div className="mx-auto max-w-2xl px-6 py-28 text-center">
             <Reveal>
               <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
@@ -278,7 +279,7 @@ export default function Home() {
               </p>
             </Reveal>
           </div>
-        </section>
+        </StackLayer>
       </main>
 
       <SiteFooter />
