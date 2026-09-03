@@ -1,5 +1,13 @@
+import type { Metadata } from "next";
+import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
+
+export const metadata: Metadata = {
+  title: "Pricing | Trayfolio",
+  description:
+    "Flat, upfront website pricing for small businesses: build packages, add-ons, monthly care plans, and marketing.",
+};
 
 const buildTiers = [
   {
@@ -90,29 +98,6 @@ const marketing = [
     name: "Social Media Ads",
     price: "$225/mo",
     description: "Management fee plus your ad spend. I set up, run, and report on campaigns across Facebook & Instagram.",
-  },
-];
-
-const faqs = [
-  {
-    question: "How long does a project take?",
-    answer:
-      "Most Starter and Growth sites are live in 1-2 weeks. Signature projects typically take 3-5 weeks depending on scope.",
-  },
-  {
-    question: "How does payment work?",
-    answer:
-      "Half up front to start the project, half due at launch. Care plans and add-ons are billed monthly once your site is live.",
-  },
-  {
-    question: "Do I own my website?",
-    answer:
-      "Yes. The site, its content, and your domain are yours. There's no long-term contract to keep your site online.",
-  },
-  {
-    question: "What if I need something not listed here?",
-    answer:
-      "Every business is different. Email me what you're looking for and I'll put together a custom quote.",
   },
 ];
 
@@ -263,23 +248,23 @@ export default function Pricing() {
           </div>
         </section>
 
-        {/* FAQ */}
-        <section id="faq" className="border-t border-stone-100 bg-stone-50 scroll-mt-20">
-          <div className="mx-auto max-w-5xl px-6 py-20">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-              Questions
-            </h2>
-            <p className="mt-2 max-w-xl text-2xl font-semibold tracking-tight sm:text-3xl">
-              Frequently asked
-            </p>
-            <div className="mt-10 grid gap-8 sm:grid-cols-2">
-              {faqs.map((faq) => (
-                <div key={faq.question}>
-                  <h3 className="font-semibold">{faq.question}</h3>
-                  <p className="mt-2 text-sm leading-6 text-stone-600">{faq.answer}</p>
-                </div>
-              ))}
+        {/* FAQ pointer */}
+        <section className="border-t border-stone-100 bg-stone-50">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-6 px-6 py-16 text-center sm:flex-row sm:justify-between sm:text-left">
+            <div>
+              <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
+                Questions
+              </h2>
+              <p className="mt-2 max-w-lg text-2xl font-semibold tracking-tight sm:text-3xl">
+                Timelines, payment, ownership, and what happens after launch.
+              </p>
             </div>
+            <Link
+              href="/faq"
+              className="whitespace-nowrap rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
+            >
+              Read the FAQ
+            </Link>
           </div>
         </section>
 

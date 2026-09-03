@@ -11,7 +11,7 @@ export default function SiteHeader() {
           <Link href="/#work" className="hover:text-stone-900">Work</Link>
           <Link href="/#demos" className="hover:text-stone-900">Demos</Link>
           <Link href="/pricing" className="hover:text-stone-900">Pricing</Link>
-          <Link href="/pricing#faq" className="hover:text-stone-900">FAQ</Link>
+          <Link href="/faq" className="hover:text-stone-900">FAQ</Link>
         </div>
         <Link
           href="/contact"

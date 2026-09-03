@@ -22,7 +22,7 @@ const columns: {
       { label: "Work", href: "/#work" },
       { label: "Demos", href: "/#demos" },
       { label: "Pricing", href: "/pricing" },
-      { label: "FAQ", href: "/pricing#faq" },
+      { label: "FAQ", href: "/faq" },
     ],
   },
   {
