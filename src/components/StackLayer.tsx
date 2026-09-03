@@ -75,7 +75,7 @@ export default function StackLayer({
       if (!first && !noRise && riseRef.current) {
         gsap.fromTo(
           riseRef.current,
-          { y: 72, scale: 0.94 },
+          { y: 36, scale: 0.975 },
           {
             y: 0,
             scale: 1,
@@ -105,7 +105,7 @@ export default function StackLayer({
           gsap.fromTo(
             sinkRef.current,
             { y: 0, scale: 1 },
-            { y: 96, scale: 0.88, ease: "none", scrollTrigger: coveredBy() }
+            { y: 44, scale: 0.95, ease: "none", scrollTrigger: coveredBy() }
           );
         }
 
@@ -113,7 +113,7 @@ export default function StackLayer({
           gsap.fromTo(
             scrimRef.current,
             { opacity: 0 },
-            { opacity: 0.55, ease: "none", scrollTrigger: coveredBy() }
+            { opacity: 0.3, ease: "none", scrollTrigger: coveredBy() }
           );
         }
       }

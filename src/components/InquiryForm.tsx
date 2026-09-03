@@ -29,6 +29,7 @@ const inputClass =
 export default function InquiryForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [business, setBusiness] = useState("");
   const [projectType, setProjectType] = useState<string[]>([]);
   const [message, setMessage] = useState("");
@@ -49,6 +50,7 @@ export default function InquiryForm() {
   function resetForm() {
     setName("");
     setEmail("");
+    setPhone("");
     setBusiness("");
     setProjectType([]);
     setMessage("");
@@ -79,6 +81,7 @@ export default function InquiryForm() {
           botcheck,
           name,
           email,
+          phone: phone || "Not given",
           business: business || "Not given",
           project_type: projectType.length ? projectType.join(", ") : "Not specified",
           message,
@@ -163,19 +166,39 @@ export default function InquiryForm() {
         </div>
       </div>
 
-      <div>
-        <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-business">
-          Business / industry
-        </label>
-        <input
-          id="inquiry-business"
-          name="business"
-          disabled={sending}
-          value={business}
-          onChange={(e) => setBusiness(e.target.value)}
-          className={inputClass}
-          placeholder="e.g. home services, apparel, photography..."
-        />
+      <div className="grid gap-5 sm:grid-cols-2">
+        <div>
+          <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-phone">
+            Phone{" "}
+            <span className="font-normal text-stone-400">(optional)</span>
+          </label>
+          <input
+            id="inquiry-phone"
+            name="phone"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel"
+            disabled={sending}
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            className={inputClass}
+            placeholder="(555) 123-4567"
+          />
+        </div>
+        <div>
+          <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-business">
+            Business / industry
+          </label>
+          <input
+            id="inquiry-business"
+            name="business"
+            disabled={sending}
+            value={business}
+            onChange={(e) => setBusiness(e.target.value)}
+            className={inputClass}
+            placeholder="e.g. home services, photography..."
+          />
+        </div>
       </div>
 
       <div>

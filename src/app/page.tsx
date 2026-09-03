@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import StackLayer from "@/components/StackLayer";
+import LayeredWord from "@/components/LayeredWord";
 import { RevealText } from "@/components/ui/reveal-text";
 import { CoverflowCarousel, type CoverflowSlide } from "@/components/ui/coverflow-carousel";
 import SiteHeader from "@/components/SiteHeader";
@@ -137,7 +138,7 @@ export default function Home() {
         </StackLayer>
 
         {/* Live demo carousel */}
-        <StackLayer id="demos" className="bg-white">
+        <StackLayer id="demos" noPad className="bg-white">
           <div className="mx-auto max-w-5xl px-6 py-24">
             <Reveal>
               <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">
@@ -165,14 +166,12 @@ export default function Home() {
         </StackLayer>
 
         {/* Recent work strip */}
-        <StackLayer id="work" className="bg-stone-50">
+        <section id="work" className="bg-stone-50">
           <div className="mx-auto max-w-5xl px-6 py-24">
-            <Reveal>
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-                Recent work
-              </h2>
-            </Reveal>
-            <div className="mt-8 grid gap-8 sm:grid-cols-3">
+            <h2>
+              <LayeredWord text="Recent Work" />
+            </h2>
+            <div className="mt-12 grid gap-8 sm:grid-cols-3">
               {work.map((project, i) => (
                 <Reveal key={project.name} delay={i * 100}>
                   <Link
@@ -198,22 +197,22 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </StackLayer>
+        </section>
 
         <SeeTheDifference />
 
         {/* Services */}
-        <StackLayer id="services" className="bg-peach">
+        <section id="services" className="bg-peach">
           <div className="mx-auto max-w-5xl px-6 py-28">
+            <h2>
+              <LayeredWord text="What I Do" />
+            </h2>
             <Reveal>
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-                What I actually do
-              </h2>
-              <p className="font-display mt-2 max-w-xl text-2xl font-semibold tracking-tight sm:text-3xl">
+              <p className="mt-6 max-w-xl text-lg text-stone-600">
                 Three services. No bloat.
               </p>
             </Reveal>
-            <div className="mt-10 grid gap-8 sm:grid-cols-3">
+            <div className="mt-12 grid gap-8 sm:grid-cols-3">
               {services.map((service, i) => (
                 <Reveal key={service.number} delay={i * 100}>
                   <span className="text-sm font-semibold text-terracotta">{service.number}</span>
@@ -223,10 +222,10 @@ export default function Home() {
               ))}
             </div>
           </div>
-        </StackLayer>
+        </section>
 
         {/* Your site, your way */}
-        <StackLayer className="bg-stone-950 text-white">
+        <StackLayer noPad className="bg-stone-950 text-white">
           <ShaderAnimation />
           <div className="relative z-10 mx-auto max-w-3xl px-6 py-28 text-center sm:py-36">
             <Reveal>
@@ -256,8 +255,8 @@ export default function Home() {
         </StackLayer>
 
         {/* Contact CTA */}
-        <StackLayer id="contact" className="bg-white">
-          <div className="mx-auto max-w-2xl px-6 py-28 text-center">
+        <section id="contact" className="bg-white">
+          <div className="mx-auto max-w-2xl px-6 pt-28 pb-[calc(7rem+var(--stack-overlap))] text-center">
             <Reveal>
               <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
                 Let&apos;s build something
@@ -286,7 +285,7 @@ export default function Home() {
               </p>
             </Reveal>
           </div>
-        </StackLayer>
+        </section>
       </main>
 
       <SiteFooter />
