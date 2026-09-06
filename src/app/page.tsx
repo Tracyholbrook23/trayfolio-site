@@ -82,6 +82,18 @@ const demoSlides: CoverflowSlide[] = [
       mobile: "Best viewed on desktop. Hover isn't available on touchscreens.",
     },
   },
+  {
+    src: "/work/autodetailingatx.jpg",
+    alt: "ATX Auto Detailing landing-page demo",
+    title: "ATX Auto Detailing",
+    subtitle: "Mobile auto detailing landing-page demo",
+    href: "/demos/autodetailing/index.html",
+    linkLabel: "View the landing page",
+    meta: [
+      { label: "Industry", value: "Automotive services" },
+      { label: "Signature move", value: "High-impact service landing page" },
+    ],
+  },
 ];
 
 const services = [
