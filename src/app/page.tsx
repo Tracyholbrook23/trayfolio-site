@@ -35,6 +35,12 @@ const work = [
     image: "/work/autodetailingatx.jpg",
     href: "https://www.autodetailingatx.com",
   },
+  {
+    name: "RunCheck",
+    description: "Pickup basketball app, Austin TX",
+    image: "/work/runcheck.jpg",
+    href: "https://www.theruncheck.app",
+  },
 ];
 
 const demoSlides: CoverflowSlide[] = [
