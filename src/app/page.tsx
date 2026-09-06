@@ -29,6 +29,12 @@ const work = [
     image: "/work/shawniesloclab.jpg",
     href: "https://www.shawniesloclab.com",
   },
+  {
+    name: "ATX Auto Detailing",
+    description: "Mobile car detailing, Austin TX",
+    image: "/work/autodetailingatx.jpg",
+    href: "https://www.autodetailingatx.com",
+  },
 ];
 
 const demoSlides: CoverflowSlide[] = [
@@ -171,7 +177,7 @@ export default function Home() {
             <h2>
               <LayeredWord text="Recent Work" />
             </h2>
-            <div className="mt-12 grid gap-8 sm:grid-cols-3">
+            <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               {work.map((project, i) => (
                 <Reveal key={project.name} delay={i * 100}>
                   <Link
