@@ -2,15 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 
-/**
- * Web3Forms access key, from https://app.web3forms.com/forms
- *
- * This is a PUBLIC key by design. It ships in the browser bundle either
- * way and only identifies which inbox submissions are delivered to, so
- * there is nothing to hide here and no env var needed.
- */
-const WEB3FORMS_ACCESS_KEY = "29b9fc26-6e77-40dd-ad1b-5439a304c145";
-
 const OWNER_EMAIL = "tracyholbrook532@gmail.com";
 
 const projectTypes = [
@@ -66,24 +57,19 @@ export default function InquiryForm() {
     setErrorMessage("");
 
     try {
-      const response = await fetch("https://api.web3forms.com/submit", {
+      const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
         body: JSON.stringify({
-          access_key: WEB3FORMS_ACCESS_KEY,
-          subject: `New website inquiry: ${business || name || "Trayfolio lead"}`,
-          from_name: "Trayfolio website",
-          // Lets you hit reply in Gmail and answer the lead directly.
-          replyto: email,
           botcheck,
           name,
           email,
-          phone: phone || "Not given",
-          business: business || "Not given",
-          project_type: projectType.length ? projectType.join(", ") : "Not specified",
+          phone,
+          business,
+          projectType,
           message,
         }),
       });
