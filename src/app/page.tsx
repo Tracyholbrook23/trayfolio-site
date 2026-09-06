@@ -9,6 +9,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import SeeTheDifference from "@/components/SeeTheDifference";
 import { ShaderAnimation } from "@/components/ui/shader-animation";
+import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 
 const work = [
   {
@@ -173,6 +174,13 @@ export default function Home() {
                 showNavigation
                 label="Live website demos"
               />
+            </Reveal>
+            <Reveal delay={250} className="mt-12 flex flex-col items-center gap-4 text-center">
+              <p className="max-w-sm text-sm text-stone-600">
+                Want something like this for your own business? Get a real, live demo of
+                your site for $50, credited back if you go on to buy.
+              </p>
+              <DemoCheckoutButton />
             </Reveal>
           </div>
         </StackLayer>
