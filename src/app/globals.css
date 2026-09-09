@@ -38,6 +38,17 @@ body {
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
 
+/* Warm, lightly crumpled paper used on the site's large cream surfaces. */
+.paper-texture {
+  background-color: var(--color-peach);
+  background-image:
+    linear-gradient(rgb(251 234 217 / 18%), rgb(251 234 217 / 18%)),
+    url("/textures/wrinkled-paper.webp");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
 .font-display {
   font-family: var(--font-display), var(--font-sans), sans-serif;
 }
@@ -52,7 +63,7 @@ body {
   animation: gradient-shift 7s ease-in-out infinite;
 }
 
-/* Soft grain texture overlay for the hero background */
+/* Fine paper grain layered over the hero's larger wrinkle texture. */
 .grain-overlay {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='140'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
   opacity: 0.045;

@@ -48,7 +48,7 @@ export default function PortfolioIntro() {
 
   return (
     <div ref={rootRef}>
-      <section ref={heroRef} className="portfolio-hero bg-peach text-stone-900">
+      <section ref={heroRef} className="paper-texture portfolio-hero text-stone-900">
         <div className="grain-overlay pointer-events-none absolute inset-0" aria-hidden="true" />
         <div className="portfolio-hero__inner">
           <div ref={heroCopyRef} className="portfolio-hero__copy">

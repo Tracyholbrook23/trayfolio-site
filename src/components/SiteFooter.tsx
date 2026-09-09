@@ -63,7 +63,7 @@ export default function SiteFooter() {
   }, []);
 
   return (
-    <StackLayer as="footer" last noRise className="bg-peach">
+    <StackLayer as="footer" last noRise className="paper-texture">
       <div className="mx-auto max-w-5xl px-6 py-16">
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
           {columns.map((col) => (

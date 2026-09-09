@@ -313,7 +313,7 @@ export default function Pricing() {
         </section>
 
         {/* A la carte */}
-        <section className="bg-peach">
+        <section className="paper-texture">
           <div className="mx-auto max-w-5xl px-6 py-20">
             <Reveal>
               <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">

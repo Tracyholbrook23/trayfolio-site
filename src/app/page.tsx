@@ -205,7 +205,7 @@ export default function Home() {
         <SeeTheDifference />
 
         {/* Services */}
-        <section id="services" className="bg-peach">
+        <section id="services" className="paper-texture">
           <div className="mx-auto max-w-5xl px-6 py-28">
             <h2>
               <LayeredWord text="What I Do" />
