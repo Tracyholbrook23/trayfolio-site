@@ -4,13 +4,13 @@ import Link from "next/link";
 import Reveal from "@/components/Reveal";
 import StackLayer from "@/components/StackLayer";
 import LayeredWord from "@/components/LayeredWord";
-import { RevealText } from "@/components/ui/reveal-text";
 import { CoverflowCarousel, type CoverflowSlide } from "@/components/ui/coverflow-carousel";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import SeeTheDifference from "@/components/SeeTheDifference";
 import { ShaderAnimation } from "@/components/ui/shader-animation";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
+import PortfolioIntro from "@/components/PortfolioIntro";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -132,44 +132,40 @@ export default function Home() {
       <SiteHeader />
 
       <main id="main-content" className="flex-1">
-        {/* Hero */}
-        <StackLayer first noPad className="bg-peach text-stone-900">
-          <div className="grain-overlay pointer-events-none absolute inset-0 -z-10" />
+        <PortfolioIntro />
 
-          <div className="mx-auto flex min-h-[calc(100svh-73px)] w-full flex-col items-center justify-center px-2 py-16 text-center sm:px-4">
-            <h1 className="sr-only">Trayfolio: websites for small businesses</h1>
-            {/* Sized in vw so the wordmark spans almost the full viewport.
-                "TRAYFOLIO" in Clash Display Bold measures 5.875em wide, so
-                15vw fills about 88% of a phone screen and 15.8vw about 93%
-                of a desktop one, with room to spare at both ends. */}
-            <RevealText
-              text="TRAYFOLIO"
-              fontSize="text-[clamp(3rem,15vw,26rem)] md:text-[clamp(3rem,15.8vw,26rem)] leading-[0.9]"
-            />
-            <Reveal delay={200}>
-              <p className="mx-auto mt-8 max-w-md text-lg leading-7 text-stone-600">
-                Custom sites for small businesses, built by one person from
-                first draft to launch. No templates, no bloat.
-              </p>
-            </Reveal>
-            <Reveal delay={350}>
-              <div className="mt-10 flex flex-wrap items-center justify-center gap-6">
-                <Link
-                  href="/contact"
-                  className="rounded-full bg-terracotta px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-light"
-                >
-                  Start your project
-                </Link>
-                <a
-                  href="#demos"
-                  className="text-sm font-semibold text-stone-700 underline decoration-stone-400 underline-offset-4 transition hover:text-stone-900"
-                >
-                  See live demos ↓
-                </a>
-              </div>
-            </Reveal>
+        {/* The remaining work follows the large selected-work sequence. */}
+        <section id="work" className="bg-stone-50">
+          <div className="mx-auto max-w-5xl px-6 py-24">
+            <h2><LayeredWord text="More Work" /></h2>
+            <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {work.slice(0, 3).map((project, i) => (
+                <Reveal key={project.name} delay={i * 75}>
+                  <Link
+                    href={project.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow hover:shadow-xl"
+                  >
+                    <div className="relative aspect-video w-full overflow-hidden bg-stone-100">
+                      <Image
+                        src={project.image}
+                        alt={`${project.name} website screenshot`}
+                        fill
+                        sizes="(max-width: 639px) calc(100vw - 3rem), (max-width: 1023px) 45vw, 320px"
+                        className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-semibold">{project.name}</h3>
+                      <p className="mt-1 text-sm text-stone-600">{project.description}</p>
+                    </div>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
           </div>
-        </StackLayer>
+        </section>
 
         {/* Live demo carousel */}
         <StackLayer id="demos" noPad className="bg-white">
@@ -205,40 +201,6 @@ export default function Home() {
             </Reveal>
           </div>
         </StackLayer>
-
-        {/* Recent work strip */}
-        <section id="work" className="bg-stone-50">
-          <div className="mx-auto max-w-5xl px-6 py-24">
-            <h2>
-              <LayeredWord text="Recent Work" />
-            </h2>
-            <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-              {work.map((project, i) => (
-                <Reveal key={project.name} delay={i * 100}>
-                  <Link
-                    href={project.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block overflow-hidden rounded-2xl bg-white"
-                  >
-                    <div className="relative aspect-video w-full overflow-hidden bg-stone-100">
-                      <Image
-                        src={project.image}
-                        alt={`${project.name} website screenshot`}
-                        fill
-                        className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <h3 className="font-semibold">{project.name}</h3>
-                      <p className="mt-1 text-sm text-stone-600">{project.description}</p>
-                    </div>
-                  </Link>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
 
         <SeeTheDifference />
 
