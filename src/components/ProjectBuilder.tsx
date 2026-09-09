@@ -235,6 +235,7 @@ export default function ProjectBuilder() {
         >
           {submitting ? "Opening checkout..." : `Pay ${formatUSD(quote.depositDue)} deposit`}
         </button>
+        <p className="mt-3 text-xs leading-5 text-stone-600">Review the <a href="/terms" className="underline underline-offset-4">terms</a> and <a href="/privacy" className="underline underline-offset-4">privacy policy</a> before continuing.</p>
 
         {error ? (
           <p className="mt-3 text-sm leading-6 text-red-700" role="alert">

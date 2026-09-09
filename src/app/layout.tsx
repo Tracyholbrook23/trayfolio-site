@@ -79,9 +79,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
+        <a href="#main-content" className="sr-only fixed left-3 top-3 z-[110] rounded-lg bg-white px-5 py-3 text-stone-900 focus:not-sr-only">Skip to content</a>
         <SmoothScroll>
           <ScrollProgress />
           {children}

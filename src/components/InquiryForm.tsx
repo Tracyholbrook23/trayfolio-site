@@ -45,6 +45,7 @@ export default function InquiryForm() {
     setBusiness("");
     setProjectType([]);
     setMessage("");
+    setBotcheck("");
     setStatus("idle");
     setErrorMessage("");
   }
@@ -76,10 +77,10 @@ export default function InquiryForm() {
 
       const data = await response.json();
 
-      if (data.success) {
+      if (response.ok && data.success) {
         setStatus("sent");
       } else {
-        throw new Error(data.message || "The form service rejected the submission.");
+        throw new Error(data.error || "Could not send your inquiry. Please try again.");
       }
     } catch (error) {
       setStatus("error");
@@ -124,6 +125,7 @@ export default function InquiryForm() {
           <input
             id="inquiry-name"
             name="name"
+            maxLength={100}
             autoComplete="name"
             required
             disabled={sending}
@@ -140,6 +142,7 @@ export default function InquiryForm() {
           <input
             id="inquiry-email"
             name="email"
+            maxLength={254}
             autoComplete="email"
             required
             type="email"
@@ -156,11 +159,12 @@ export default function InquiryForm() {
         <div>
           <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-phone">
             Phone{" "}
-            <span className="font-normal text-stone-400">(optional)</span>
+            <span className="font-normal text-stone-600">(optional)</span>
           </label>
           <input
             id="inquiry-phone"
             name="phone"
+            maxLength={40}
             type="tel"
             inputMode="tel"
             autoComplete="tel"
@@ -178,6 +182,7 @@ export default function InquiryForm() {
           <input
             id="inquiry-business"
             name="business"
+            maxLength={150}
             disabled={sending}
             value={business}
             onChange={(e) => setBusiness(e.target.value)}
@@ -216,6 +221,7 @@ export default function InquiryForm() {
         <textarea
           id="inquiry-message"
           name="message"
+          maxLength={3000}
           required
           disabled={sending}
           value={message}
@@ -259,8 +265,9 @@ export default function InquiryForm() {
         </p>
       ) : (
         <p className="text-xs text-stone-500">
-          Sends straight to my inbox. No account needed, and I never share your
-          details with anyone.
+          Your inquiry is delivered to my inbox through an email service so I can reply. No account needed. Read the{" "}
+          <a href="/privacy" className="underline underline-offset-4">privacy policy</a>
+          {" "}for how your information is handled.
         </p>
       )}
     </form>

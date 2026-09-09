@@ -8,9 +8,7 @@ const BASE_URL = "https://www.trayfolio.net";
 const routes = ["", "/pricing", "/contact", "/faq", "/start", "/privacy", "/terms"];
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
   return routes.map((route) => ({
     url: `${BASE_URL}${route}`,
-    lastModified,
   }));
 }

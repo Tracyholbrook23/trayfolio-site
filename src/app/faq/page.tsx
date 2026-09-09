@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import { PACKAGES, formatUSD } from "@/lib/pricing";
 import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/faq" },
   title: "FAQ | Trayfolio",
   description:
     "Answers to common questions about working with Trayfolio: timelines, payment, ownership, revisions, and support after launch.",
@@ -37,12 +39,12 @@ const faqGroups = [
       {
         question: "How much does a website cost?",
         answer:
-          "Builds are flat-rate: $700 for Starter, $1,500 for Growth, and $3,200 for Signature. Each package lists exactly what's included on the pricing page, and add-ons are priced separately.",
+          `Builds are flat-rate: ${formatUSD(PACKAGES.starter.amount)} for Starter, ${formatUSD(PACKAGES.growth.amount)} for Growth, and ${formatUSD(PACKAGES.signature.amount)} for Signature. Each package lists exactly what's included on the pricing page, and add-ons are priced separately.`,
       },
       {
         question: "How does payment work?",
         answer:
-          "Half up front to start the project, half due at launch. Care plans and add-ons are billed monthly once your site is live.",
+          "Half up front to start the project, half due at launch. Build add-ons are one-time charges included in your project total. Optional care plans are billed monthly once your site is live.",
       },
       {
         question: "How many rounds of revisions do I get?",
@@ -62,7 +64,7 @@ const faqGroups = [
       {
         question: "What happens after my site goes live?",
         answer:
-          "Nothing you have to do. Care plans are optional and start at $75/mo for hosting, updates, monitoring, and a bit of edit time each month. They're billed month to month and you can cancel anytime.",
+          "Nothing you have to do. Care plans are optional and start at $25/mo for hosting, updates, monitoring, and a bit of edit time each month. They're billed month to month and you can cancel anytime.",
       },
     ],
   },
@@ -73,7 +75,7 @@ export default function FaqPage() {
     <div className="flex min-h-screen flex-col bg-white text-stone-900">
       <SiteHeader />
 
-      <main className="flex-1 pb-[var(--stack-overlap)]">
+      <main id="main-content" className="flex-1 pb-[var(--stack-overlap)]">
         {/* Header */}
         <section className="mx-auto max-w-3xl px-6 pb-12 pt-16 text-center sm:pt-24">
           <Reveal>

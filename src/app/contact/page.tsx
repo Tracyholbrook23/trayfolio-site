@@ -5,6 +5,7 @@ import Reveal from "@/components/Reveal";
 import InquiryForm from "@/components/InquiryForm";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/contact" },
   title: "Contact | Trayfolio",
   description:
     "Start a website project with Trayfolio. Tell me about your business and get a reply within one business day.",
@@ -14,7 +15,7 @@ export default function ContactPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-stone-900">
       <SiteHeader />
-      <main className="flex-1 pb-[var(--stack-overlap)]">
+      <main id="main-content" className="flex-1 pb-[var(--stack-overlap)]">
         <section className="mx-auto max-w-5xl px-6 py-24 sm:py-28">
           <div className="grid gap-12 lg:grid-cols-5">
             <Reveal className="lg:col-span-2">

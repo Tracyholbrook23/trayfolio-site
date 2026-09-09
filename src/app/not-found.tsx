@@ -13,7 +13,7 @@ export default function NotFound() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-stone-900">
       <SiteHeader />
-      <main className="flex-1 pb-[var(--stack-overlap)]">
+      <main id="main-content" className="flex-1 pb-[var(--stack-overlap)]">
         <section className="mx-auto flex max-w-2xl flex-col items-center px-6 py-24 text-center sm:py-32">
           <Reveal>
             <p className="font-display text-7xl font-semibold tracking-tight text-terracotta sm:text-8xl">

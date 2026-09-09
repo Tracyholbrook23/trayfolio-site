@@ -1,3 +1,4 @@
+import { readSubmission } from "@/lib/submission";
 import { NextResponse } from "next/server";
 import {
   buildQuote,
@@ -40,11 +41,11 @@ function rateLimited(ip: string): boolean {
 }
 
 function isPackageId(value: unknown): value is PackageId {
-  return typeof value === "string" && value in PACKAGES;
+  return typeof value === "string" && Object.hasOwn(PACKAGES, value);
 }
 
 function isAddOnId(value: unknown): value is AddOnId {
-  return typeof value === "string" && value in ADD_ONS;
+  return typeof value === "string" && Object.hasOwn(ADD_ONS, value);
 }
 
 export async function POST(request: Request) {
@@ -66,14 +67,17 @@ export async function POST(request: Request) {
     );
   }
 
-  let payload: unknown;
-  try {
-    payload = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Could not read that request." }, { status: 400 });
-  }
+  const submission = await readSubmission(request);
+  if (!submission.ok) return submission.response;
+  const payload = submission.data;
 
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+    return NextResponse.json({ error: "Invalid request." }, { status: 400 });
+  }
   const body = payload as { kind?: unknown; packageId?: unknown; addOns?: unknown };
+  if (body.kind !== undefined && body.kind !== "demo") {
+    return NextResponse.json({ error: "Invalid checkout type." }, { status: 400 });
+  }
   const origin = new URL(request.url).origin;
 
   // --- The $50 demo: one fixed item, no configuration, no deposit split. ---
@@ -97,6 +101,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Pick a package to continue." }, { status: 400 });
   }
 
+  if (body.addOns !== undefined && !Array.isArray(body.addOns)) {
+    return NextResponse.json({ error: "Invalid add-ons." }, { status: 400 });
+  }
   const rawAddOns = Array.isArray(body.addOns) ? body.addOns : [];
   if (rawAddOns.length > 20) {
     return NextResponse.json({ error: "Too many add-ons." }, { status: 400 });
@@ -104,8 +111,11 @@ export async function POST(request: Request) {
 
   const addOns: { id: AddOnId; quantity: number }[] = [];
   for (const entry of rawAddOns) {
+    if (!entry || typeof entry !== "object" || Array.isArray(entry)) {
+      return NextResponse.json({ error: "That selection is not valid." }, { status: 400 });
+    }
     const item = entry as { id?: unknown; quantity?: unknown };
-    if (!isAddOnId(item.id) || typeof item.quantity !== "number") {
+    if (!isAddOnId(item.id) || typeof item.quantity !== "number" || !Number.isInteger(item.quantity) || item.quantity < 1 || item.quantity > 40) {
       return NextResponse.json({ error: "That selection is not valid." }, { status: 400 });
     }
     addOns.push({ id: item.id, quantity: item.quantity });
@@ -157,6 +167,7 @@ async function createSession(secretKey: string, form: URLSearchParams) {
   try {
     const response = await fetch(STRIPE_API, {
       method: "POST",
+      signal: AbortSignal.timeout(10_000),
       headers: stripeHeaders(secretKey),
       body: form.toString(),
     });

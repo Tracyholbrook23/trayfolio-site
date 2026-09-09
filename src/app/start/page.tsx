@@ -5,6 +5,7 @@ import SiteFooter from "@/components/SiteFooter";
 import ProjectBuilder from "@/components/ProjectBuilder";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/start" },
   title: "Start your project | Trayfolio",
   description:
     "Pick a package, add what you need, and pay a 50% deposit to get started. Balance due at launch.",
@@ -15,7 +16,7 @@ export default function StartPage() {
     <div className="flex min-h-screen flex-col bg-white text-stone-900">
       <SiteHeader />
 
-      <main className="flex-1 pb-[var(--stack-overlap)]">
+      <main id="main-content" className="flex-1 pb-[var(--stack-overlap)]">
         <section className="mx-auto max-w-6xl px-6 pb-10 pt-16 sm:pt-20">
           <p className="text-sm font-semibold uppercase tracking-wider text-stone-500">
             Start your project

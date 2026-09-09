@@ -7,6 +7,7 @@ import LayeredWord from "@/components/LayeredWord";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/pricing" },
   title: "Pricing | Trayfolio",
   description:
     "Flat, upfront website pricing for small businesses. Packages from $400, every add-on priced individually, and a $50 demo before you commit.",
@@ -125,7 +126,7 @@ export default function Pricing() {
     <div className="flex flex-col flex-1 bg-white text-stone-900">
       <SiteHeader />
 
-      <main className="flex-1 pb-[var(--stack-overlap)]">
+      <main id="main-content" className="flex-1 pb-[var(--stack-overlap)]">
         {/* Header */}
         <section className="mx-auto max-w-5xl px-6 pb-14 pt-16 sm:pt-24">
           <p className="text-sm font-semibold uppercase tracking-wider text-stone-500">

@@ -14,9 +14,9 @@
 
   /* Earthy accent palette */
   --color-terracotta: #b5541f;
-  --color-terracotta-light: #e08d4b;
+  --color-terracotta-light: #974419;
   --color-gold: #c9a227;
-  --color-olive: #6e7350;
+  --color-olive: #555a3d;
   --color-olive-light: #9ba37a;
   --color-sand: #efe3cb;
 
@@ -26,7 +26,7 @@
 
   /* Minimal semantic tokens (shadcn-style) so ported UI components read correctly */
   --color-muted: #efe3cb;
-  --color-muted-foreground: #8a7f6c;
+  --color-muted-foreground: #625846;
   --color-ring: #b5541f;
 }
 
@@ -216,3 +216,5 @@ body {
     will-change: auto;
   }
 }
+
+:focus-visible { outline: 3px solid #974419; outline-offset: 4px; }

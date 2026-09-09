@@ -105,6 +105,7 @@ const MAX_QUANTITY = 40;
  * something costs.
  */
 export function buildQuote(request: QuoteRequest): Quote {
+  if (!Object.hasOwn(PACKAGES, request.packageId)) throw new Error("Unknown package.");
   const pkg = PACKAGES[request.packageId];
   if (!pkg) throw new Error("Unknown package.");
 
@@ -112,19 +113,19 @@ export function buildQuote(request: QuoteRequest): Quote {
   const seen = new Set<AddOnId>();
 
   for (const entry of request.addOns) {
+    if (!Object.hasOwn(ADD_ONS, entry.id)) throw new Error("Unknown add-on.");
     const addOn = ADD_ONS[entry.id];
     if (!addOn) throw new Error("Unknown add-on.");
     if (seen.has(entry.id)) throw new Error("Duplicate add-on.");
     seen.add(entry.id);
 
-    // Anything the package already covers is never charged again.
-    if (pkg.includes.includes(entry.id)) continue;
-
-    const quantity = Math.floor(entry.quantity);
-    if (!Number.isFinite(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
+    const quantity = entry.quantity;
+    if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_QUANTITY) {
       throw new Error("Invalid quantity.");
     }
     if (!addOn.perUnit && quantity !== 1) throw new Error("Invalid quantity.");
+    // Anything the package already covers is never charged again.
+    if (pkg.includes.includes(entry.id)) continue;
 
     lines.push({ label: addOn.label, amount: addOn.amount, quantity });
   }

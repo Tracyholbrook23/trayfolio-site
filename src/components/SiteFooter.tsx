@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { RevealText } from "@/components/ui/reveal-text";
+import { CookieSettingsButton } from "@/components/GoogleAnalytics";
 import StackLayer from "@/components/StackLayer";
 
 const columns: {
@@ -67,7 +68,7 @@ export default function SiteFooter() {
         <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
           {columns.map((col) => (
             <div key={col.heading}>
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-400">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-600">
                 {col.heading}
               </h3>
               <ul className="mt-4 space-y-3 text-sm text-stone-600">
@@ -78,23 +79,24 @@ export default function SiteFooter() {
                         href={link.href}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="transition hover:text-terracotta"
+                        className="break-words transition hover:text-terracotta"
                       >
                         {link.label}
                       </a>
                     ) : (
-                      <Link href={link.href} className="transition hover:text-terracotta">
+                      <Link href={link.href} className="break-words transition hover:text-terracotta">
                         {link.label}
                       </Link>
                     )}
                   </li>
                 ))}
               </ul>
+              {col.heading === "Legal" && <CookieSettingsButton />}
             </div>
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col gap-4 border-t border-stone-200 pt-8 text-xs text-stone-400 sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-14 flex flex-col gap-4 border-t border-stone-200 pt-8 text-xs text-stone-600 sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Trayfolio. All rights reserved.</span>
           <span>Built by Tracy Holbrook.</span>
         </div>

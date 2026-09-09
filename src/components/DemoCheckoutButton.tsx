@@ -35,6 +35,7 @@ export default function DemoCheckoutButton({ className = "" }: { className?: str
       >
         {submitting ? "Opening checkout..." : "Get a $50 demo"}
       </button>
+      <p className="mt-3 max-w-60 text-xs leading-5 text-stone-600">Non-refundable; credited toward a build. Read the <a href="/terms" className="underline underline-offset-4">terms</a> and <a href="/privacy" className="underline underline-offset-4">privacy policy</a>.</p>
       {error && (
         <p className="mt-2 text-sm text-red-700" role="alert">
           {error}

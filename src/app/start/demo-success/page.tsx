@@ -4,6 +4,7 @@ import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 
 export const metadata: Metadata = {
+  alternates: { canonical: "/start/demo-success" },
   title: "Demo ordered | Trayfolio",
   description: "Your demo is ordered and your $50 credit code is on its way.",
   robots: { index: false },
@@ -13,7 +14,7 @@ export default function DemoSuccess() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-stone-900">
       <SiteHeader />
-      <main className="flex-1 pb-[var(--stack-overlap)]">
+      <main id="main-content" className="flex-1 pb-[var(--stack-overlap)]">
         <section className="mx-auto max-w-2xl px-6 py-24 text-center sm:py-32">
           <p className="text-sm font-semibold uppercase tracking-wider text-terracotta">
             Demo ordered

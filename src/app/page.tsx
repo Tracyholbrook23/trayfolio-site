@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
@@ -10,6 +11,8 @@ import SiteFooter from "@/components/SiteFooter";
 import SeeTheDifference from "@/components/SeeTheDifference";
 import { ShaderAnimation } from "@/components/ui/shader-animation";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 const work = [
   {
@@ -41,6 +44,12 @@ const work = [
     description: "Pickup basketball app, Austin TX",
     image: "/work/runcheck.jpg",
     href: "https://www.theruncheck.app",
+  },
+  {
+    name: "Out of Jersey Creations",
+    description: "Custom laser engraving, California",
+    image: "/work/outofjerseycreations.jpg",
+    href: "https://www.outofjerseycreationshub.com",
   },
 ];
 
@@ -122,7 +131,7 @@ export default function Home() {
     <div className="flex flex-col flex-1 bg-white text-stone-900">
       <SiteHeader />
 
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         {/* Hero */}
         <StackLayer first noPad className="bg-peach text-stone-900">
           <div className="grain-overlay pointer-events-none absolute inset-0 -z-10" />
