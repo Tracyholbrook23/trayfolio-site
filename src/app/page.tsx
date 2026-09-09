@@ -16,10 +16,10 @@ export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 const work = [
   {
-    name: "Valtier Media",
-    description: "Austin photography & videography studio",
-    image: "/work/valtiermedia.jpg",
-    href: "https://www.valtiermedia.com",
+    name: "Out of Jersey Creations",
+    description: "Custom laser engraving, California",
+    image: "/work/outofjerseycreations.jpg",
+    href: "https://www.outofjerseycreationshub.com",
   },
   {
     name: "MØDE",
@@ -46,10 +46,10 @@ const work = [
     href: "https://www.theruncheck.app",
   },
   {
-    name: "Out of Jersey Creations",
-    description: "Custom laser engraving, California",
-    image: "/work/outofjerseycreations.jpg",
-    href: "https://www.outofjerseycreationshub.com",
+    name: "Valtier Media",
+    description: "Austin photography & videography studio",
+    image: "/work/valtiermedia.jpg",
+    href: "https://www.valtiermedia.com",
   },
 ];
 

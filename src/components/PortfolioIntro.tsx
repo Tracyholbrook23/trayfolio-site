@@ -12,7 +12,7 @@ if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger, useGSAP);
 const featuredWork = [
   { name: "RunCheck", eyebrow: "Product design · Austin", description: "A bold launch site for a pickup basketball platform built around live local runs.", image: "/work/runcheck.jpg", href: "https://www.theruncheck.app", tone: "portfolio-feature--runcheck" },
   { name: "ATX Auto Detailing", eyebrow: "Service business · Austin", description: "A cinematic, conversion-focused site that brings a mobile detailing service to life.", image: "/work/autodetailingatx.jpg", href: "https://www.autodetailingatx.com", tone: "portfolio-feature--atx" },
-  { name: "Out of Jersey Creations", eyebrow: "Custom commerce · California", description: "A warm editorial storefront for one-of-a-kind laser-engraved gifts and commissions.", image: "/work/outofjerseycreations.jpg", href: "https://www.outofjerseycreationshub.com", tone: "portfolio-feature--jersey" },
+  { name: "Valtier Media", eyebrow: "Creative studio · Austin", description: "A polished portfolio for an Austin photography and videography studio built to make every frame feel cinematic.", image: "/work/valtiermedia.jpg", href: "https://www.valtiermedia.com", tone: "portfolio-feature--valtier" },
 ];
 
 export default function PortfolioIntro() {
