@@ -8,7 +8,7 @@ import { CoverflowCarousel, type CoverflowSlide } from "@/components/ui/coverflo
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import SeeTheDifference from "@/components/SeeTheDifference";
-import { ShaderAnimation } from "@/components/ui/shader-animation";
+import DeferredShaderAnimation from "@/components/DeferredShaderAnimation";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 import PortfolioIntro from "@/components/PortfolioIntro";
 
@@ -104,8 +104,8 @@ const demoSlides: CoverflowSlide[] = [
     ],
   },
   {
-    src: "/demos/nu2u-moving/images/gallery/ai-truck-highway.jpg",
-    alt: "Nu2U Moving and Delivery demo site: moving truck on the highway",
+    src: "/demos/nu2u-moving/hero-preview.png",
+    alt: "Nu2U Moving and Delivery demo homepage hero",
     title: "Nu2U Moving & Delivery",
     subtitle: "Moving and delivery service demo",
     href: "/demos/nu2u-moving/",
@@ -147,7 +147,7 @@ export default function Home() {
         <PortfolioIntro />
 
         {/* The remaining work follows the large selected-work sequence. */}
-        <section id="work" className="bg-stone-50">
+        <section id="work" className="deferred-render bg-stone-50">
           <div className="mx-auto max-w-5xl px-6 py-24">
             <h2><LayeredWord text="More Work" /></h2>
             <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -180,7 +180,7 @@ export default function Home() {
         </section>
 
         {/* Live demo carousel */}
-        <StackLayer id="demos" noPad className="bg-white">
+        <StackLayer id="demos" noPad className="deferred-render bg-white">
           <div className="mx-auto max-w-5xl px-6 py-24">
             <Reveal>
               <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">
@@ -217,7 +217,7 @@ export default function Home() {
         <SeeTheDifference />
 
         {/* Services */}
-        <section id="services" className="paper-texture">
+        <section id="services" className="paper-texture deferred-render">
           <div className="mx-auto max-w-5xl px-6 py-28">
             <h2>
               <LayeredWord text="What I Do" />
@@ -240,8 +240,8 @@ export default function Home() {
         </section>
 
         {/* Your site, your way */}
-        <StackLayer noPad className="bg-stone-950 text-white">
-          <ShaderAnimation />
+        <StackLayer noPad className="deferred-render bg-stone-950 text-white">
+          <DeferredShaderAnimation />
           <div className="relative z-10 mx-auto max-w-3xl px-6 py-28 text-center sm:py-36">
             <Reveal>
               <h2 className="font-display text-4xl font-semibold tracking-tight sm:text-6xl">
@@ -270,7 +270,7 @@ export default function Home() {
         </StackLayer>
 
         {/* Contact CTA */}
-        <section id="contact" className="bg-white">
+        <section id="contact" className="deferred-render bg-white">
           <div className="mx-auto max-w-2xl px-6 pt-28 pb-[calc(7rem+var(--stack-overlap))] text-center">
             <Reveal>
               <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
