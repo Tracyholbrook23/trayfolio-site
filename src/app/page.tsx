@@ -103,6 +103,18 @@ const demoSlides: CoverflowSlide[] = [
       { label: "Signature move", value: "High-impact service landing page" },
     ],
   },
+  {
+    src: "/demos/nu2u-moving/images/gallery/ai-truck-highway.jpg",
+    alt: "Nu2U Moving and Delivery demo site: moving truck on the highway",
+    title: "Nu2U Moving & Delivery",
+    subtitle: "Moving and delivery service demo",
+    href: "/demos/nu2u-moving/",
+    linkLabel: "Scroll through the live demo",
+    meta: [
+      { label: "Industry", value: "Moving & delivery" },
+      { label: "Signature move", value: "Scroll-scrubbed loading sequence" },
+    ],
+  },
 ];
 
 const services = [

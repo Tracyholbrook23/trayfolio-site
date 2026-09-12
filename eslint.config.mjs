@@ -11,8 +11,9 @@ const eslintConfig = defineConfig([
     ".next/**",
     "out/**",
     "build/**",
-    // Generated static export for the Auto Detailing demo, not authored source.
+    // Generated static demo exports, not authored source.
     "public/demos/autodetailing/**",
+    "public/demos/nu2u-moving/**",
     "next-env.d.ts",
   ]),
 ]);
