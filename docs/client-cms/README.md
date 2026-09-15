@@ -111,11 +111,70 @@ as phase 0's migration step):
    don't reuse the local one, `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
    prints a fresh one).
 
+## Phase 2: schema-driven editor, draft save, Draft Mode preview
+
+Goal: replace the placeholder dashboard with a real editor, driven
+entirely by content.schema.ts, that saves unpublished drafts and lets you
+preview them on the real site before anything goes live. Publishing
+(copying a draft into content_values) is still the next phase, not this
+one, saving a draft does not change what visitors see.
+
+What's done:
+- `src/lib/db/schema.ts`: added the `content_drafts` table, same shape as
+  `content_values` (one row per sectionKey+fieldKey), so an unpublished
+  edit lives entirely separately from the live value.
+- `src/lib/cms/get-content.ts`: `getContentValue()` now checks Next.js
+  Draft Mode; when it's on, it reads a field's draft first and only falls
+  back to the published value if that field has no draft yet. Added
+  `getEditableValue()`, an uncached read used only by the dashboard, which
+  also reports whether what it's showing is a draft or the last published
+  value.
+- `src/lib/cms/validate.ts`: server-side validation per FieldDef (required,
+  min/max length, and format checks for email/phone/url/price/number).
+  This is the actual guardrail, not the form's own `maxLength` attributes.
+- `src/lib/cms/actions.ts`: three Server Actions.
+  - `saveDraftAction`: re-checks the session itself (never trusts
+    `proxy.ts` alone), looks the field up in `contentSchema` itself (never
+    trusts the section/field keys a request claims), validates, then
+    upserts into `content_drafts`.
+  - `enablePreviewAction`: turns on Draft Mode, sends you to the live
+    homepage.
+  - `exitPreviewAction`: turns Draft Mode back off.
+- `src/app/client/dashboard/page.tsx`: now a section list generated from
+  `contentSchema`, plus a "Preview saved drafts on live site" button.
+- `src/app/client/dashboard/[section]/`: the generic per-section editor.
+  One form per field, rendered from that field's `FieldDef`
+  (`page.tsx` fetches the data, `section-editor-form.tsx` is the actual
+  form, a client component so it can show save/error state inline).
+- `src/components/PreviewBanner.tsx`: shown site-wide whenever Draft Mode
+  is on, with a one-click "Exit preview" button. Wired into
+  `src/app/layout.tsx`.
+
+Known gap, deliberately deferred: every logged-in role (OWNER,
+CLIENT_ADMIN, CLIENT_EDITOR) can currently edit every section, there's no
+per-role restriction on which sections/fields someone can touch yet. Fine
+for solo testing with one OWNER account; worth adding before a real client
+site has more than one login.
+
+Still needed, on your Mac terminal (same esbuild-needs-your-platform
+reason as phases 0 and 1):
+1. `npx drizzle-kit generate` then `npx drizzle-kit migrate` (adds the
+   `content_drafts` table).
+2. `npm run dev`, log in, open the Home section, change the hero
+   subheading, and hit "Save draft" — confirm it shows "Draft saved." and
+   an "Unpublished draft" tag, and that the public homepage still shows
+   the OLD text (nothing publishes yet).
+3. Go back to `/client/dashboard` and click "Preview saved drafts on live
+   site" — confirm you land on the homepage with the amber preview banner
+   showing, and the hero subheading now shows your edited text.
+4. Click "Exit preview" in the banner — confirm the banner disappears and
+   the homepage goes back to showing the old, published text.
+
 ## Next phases (not started)
 
-1. Schema-driven dashboard for the Home section (draft save + Draft Mode
-   preview)
-2. Publish action + version history + audit log
-3. Images (Vercel Blob + sharp)
-4. Expand the schema to more sections
-5. Extract into a shared package once proven here
+1. Publish action + version history + audit log
+2. Images (Vercel Blob + sharp)
+3. Expand the schema to more sections
+4. Per-role restrictions on which sections/fields a role can edit
+5. Login rate limiting / lockout (carried over from phase 1)
+6. Extract into a shared package once proven here

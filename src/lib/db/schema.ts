@@ -43,3 +43,23 @@ export const users = pgTable("users", {
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   disabledAt: timestamp("disabled_at", { withTimezone: true }),
 });
+
+/**
+ * Phase 2: unpublished edits, one row per (sectionKey, fieldKey) exactly
+ * like content_values. A field with no draft row here just isn't being
+ * edited right now, the live site (and dashboard) fall back to
+ * content_values for it. Publishing (a later phase) will copy a section's
+ * drafts into content_values and clear them.
+ */
+export const contentDrafts = pgTable(
+  "content_drafts",
+  {
+    id: serial("id").primaryKey(),
+    sectionKey: text("section_key").notNull(),
+    fieldKey: text("field_key").notNull(),
+    value: jsonb("value").notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedBy: text("updated_by"),
+  },
+  (table) => [unique("content_drafts_section_field_unique").on(table.sectionKey, table.fieldKey)],
+);

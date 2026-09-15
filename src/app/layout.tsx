@@ -1,29 +1,14 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import ScrollProgress from "@/components/ScrollProgress";
-import SmoothScroll from "@/components/SmoothScroll";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-// Required by Lenis. Without it html keeps the `h-full` height below
-// (100% = viewport), so Lenis measures the page as one screen tall and
-// caps scrolling short of the real bottom. Its stylesheet sets
-// `html.lenis, html.lenis body { height: auto }`, which lets Lenis see
-// the true content height and re-measure when the page grows.
-import "lenis/dist/lenis.css";
+import { PreviewBanner } from "@/components/PreviewBanner";
 import "./globals.css";
 
 const clashDisplay = localFont({
-  src: [
-    {
-      path: "../fonts/ClashDisplay-Bold.woff2",
-      weight: "700",
-      style: "normal",
-    },
-    {
-      path: "../fonts/ClashDisplay-Bold.woff",
-      weight: "700",
-      style: "normal",
-    },
-  ],
+  src: "../fonts/ClashDisplay-Bold.woff2",
+  weight: "700",
+  style: "normal",
   variable: "--font-clash",
   display: "swap",
 });
@@ -76,16 +61,24 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${clashDisplay.variable} h-full antialiased`}
     >
+      <head>
+        <link
+          rel="preload"
+          href="/textures/wrinkled-paper.webp"
+          as="image"
+          type="image/webp"
+          fetchPriority="high"
+        />
+      </head>
       <body className="min-h-full flex flex-col">
+        <PreviewBanner />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <a href="#main-content" className="sr-only fixed left-3 top-3 z-[110] rounded-lg bg-white px-5 py-3 text-stone-900 focus:not-sr-only">Skip to content</a>
-        <SmoothScroll>
-          <ScrollProgress />
-          {children}
-        </SmoothScroll>
+        <ScrollProgress />
+        {children}
         <GoogleAnalytics />
       </body>
     </html>

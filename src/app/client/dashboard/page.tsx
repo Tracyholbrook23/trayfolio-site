@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { getSession } from "@/lib/auth/session";
 import { logout } from "@/lib/auth/actions";
+import { enablePreviewAction } from "@/lib/cms/actions";
+import { contentSchema } from "@/lib/cms/content.schema";
 
 export const metadata: Metadata = { title: "Dashboard | Trayfolio" };
 
 /**
- * Phase 1 placeholder: proves the login -> session -> protected route loop
- * works end to end. middleware.ts is what actually keeps a logged-out
- * visitor out of here, this page just displays who's signed in. The real
- * schema-driven content editor replaces this in phase 2.
+ * Section list, generated entirely from contentSchema. This page (and the
+ * editor behind each link) has no built-in knowledge of what sections or
+ * fields exist on this particular site, see content.schema.ts. Adding a
+ * new site's content just means writing a new content.schema.ts, this
+ * dashboard doesn't change.
  */
 export default async function ClientDashboardPage() {
   const session = await getSession();
@@ -16,20 +20,37 @@ export default async function ClientDashboardPage() {
   return (
     <div className="min-h-screen bg-stone-50 px-6 py-16">
       <div className="mx-auto max-w-lg">
-        <h1 className="text-xl font-semibold text-stone-900">Client dashboard</h1>
-        <p className="mt-2 text-sm text-stone-600">
-          Logged in as <strong>{session.email}</strong> ({session.role}).
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-stone-900">Client dashboard</h1>
+          <form action={logout}>
+            <button type="submit" className="text-sm font-medium text-stone-500 underline">
+              Log out
+            </button>
+          </form>
+        </div>
+        <p className="mt-1 text-sm text-stone-600">
+          Signed in as {session.email} ({session.role})
         </p>
-        <p className="mt-4 text-sm text-stone-500">
-          This is a placeholder. The real content editor (built from
-          content.schema.ts) arrives in phase 2.
-        </p>
-        <form action={logout} className="mt-8">
+
+        <ul className="mt-8 space-y-3">
+          {contentSchema.map((section) => (
+            <li key={section.key}>
+              <Link
+                href={`/client/dashboard/${section.key}`}
+                className="block rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-900 hover:border-stone-300"
+              >
+                {section.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+
+        <form action={enablePreviewAction} className="mt-8">
           <button
             type="submit"
             className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700"
           >
-            Log out
+            Preview saved drafts on live site
           </button>
         </form>
       </div>

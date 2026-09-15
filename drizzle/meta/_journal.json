@@ -15,6 +15,13 @@
       "when": 1789446061460,
       "tag": "0001_silly_xavin",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789447605217,
+      "tag": "0002_woozy_havok",
+      "breakpoints": true
     }
   ]
 }
