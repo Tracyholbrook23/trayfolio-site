@@ -63,3 +63,21 @@ export const contentDrafts = pgTable(
   },
   (table) => [unique("content_drafts_section_field_unique").on(table.sectionKey, table.fieldKey)],
 );
+
+/**
+ * Phase 3: append-only publish history. Every time publishSectionAction
+ * copies a field's draft into content_values, it also inserts one row
+ * here with that same value, so this table is a running log of every
+ * value a field has ever been published with, in order. No unique
+ * constraint on (sectionKey, fieldKey): a field can and should have many
+ * rows over time. Rollback (a later phase) is just publishing an old
+ * version's value again, not a separate mechanism.
+ */
+export const contentVersions = pgTable("content_versions", {
+  id: serial("id").primaryKey(),
+  sectionKey: text("section_key").notNull(),
+  fieldKey: text("field_key").notNull(),
+  value: jsonb("value").notNull(),
+  publishedAt: timestamp("published_at", { withTimezone: true }).notNull().defaultNow(),
+  publishedBy: text("published_by"),
+});

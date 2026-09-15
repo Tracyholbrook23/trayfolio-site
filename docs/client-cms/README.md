@@ -170,11 +170,54 @@ reason as phases 0 and 1):
 4. Click "Exit preview" in the banner — confirm the banner disappears and
    the homepage goes back to showing the old, published text.
 
+## Phase 3: publish
+
+Goal: an actual "Publish" action that takes a section's saved drafts and
+makes them live, the missing piece that made phase 2 draft-only.
+
+What's done:
+- `src/lib/db/schema.ts`: added `content_versions`, an append-only log (no
+  unique constraint, a field can have many rows over time). Every publish
+  writes one row per field here with the value being published, so this
+  doubles as both publish history and the future rollback feature's data
+  source (a rollback is just "publish this old row's value again", not a
+  separate mechanism).
+- `src/lib/cms/actions.ts`: `publishSectionAction`. Re-checks the session
+  itself (same defense-in-depth reasoning as `saveDraftAction`), reads
+  every drafted field in the section, and for each one: upserts
+  `content_values`, logs a `content_versions` row, deletes the draft.
+  Calls `revalidateTag` once at the end so the site updates immediately,
+  and redirects back to the same section afterward (this is what clears
+  the "Unpublished draft" tags right away, that state gets refetched on
+  the redirect).
+- `src/app/client/dashboard/[section]/publish-section-button.tsx`: a
+  "Publish section" button next to the section heading, with a native
+  confirm dialog since this is the action that actually changes what
+  visitors see. Publishing with nothing drafted shows an inline error
+  instead of doing anything.
+
+Not built yet, on purpose: a version history viewer or rollback UI
+(`content_versions` is being written to starting now, so the data will be
+there once that UI exists), and a separate audit log table (logins,
+disables, etc. aren't tracked yet, just content publishes).
+
+Still needed, on your Mac terminal:
+1. `npx drizzle-kit generate` then `npx drizzle-kit migrate` (adds
+   `content_versions`).
+2. `npm run dev`, edit the Home Page hero subheading, save a draft, then
+   click "Publish section" (confirm the dialog) — confirm the live
+   homepage now shows the new text immediately, and the "Unpublished
+   draft" tag is gone.
+3. Try clicking "Publish section" again with nothing changed — confirm
+   you get "Nothing to publish" instead of a silent no-op or an error
+   page.
+
 ## Next phases (not started)
 
-1. Publish action + version history + audit log
+1. Version history viewer + rollback (read from content_versions)
 2. Images (Vercel Blob + sharp)
 3. Expand the schema to more sections
 4. Per-role restrictions on which sections/fields a role can edit
 5. Login rate limiting / lockout (carried over from phase 1)
-6. Extract into a shared package once proven here
+6. Audit log (separate from content_versions: logins, account changes)
+7. Extract into a shared package once proven here

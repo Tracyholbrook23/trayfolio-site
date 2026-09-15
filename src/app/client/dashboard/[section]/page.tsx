@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { contentSchema } from "@/lib/cms/content.schema";
 import { getEditableValue } from "@/lib/cms/get-content";
 import { SectionEditorForm } from "./section-editor-form";
+import { PublishSectionButton } from "./publish-section-button";
 
 export async function generateMetadata({
   params,
@@ -48,7 +49,10 @@ export default async function SectionEditorPage({
         <a href="/client/dashboard" className="text-sm text-stone-500 underline">
           &larr; All sections
         </a>
-        <h1 className="mt-2 text-xl font-semibold text-stone-900">{section.label}</h1>
+        <div className="mt-2 flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-stone-900">{section.label}</h1>
+          <PublishSectionButton sectionKey={section.key} />
+        </div>
 
         <div className="mt-8 space-y-8">
           {fields.map(({ field, value, isDraft }) => (
