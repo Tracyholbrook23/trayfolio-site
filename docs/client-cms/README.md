@@ -139,16 +139,15 @@ What's done:
     upserts into `content_drafts`.
   - `enablePreviewAction`: turns on Draft Mode, sends you to the live
     homepage.
-  - `exitPreviewAction`: turns Draft Mode back off.
+  - Logging out turns Draft Mode back off.
 - `src/app/client/dashboard/page.tsx`: now a section list generated from
   `contentSchema`, plus a "Preview saved drafts on live site" button.
 - `src/app/client/dashboard/[section]/`: the generic per-section editor.
   One form per field, rendered from that field's `FieldDef`
   (`page.tsx` fetches the data, `section-editor-form.tsx` is the actual
   form, a client component so it can show save/error state inline).
-- `src/components/PreviewBanner.tsx`: shown site-wide whenever Draft Mode
-  is on, with a one-click "Exit preview" button. Wired into
-  `src/app/layout.tsx`.
+- `src/components/cms/VisualEditorToolbar.tsx`: page-scoped editing,
+  publishing, draft status, and exit controls.
 
 Known gap, deliberately deferred: every logged-in role (OWNER,
 CLIENT_ADMIN, CLIENT_EDITOR) can currently edit every section, there's no
@@ -212,12 +211,43 @@ Still needed, on your Mac terminal:
    you get "Nothing to publish" instead of a silent no-op or an error
    page.
 
-## Next phases (not started)
+## Phase 4: text-complete client editing (in progress)
 
-1. Version history viewer + rollback (read from content_versions)
-2. Images (Vercel Blob + sharp)
-3. Expand the schema to more sections
-4. Per-role restrictions on which sections/fields a role can edit
-5. Login rate limiting / lockout (carried over from phase 1)
-6. Audit log (separate from content_versions: logins, account changes)
-7. Extract into a shared package once proven here
+The CMS is no longer limited to the homepage hero subheading. The schema is
+now the source of both validation rules and safe default copy, so fields show
+their real starting text in a fresh dashboard without requiring seed rows.
+
+Built in this phase:
+- Page-aware preview links; preview opens the page being edited.
+- Editable Home hero and selected-work introduction copy.
+- Editable Contact, Start, FAQ, and non-transactional Pricing page copy.
+- 89 schema-governed text fields, with per-field length and format limits.
+- Click-to-edit affordances for the newly connected public text.
+- Visual editing on the actual website: login now opens the homepage in Edit
+  mode, clicking text opens an anchored editing panel, and a floating toolbar
+  publishes the current page. The section dashboard remains as a fallback.
+- Live database rechecks for every mutation. Disabled/deleted accounts are
+  rejected even if an old encrypted session cookie still exists.
+- Role enforcement: all active roles may save drafts, OWNER and CLIENT_ADMIN
+  may publish, and rollback is OWNER-only.
+- Visual toolbar draft counts, disabled publish when nothing has changed, and
+  confirmed page-level draft discard.
+- Remaining safe homepage text connected, including project descriptions,
+  services, demos intro, brand callout, and contact CTA. Fixed item counts keep
+  the layout developer-controlled while every item’s copy remains editable.
+- Persistent database-backed login throttling (five failures per email/network
+  pair in 15 minutes), including constant-cost bcrypt verification for unknown
+  accounts.
+- Append-only CMS/security activity logging and an OWNER-only activity screen.
+
+Pricing amounts, package contents, checkout terms, legal copy, navigation,
+routes, and layout remain developer-controlled. Those values affect contracts
+or application behavior and must not drift away from the actual checkout
+configuration.
+
+## Next phases
+
+1. Exercise the full workflow with a client-style acceptance test.
+2. Extract the proven implementation into a shared package.
+3. Install it on the first real client site and adapt that site’s schema.
+4. Add images later as a separate constrained phase (Vercel Blob + sharp).

@@ -1,7 +1,7 @@
 import "server-only";
 import { draftMode } from "next/headers";
 import { unstable_cache } from "next/cache";
-import { and, desc, eq } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { contentValues, contentDrafts, contentVersions } from "@/lib/db/schema";
 
@@ -85,6 +85,7 @@ async function getPublishedValue(
 export async function getEditableValue(
   sectionKey: string,
   fieldKey: string,
+  fallback: string,
 ): Promise<{ value: string | null; isDraft: boolean }> {
   const draftValue = await readDraftValue(sectionKey, fieldKey);
   if (draftValue !== null) return { value: draftValue, isDraft: true };
@@ -96,7 +97,30 @@ export async function getEditableValue(
     .limit(1);
 
   const value = rows[0]?.value;
-  return { value: typeof value === "string" ? value : null, isDraft: false };
+  return { value: typeof value === "string" ? value : fallback, isDraft: false };
+}
+
+/** Reads a whole schema section in parallel using its safe defaults. */
+export async function getSectionContent(sectionKey: string): Promise<Record<string, string>> {
+  const { getSectionDef } = await import("@/lib/cms/content.schema");
+  const section = getSectionDef(sectionKey);
+  if (!section) throw new Error(`Unknown CMS section: ${sectionKey}`);
+
+  const entries = await Promise.all(
+    section.fields.map(async (field) => [
+      field.key,
+      await getContentValue(sectionKey, field.key, field.defaultValue),
+    ] as const),
+  );
+  return Object.fromEntries(entries);
+}
+
+export async function getSectionDraftCount(sectionKey: string): Promise<number> {
+  const [row] = await db
+    .select({ count: count() })
+    .from(contentDrafts)
+    .where(eq(contentDrafts.sectionKey, sectionKey));
+  return row?.count ?? 0;
 }
 
 export interface FieldVersion {
@@ -133,7 +157,7 @@ export async function getFieldVersions(
     })
     .from(contentVersions)
     .where(and(eq(contentVersions.sectionKey, sectionKey), eq(contentVersions.fieldKey, fieldKey)))
-    .orderBy(desc(contentVersions.publishedAt))
+    .orderBy(desc(contentVersions.publishedAt), desc(contentVersions.id))
     .limit(limit);
 
   return rows.map((row) => ({

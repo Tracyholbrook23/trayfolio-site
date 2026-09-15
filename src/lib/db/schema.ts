@@ -1,4 +1,4 @@
-import { pgTable, serial, text, jsonb, timestamp, unique } from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgTable, serial, text, jsonb, timestamp, unique } from "drizzle-orm/pg-core";
 
 /**
  * The site's LIVE, published content. One row per editable field, keyed by
@@ -81,3 +81,31 @@ export const contentVersions = pgTable("content_versions", {
   publishedAt: timestamp("published_at", { withTimezone: true }).notNull().defaultNow(),
   publishedBy: text("published_by"),
 });
+
+/** Failed-login windows persist across serverless instances and deployments. */
+export const loginAttempts = pgTable(
+  "login_attempts",
+  {
+    id: serial("id").primaryKey(),
+    attemptKey: text("attempt_key").notNull(),
+    attemptedAt: timestamp("attempted_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("login_attempts_key_time_idx").on(table.attemptKey, table.attemptedAt)],
+);
+
+/** Append-only record of security and content mutations. */
+export const auditLog = pgTable(
+  "audit_log",
+  {
+    id: serial("id").primaryKey(),
+    actorUserId: integer("actor_user_id"),
+    actorEmail: text("actor_email"),
+    action: text("action").notNull(),
+    sectionKey: text("section_key"),
+    fieldKey: text("field_key"),
+    success: boolean("success").notNull().default(true),
+    details: jsonb("details"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [index("audit_log_created_at_idx").on(table.createdAt)],
+);

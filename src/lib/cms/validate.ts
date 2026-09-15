@@ -13,9 +13,8 @@ export interface ValidationResult {
  * (maxLength attributes, input types) are just UX, never trusted alone,
  * see the architecture doc's security section.
  *
- * "image" and "list" fields aren't validated here yet (no field uses
- * either type today); they get real handling (upload safety, per-item
- * rules) when a field of that type is actually added to a schema.
+ * Image and repeatable-list editing are intentionally outside the current
+ * text-only CMS scope.
  */
 export function validateField(field: FieldDef, rawValue: string): ValidationResult {
   const value = rawValue.trim();

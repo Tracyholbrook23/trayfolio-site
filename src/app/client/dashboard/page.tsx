@@ -31,6 +31,11 @@ export default async function ClientDashboardPage() {
         <p className="mt-1 text-sm text-stone-600">
           Signed in as {session.email} ({session.role})
         </p>
+        {session.role === "OWNER" ? (
+          <Link href="/client/dashboard/activity" className="mt-3 inline-block text-sm font-medium text-stone-600 underline">
+            View activity log
+          </Link>
+        ) : null}
 
         <ul className="mt-8 space-y-3">
           {contentSchema.map((section) => (
@@ -39,18 +44,22 @@ export default async function ClientDashboardPage() {
                 href={`/client/dashboard/${section.key}`}
                 className="block rounded-lg border border-stone-200 bg-white px-4 py-3 text-sm font-medium text-stone-900 hover:border-stone-300"
               >
-                {section.label}
+                <span>{section.label}</span>
+                <span className="mt-1 block text-xs font-normal text-stone-500">
+                  {section.fields.length} editable fields
+                </span>
               </Link>
             </li>
           ))}
         </ul>
 
         <form action={enablePreviewAction} className="mt-8">
+          <input type="hidden" name="path" value="/" />
           <button
             type="submit"
             className="rounded-lg border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700"
           >
-            Preview saved drafts on live site
+            Open visual website editor
           </button>
         </form>
       </div>

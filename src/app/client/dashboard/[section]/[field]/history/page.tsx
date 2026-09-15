@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { contentSchema } from "@/lib/cms/content.schema";
 import { getFieldVersions } from "@/lib/cms/get-content";
 import { RollbackFieldButton } from "./rollback-field-button";
+import { getSession } from "@/lib/auth/session";
 
 export async function generateMetadata({
   params,
@@ -36,7 +37,7 @@ export default async function FieldHistoryPage({
   const field = section?.fields.find((f) => f.key === fieldKey);
   if (!section || !field) notFound();
 
-  const versions = await getFieldVersions(sectionKey, fieldKey);
+  const [versions, session] = await Promise.all([getFieldVersions(sectionKey, fieldKey), getSession()]);
 
   return (
     <div className="min-h-screen bg-stone-50 px-6 py-16">
@@ -62,7 +63,7 @@ export default async function FieldHistoryPage({
                   </p>
                   {i === 0 ? (
                     <span className="shrink-0 text-xs font-medium text-emerald-700">Current</span>
-                  ) : (
+                  ) : session.role === "OWNER" ? (
                     <div className="shrink-0">
                       <RollbackFieldButton
                         sectionKey={sectionKey}
@@ -70,7 +71,7 @@ export default async function FieldHistoryPage({
                         versionId={version.id}
                       />
                     </div>
-                  )}
+                  ) : null}
                 </div>
                 <p className="mt-2 whitespace-pre-wrap text-sm text-stone-900">{version.value}</p>
               </li>

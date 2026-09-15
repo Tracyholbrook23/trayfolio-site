@@ -11,47 +11,32 @@ import SeeTheDifference from "@/components/SeeTheDifference";
 import DeferredShaderAnimation from "@/components/DeferredShaderAnimation";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 import PortfolioIntro from "@/components/PortfolioIntro";
-import { getContentValue } from "@/lib/cms/get-content";
+import { getSectionContent, getSectionDraftCount } from "@/lib/cms/get-content";
 import { getSession } from "@/lib/auth/session";
+import { draftMode } from "next/headers";
+import { VisualEditorToolbar } from "@/components/cms/VisualEditorToolbar";
+import { EditableField } from "@/components/cms/EditableField";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 const work = [
   {
     name: "Out of Jersey Creations",
-    description: "Custom laser engraving, California",
+    descriptionKey: "recent1Description",
     image: "/work/outofjerseycreations.jpg",
     href: "https://www.outofjerseycreationshub.com",
   },
   {
     name: "MØDE",
-    description: "Custom membership platform",
+    descriptionKey: "recent2Description",
     image: "/work/mode.jpg",
     href: "https://www.enterm0de.com",
   },
   {
     name: "Shawnie's Loc Lab",
-    description: "Loc & braid specialist, Lansing MI",
+    descriptionKey: "recent3Description",
     image: "/work/shawniesloclab.jpg",
     href: "https://www.shawniesloclab.com",
-  },
-  {
-    name: "ATX Auto Detailing",
-    description: "Mobile car detailing, Austin TX",
-    image: "/work/autodetailingatx.jpg",
-    href: "https://www.autodetailingatx.com",
-  },
-  {
-    name: "RunCheck",
-    description: "Pickup basketball app, Austin TX",
-    image: "/work/runcheck.jpg",
-    href: "https://www.theruncheck.app",
-  },
-  {
-    name: "Valtier Media",
-    description: "Austin photography & videography studio",
-    image: "/work/valtiermedia.jpg",
-    href: "https://www.valtiermedia.com",
   },
 ];
 
@@ -122,52 +107,50 @@ const demoSlides: CoverflowSlide[] = [
 const services = [
   {
     number: "01",
-    title: "Website Creation",
-    description:
-      "Built around your real business: your services, your photos, your customers, not a template with your logo dropped in.",
+    titleKey: "service1Title",
+    descriptionKey: "service1Description",
   },
   {
     number: "02",
-    title: "Website Redesigns",
-    description:
-      "A modern look and faster load times for a site that's outdated, slow, or doesn't work well on phones.",
+    titleKey: "service2Title",
+    descriptionKey: "service2Description",
   },
   {
     number: "03",
-    title: "Care & Support",
-    description:
-      "Ongoing edits, monitoring, and small changes after launch, billed month to month. Cancel anytime.",
+    titleKey: "service3Title",
+    descriptionKey: "service3Description",
   },
 ];
 
 export default async function Home() {
-  const heroLede = await getContentValue(
-    "home",
-    "heroLede",
-    "Custom strategy, design, and development\u2014from the first idea to a site ready to win customers.",
-  );
+  const [homeContent, session, draft, draftCount] = await Promise.all([
+    getSectionContent("home"),
+    getSession(),
+    draftMode(),
+    getSectionDraftCount("home"),
+  ]);
 
   // Any logged-in dashboard user (owner or client) sees click-to-edit
   // affordances over their own CMS-backed content, see EditableField.
   // This is a UX convenience only, not an access check: every actual
   // write is still independently gated by the Server Action it submits
   // to.
-  const session = await getSession();
-  const editing = Boolean(session.userId);
+  const editing = Boolean(session.userId && draft.isEnabled);
 
   return (
     <div className="flex flex-col flex-1 bg-white text-stone-900">
+      {session.userId ? <VisualEditorToolbar role={session.role} previewing={draft.isEnabled} draftCount={draftCount} /> : null}
       <SiteHeader />
 
       <main id="main-content" className="flex-1">
-        <PortfolioIntro heroLede={heroLede} editing={editing} />
+        <PortfolioIntro content={homeContent} editing={editing} />
 
         {/* The remaining work follows the large selected-work sequence. */}
         <section id="work" className="deferred-render bg-stone-50">
           <div className="mx-auto max-w-5xl px-6 py-24">
-            <h2><LayeredWord text="More Work" /></h2>
+            <EditableField as="div" sectionKey="home" fieldKey="recentWorkHeading" label="Recent work heading" editing={editing} value={homeContent.recentWorkHeading}><LayeredWord text={homeContent.recentWorkHeading} /></EditableField>
             <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {work.slice(0, 3).map((project, i) => (
+              {work.map((project, i) => (
                 <Reveal key={project.name} delay={i * 75}>
                   <Link
                     href={project.href}
@@ -186,7 +169,7 @@ export default async function Home() {
                     </div>
                     <div className="p-5">
                       <h3 className="font-semibold">{project.name}</h3>
-                      <p className="mt-1 text-sm text-stone-600">{project.description}</p>
+                      <EditableField as="p" sectionKey="home" fieldKey={project.descriptionKey} label={`${project.name} description`} editing={editing} className="mt-1 text-sm text-stone-600">{homeContent[project.descriptionKey]}</EditableField>
                     </div>
                   </Link>
                 </Reveal>
@@ -199,13 +182,8 @@ export default async function Home() {
         <StackLayer id="demos" noPad className="deferred-render bg-white">
           <div className="mx-auto max-w-5xl px-6 py-24">
             <Reveal>
-              <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">
-                Drag through a few live builds
-              </p>
-              <p className="mx-auto mt-1.5 max-w-md text-center text-sm text-stone-600">
-                Real, interactive demo sites and effects. Drag the cards, then click one to try
-                it for real.
-              </p>
+              <EditableField as="p" sectionKey="home" fieldKey="demosHeading" label="Live demos heading" editing={editing} className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">{homeContent.demosHeading}</EditableField>
+              <EditableField as="p" sectionKey="home" fieldKey="demosIntro" label="Live demos introduction" editing={editing} className="mx-auto mt-1.5 max-w-md text-center text-sm text-stone-600">{homeContent.demosIntro}</EditableField>
             </Reveal>
             <Reveal delay={150} className="mt-10">
               <CoverflowCarousel
@@ -235,20 +213,16 @@ export default async function Home() {
         {/* Services */}
         <section id="services" className="paper-texture deferred-render">
           <div className="mx-auto max-w-5xl px-6 py-28">
-            <h2>
-              <LayeredWord text="What I Do" />
-            </h2>
+            <EditableField as="div" sectionKey="home" fieldKey="servicesHeading" label="Services heading" editing={editing} value={homeContent.servicesHeading}><LayeredWord text={homeContent.servicesHeading} /></EditableField>
             <Reveal>
-              <p className="mt-6 max-w-xl text-lg text-stone-600">
-                Three services. No bloat.
-              </p>
+              <EditableField as="p" sectionKey="home" fieldKey="servicesIntro" label="Services introduction" editing={editing} className="mt-6 max-w-xl text-lg text-stone-600">{homeContent.servicesIntro}</EditableField>
             </Reveal>
             <div className="mt-12 grid gap-8 sm:grid-cols-3">
               {services.map((service, i) => (
                 <Reveal key={service.number} delay={i * 100}>
                   <span className="text-sm font-semibold text-terracotta">{service.number}</span>
-                  <h3 className="mt-2 font-semibold">{service.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-stone-600">{service.description}</p>
+                  <EditableField as="div" sectionKey="home" fieldKey={service.titleKey} label={`Service ${i + 1} title`} editing={editing} className="mt-2 font-semibold">{homeContent[service.titleKey]}</EditableField>
+                  <EditableField as="p" sectionKey="home" fieldKey={service.descriptionKey} label={`Service ${i + 1} description`} editing={editing} className="mt-2 text-sm leading-6 text-stone-600">{homeContent[service.descriptionKey]}</EditableField>
                 </Reveal>
               ))}
             </div>
@@ -260,25 +234,20 @@ export default async function Home() {
           <DeferredShaderAnimation />
           <div className="relative z-10 mx-auto max-w-3xl px-6 py-28 text-center sm:py-36">
             <Reveal>
-              <h2 className="font-display text-4xl font-semibold tracking-tight sm:text-6xl">
-                Your Site. Your Way.
-              </h2>
-              <p className="mx-auto mt-6 max-w-xl text-lg text-stone-300">
-                Built around your business, your brand, and how you actually want to work
-                with a designer. No templates, no hand-offs, no guesswork.
-              </p>
+              <EditableField as="div" sectionKey="home" fieldKey="brandCtaHeading" label="Brand callout heading" editing={editing} className="font-display text-4xl font-semibold tracking-tight sm:text-6xl">{homeContent.brandCtaHeading}</EditableField>
+              <EditableField as="p" sectionKey="home" fieldKey="brandCtaBody" label="Brand callout text" editing={editing} className="mx-auto mt-6 max-w-xl text-lg text-stone-300">{homeContent.brandCtaBody}</EditableField>
               <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
                 <Link
                   href="/contact"
                   className="rounded-full bg-terracotta px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-light"
                 >
-                  Let&apos;s talk
+                  <EditableField as="span" sectionKey="home" fieldKey="brandPrimaryCta" label="Brand callout primary button" editing={editing}>{homeContent.brandPrimaryCta}</EditableField>
                 </Link>
                 <Link
                   href="/pricing"
                   className="rounded-full border border-white/30 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
                 >
-                  Pricing
+                  <EditableField as="span" sectionKey="home" fieldKey="brandSecondaryCta" label="Brand callout secondary button" editing={editing}>{homeContent.brandSecondaryCta}</EditableField>
                 </Link>
               </div>
             </Reveal>
@@ -289,29 +258,22 @@ export default async function Home() {
         <section id="contact" className="deferred-render bg-white">
           <div className="mx-auto max-w-2xl px-6 pt-28 pb-[calc(7rem+var(--stack-overlap))] text-center">
             <Reveal>
-              <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-                Let&apos;s build something
-              </h2>
-              <p className="font-display mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">
-                Ready to start your website?
-              </p>
-              <p className="mx-auto mt-4 max-w-md text-stone-600">
-                Tell me a bit about your business and what you need. I read every inquiry
-                myself and usually reply within a business day.
-              </p>
+              <EditableField as="div" sectionKey="home" fieldKey="contactEyebrow" label="Homepage contact eyebrow" editing={editing} className="text-sm font-semibold uppercase tracking-wider text-stone-500">{homeContent.contactEyebrow}</EditableField>
+              <EditableField as="p" sectionKey="home" fieldKey="contactHeading" label="Homepage contact heading" editing={editing} className="font-display mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{homeContent.contactHeading}</EditableField>
+              <EditableField as="p" sectionKey="home" fieldKey="contactBody" label="Homepage contact text" editing={editing} className="mx-auto mt-4 max-w-md text-stone-600">{homeContent.contactBody}</EditableField>
               <Link
                 href="/contact"
                 className="mt-8 inline-block rounded-full bg-terracotta px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-light"
               >
-                Start your project
+                <EditableField as="span" sectionKey="home" fieldKey="contactCta" label="Homepage contact button" editing={editing}>{homeContent.contactCta}</EditableField>
               </Link>
               <p className="mt-6 text-sm text-stone-500">
-                Prefer email? Reach me at{" "}
+                <EditableField as="span" sectionKey="home" fieldKey="contactEmailPrompt" label="Homepage email prompt" editing={editing}>{homeContent.contactEmailPrompt}</EditableField>{" "}
                 <a
-                  href="mailto:tracyholbrook532@gmail.com"
+                  href={`mailto:${homeContent.contactEmail}`}
                   className="underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
                 >
-                  tracyholbrook532@gmail.com
+                  <EditableField as="span" sectionKey="home" fieldKey="contactEmail" label="Homepage contact email" editing={editing}>{homeContent.contactEmail}</EditableField>
                 </a>
               </p>
             </Reveal>

@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import ScrollProgress from "@/components/ScrollProgress";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
-import { PreviewBanner } from "@/components/PreviewBanner";
 import "./globals.css";
 
 const clashDisplay = localFont({
@@ -71,7 +70,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <PreviewBanner />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

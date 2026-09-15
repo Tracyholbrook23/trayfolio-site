@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { contentSchema } from "@/lib/cms/content.schema";
 import { getEditableValue } from "@/lib/cms/get-content";
 import { SectionEditorForm } from "./section-editor-form";
 import { PublishSectionButton } from "./publish-section-button";
+import { enablePreviewAction } from "@/lib/cms/actions";
+import { getSession } from "@/lib/auth/session";
 
 export async function generateMetadata({
   params,
@@ -36,23 +39,33 @@ export default async function SectionEditorPage({
   const section = contentSchema.find((s) => s.key === sectionKey);
   if (!section) notFound();
 
+  const session = await getSession();
+
   const fields = await Promise.all(
     section.fields.map(async (field) => ({
       field,
-      ...(await getEditableValue(section.key, field.key)),
+      ...(await getEditableValue(section.key, field.key, field.defaultValue)),
     })),
   );
 
   return (
     <div className="min-h-screen bg-stone-50 px-6 py-16">
       <div className="mx-auto max-w-lg">
-        <a href="/client/dashboard" className="text-sm text-stone-500 underline">
+        <Link href="/client/dashboard" className="text-sm text-stone-500 underline">
           &larr; All sections
-        </a>
+        </Link>
         <div className="mt-2 flex items-center justify-between">
           <h1 className="text-xl font-semibold text-stone-900">{section.label}</h1>
-          <PublishSectionButton sectionKey={section.key} />
+          {(session.role === "OWNER" || session.role === "CLIENT_ADMIN") && (
+            <PublishSectionButton sectionKey={section.key} />
+          )}
         </div>
+        <form action={enablePreviewAction} className="mt-4">
+          <input type="hidden" name="path" value={section.path} />
+          <button type="submit" className="text-sm font-medium text-stone-600 underline">
+            Preview this page
+          </button>
+        </form>
 
         <div className="mt-8 space-y-8">
           {fields.map(({ field, value, isDraft }) => (

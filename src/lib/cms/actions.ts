@@ -8,7 +8,8 @@ import { db } from "@/lib/db/client";
 import { contentDrafts, contentValues, contentVersions } from "@/lib/db/schema";
 import { contentSchema } from "@/lib/cms/content.schema";
 import { validateField } from "@/lib/cms/validate";
-import { getSession } from "@/lib/auth/session";
+import { requireActiveUser } from "@/lib/auth/session";
+import { writeAudit } from "@/lib/cms/audit";
 
 export interface SaveDraftState {
   error?: string;
@@ -31,10 +32,16 @@ export async function saveDraftAction(
   _prevState: SaveDraftState,
   formData: FormData,
 ): Promise<SaveDraftState> {
-  const session = await getSession();
-  if (!session.userId) {
-    redirect("/client/login");
-  }
+  return saveDraft(formData);
+}
+
+/** Direct-call variant used by the visual editor on the real website. */
+export async function saveInlineDraftAction(formData: FormData): Promise<SaveDraftState> {
+  return saveDraft(formData);
+}
+
+async function saveDraft(formData: FormData): Promise<SaveDraftState> {
+  const user = await requireActiveUser();
 
   const sectionKey = String(formData.get("sectionKey") || "");
   const fieldKey = String(formData.get("fieldKey") || "");
@@ -58,12 +65,20 @@ export async function saveDraftAction(
       sectionKey,
       fieldKey,
       value: result.value,
-      updatedBy: session.email,
+      updatedBy: user.email,
     })
     .onConflictDoUpdate({
       target: [contentDrafts.sectionKey, contentDrafts.fieldKey],
-      set: { value: result.value, updatedAt: new Date(), updatedBy: session.email },
+      set: { value: result.value, updatedAt: new Date(), updatedBy: user.email },
     });
+
+  await writeAudit({
+    actorUserId: user.id,
+    actorEmail: user.email,
+    action: "DRAFT_SAVED",
+    sectionKey,
+    fieldKey,
+  });
 
   return { success: true };
 }
@@ -74,31 +89,40 @@ export async function saveDraftAction(
  * published values, through the real page and components, not a
  * simulated preview.
  */
-export async function enablePreviewAction() {
-  const session = await getSession();
-  if (!session.userId) {
-    redirect("/client/login");
-  }
+export async function enablePreviewAction(formData: FormData) {
+  await requireActiveUser();
 
   const draft = await draftMode();
   draft.enable();
-  redirect("/");
+  const requestedPath = String(formData.get("path") || "/");
+  const path = contentSchema.some((section) => section.path === requestedPath) ? requestedPath : "/";
+  redirect(path);
 }
-
-/**
- * Called from the PreviewBanner shown site-wide while Draft Mode is on.
- * No session check needed to turn preview off, exiting preview can never
- * expose or change anything, only stop showing drafts.
- */
-export async function exitPreviewAction() {
-  const draft = await draftMode();
-  draft.disable();
-  redirect("/");
-}
-
 
 export interface PublishState {
   error?: string;
+}
+
+export interface DiscardDraftsState {
+  error?: string;
+}
+
+export async function discardSectionDraftsAction(
+  _prevState: DiscardDraftsState,
+  formData: FormData,
+): Promise<DiscardDraftsState> {
+  const user = await requireActiveUser();
+  const sectionKey = String(formData.get("sectionKey") || "");
+  const section = contentSchema.find((item) => item.key === sectionKey);
+  if (!section) return { error: "That section doesn't exist." };
+
+  const deleted = await db
+    .delete(contentDrafts)
+    .where(eq(contentDrafts.sectionKey, sectionKey))
+    .returning({ id: contentDrafts.id });
+  await writeAudit({ actorUserId: user.id, actorEmail: user.email, action: "DRAFTS_DISCARDED", sectionKey, details: { count: deleted.length } });
+  const returnPath = String(formData.get("returnPath") || "");
+  redirect(returnPath === section.path ? returnPath : `/client/dashboard/${sectionKey}`);
 }
 
 /**
@@ -125,10 +149,7 @@ export async function publishSectionAction(
   _prevState: PublishState,
   formData: FormData,
 ): Promise<PublishState> {
-  const session = await getSession();
-  if (!session.userId) {
-    redirect("/client/login");
-  }
+  const user = await requireActiveUser(["OWNER", "CLIENT_ADMIN"]);
 
   const sectionKey = String(formData.get("sectionKey") || "");
   const section = contentSchema.find((s) => s.key === sectionKey);
@@ -152,18 +173,18 @@ export async function publishSectionAction(
         sectionKey: draft.sectionKey,
         fieldKey: draft.fieldKey,
         value: draft.value,
-        updatedBy: session.email,
+        updatedBy: user.email,
       })
       .onConflictDoUpdate({
         target: [contentValues.sectionKey, contentValues.fieldKey],
-        set: { value: draft.value, updatedAt: new Date(), updatedBy: session.email },
+        set: { value: draft.value, updatedAt: new Date(), updatedBy: user.email },
       });
 
     await db.insert(contentVersions).values({
       sectionKey: draft.sectionKey,
       fieldKey: draft.fieldKey,
       value: draft.value,
-      publishedBy: session.email,
+      publishedBy: user.email,
     });
 
     await db
@@ -176,8 +197,12 @@ export async function publishSectionAction(
       );
   }
 
+  await writeAudit({ actorUserId: user.id, actorEmail: user.email, action: "SECTION_PUBLISHED", sectionKey, details: { count: drafts.length } });
+
   updateTag(`content:${sectionKey}`);
-  redirect(`/client/dashboard/${sectionKey}`);
+  const returnPath = String(formData.get("returnPath") || "");
+  const destination = returnPath === section.path ? returnPath : `/client/dashboard/${sectionKey}`;
+  redirect(destination);
 }
 
 export interface RollbackState {
@@ -208,10 +233,7 @@ export async function rollbackFieldAction(
   _prevState: RollbackState,
   formData: FormData,
 ): Promise<RollbackState> {
-  const session = await getSession();
-  if (!session.userId) {
-    redirect("/client/login");
-  }
+  const user = await requireActiveUser(["OWNER"]);
 
   const sectionKey = String(formData.get("sectionKey") || "");
   const fieldKey = String(formData.get("fieldKey") || "");
@@ -255,23 +277,25 @@ export async function rollbackFieldAction(
       sectionKey,
       fieldKey,
       value: result.value,
-      updatedBy: session.email,
+      updatedBy: user.email,
     })
     .onConflictDoUpdate({
       target: [contentValues.sectionKey, contentValues.fieldKey],
-      set: { value: result.value, updatedAt: new Date(), updatedBy: session.email },
+      set: { value: result.value, updatedAt: new Date(), updatedBy: user.email },
     });
 
   await db.insert(contentVersions).values({
     sectionKey,
     fieldKey,
     value: result.value,
-    publishedBy: session.email,
+    publishedBy: user.email,
   });
 
   await db
     .delete(contentDrafts)
     .where(and(eq(contentDrafts.sectionKey, sectionKey), eq(contentDrafts.fieldKey, fieldKey)));
+
+  await writeAudit({ actorUserId: user.id, actorEmail: user.email, action: "FIELD_ROLLED_BACK", sectionKey, fieldKey, details: { versionId } });
 
   updateTag(`content:${sectionKey}`);
   redirect(`/client/dashboard/${sectionKey}`);

@@ -3,6 +3,11 @@ import Link from "next/link";
 import SiteHeader from "@/components/SiteHeader";
 import SiteFooter from "@/components/SiteFooter";
 import Reveal from "@/components/Reveal";
+import { EditableField } from "@/components/cms/EditableField";
+import { getSectionContent, getSectionDraftCount } from "@/lib/cms/get-content";
+import { getSession } from "@/lib/auth/session";
+import { draftMode } from "next/headers";
+import { VisualEditorToolbar } from "@/components/cms/VisualEditorToolbar";
 import LayeredWord from "@/components/LayeredWord";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 
@@ -121,9 +126,12 @@ function Cell({ value, highlight = false }: { value: string; highlight?: boolean
   );
 }
 
-export default function Pricing() {
+export default async function Pricing() {
+  const [content, session, draft, draftCount] = await Promise.all([getSectionContent("pricing"), getSession(), draftMode(), getSectionDraftCount("pricing")]);
+  const editing = Boolean(session.userId && draft.isEnabled);
   return (
     <div className="flex flex-col flex-1 bg-white text-stone-900">
+      {session.userId ? <VisualEditorToolbar role={session.role} previewing={draft.isEnabled} draftCount={draftCount} /> : null}
       <SiteHeader />
 
       <main id="main-content" className="flex-1 pb-[var(--stack-overlap)]">
@@ -132,14 +140,9 @@ export default function Pricing() {
           <p className="text-sm font-semibold uppercase tracking-wider text-stone-500">
             Pricing
           </p>
-          <h1 className="mt-3">
-            <LayeredWord text="Flat Pricing" />
-          </h1>
+          <EditableField as="div" sectionKey="pricing" fieldKey="heading" label="Page heading" editing={editing} value={content.heading} className="mt-3"><LayeredWord text={content.heading} /></EditableField>
           <Reveal>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-stone-600">
-              You see the number before we start, and it does not move. Pick a package
-              or build your own from the list below.
-            </p>
+            <EditableField as="p" sectionKey="pricing" fieldKey="intro" label="Page introduction" editing={editing} className="mt-6 max-w-xl text-lg leading-8 text-stone-600">{content.intro}</EditableField>
           </Reveal>
         </section>
 
@@ -148,9 +151,7 @@ export default function Pricing() {
           <Reveal>
             <div className="flex flex-col gap-6 rounded-3xl border border-terracotta/30 bg-peach px-8 py-10 sm:flex-row sm:items-center sm:justify-between sm:px-12">
               <div className="max-w-xl">
-                <p className="text-sm font-semibold uppercase tracking-wider text-terracotta">
-                  Start here
-                </p>
+                <EditableField as="p" sectionKey="pricing" fieldKey="demoEyebrow" label="Demo eyebrow" editing={editing} className="text-sm font-semibold uppercase tracking-wider text-terracotta">{content.demoEyebrow}</EditableField>
                 <p className="font-display mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
                   See it before you buy it. $50.
                 </p>
@@ -175,13 +176,8 @@ export default function Pricing() {
         <section className="bg-stone-50">
           <div className="mx-auto max-w-5xl px-6 py-20">
             <Reveal>
-              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                Three packages
-              </h2>
-              <p className="mt-3 max-w-xl text-stone-600">
-                Each one adds pages and one more thing your site can do. Every package
-                costs less than buying the same pieces separately.
-              </p>
+              <EditableField as="div" sectionKey="pricing" fieldKey="packagesHeading" label="Packages heading" editing={editing} className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{content.packagesHeading}</EditableField>
+              <EditableField as="p" sectionKey="pricing" fieldKey="packagesIntro" label="Packages introduction" editing={editing} className="mt-3 max-w-xl text-stone-600">{content.packagesIntro}</EditableField>
             </Reveal>
 
             <div className="mt-12 grid items-start gap-8 sm:grid-cols-3">
@@ -243,13 +239,8 @@ export default function Pricing() {
         {/* Included or bolted on */}
         <section className="mx-auto max-w-5xl px-6 py-20">
           <Reveal>
-            <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-              Included, or bolted on
-            </h2>
-            <p className="mt-3 max-w-xl text-stone-600">
-              Any package can reach the same place with add-ons. It just costs more to get
-              there.
-            </p>
+            <EditableField as="div" sectionKey="pricing" fieldKey="comparisonHeading" label="Comparison heading" editing={editing} className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{content.comparisonHeading}</EditableField>
+            <EditableField as="p" sectionKey="pricing" fieldKey="comparisonIntro" label="Comparison introduction" editing={editing} className="mt-3 max-w-xl text-stone-600">{content.comparisonIntro}</EditableField>
           </Reveal>
 
           <Reveal delay={100} className="mt-10">
@@ -316,9 +307,7 @@ export default function Pricing() {
         <section className="paper-texture">
           <div className="mx-auto max-w-5xl px-6 py-20">
             <Reveal>
-              <h2 className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">
-                Build your own
-              </h2>
+              <EditableField as="div" sectionKey="pricing" fieldKey="buildHeading" label="Build-your-own heading" editing={editing} className="font-display text-3xl font-semibold tracking-tight sm:text-4xl">{content.buildHeading}</EditableField>
               <p className="mt-3 max-w-xl text-stone-700">
                 Every piece, priced on its own. Start from a $400 base site with up to 3
                 pages and add only what you need.
@@ -349,10 +338,7 @@ export default function Pricing() {
             </div>
 
             <Reveal delay={300}>
-              <p className="mt-10 text-sm text-stone-600">
-                Redesigning a site you already have is priced the same as building new.
-                Domain and DNS setup is free with every build.
-              </p>
+              <EditableField as="p" sectionKey="pricing" fieldKey="redesignNote" label="Redesign note" editing={editing} className="mt-10 text-sm text-stone-600">{content.redesignNote}</EditableField>
             </Reveal>
           </div>
         </section>
@@ -368,16 +354,13 @@ export default function Pricing() {
                 <p className="font-display mt-2 text-2xl font-semibold tracking-tight sm:text-3xl">
                   Care plan, $25 a month
                 </p>
-                <p className="mt-3 leading-7 text-stone-600">
-                  Hosting, security updates, uptime monitoring, and small edits when you
-                  need them. Optional, month to month, cancel anytime.
-                </p>
+                <EditableField as="p" sectionKey="pricing" fieldKey="careBody" label="Care plan description" editing={editing} className="mt-3 leading-7 text-stone-600">{content.careBody}</EditableField>
               </div>
               <Link
                 href="/contact"
                 className="shrink-0 self-start rounded-full border border-stone-300 px-7 py-3.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-50 sm:self-auto"
               >
-                Ask about care
+                <EditableField as="span" sectionKey="pricing" fieldKey="careCta" label="Care plan button" editing={editing}>{content.careCta}</EditableField>
               </Link>
             </div>
           </Reveal>
@@ -390,15 +373,13 @@ export default function Pricing() {
               <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
                 Questions
               </h2>
-              <p className="mt-2 max-w-lg text-2xl font-semibold tracking-tight sm:text-3xl">
-                Timelines, payment, ownership, and what happens after launch.
-              </p>
+              <EditableField as="p" sectionKey="pricing" fieldKey="faqHeading" label="FAQ callout heading" editing={editing} className="mt-2 max-w-lg text-2xl font-semibold tracking-tight sm:text-3xl">{content.faqHeading}</EditableField>
             </div>
             <Link
               href="/faq"
               className="whitespace-nowrap rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-stone-800"
             >
-              Read the FAQ
+              <EditableField as="span" sectionKey="pricing" fieldKey="faqCta" label="FAQ button" editing={editing}>{content.faqCta}</EditableField>
             </Link>
           </div>
         </section>
@@ -406,18 +387,13 @@ export default function Pricing() {
         {/* Contact CTA */}
         <section className="mx-auto max-w-5xl px-6 py-20">
           <div className="rounded-3xl bg-peach px-8 py-14 text-center text-stone-900 sm:px-16">
-            <h2 className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">
-              Not sure which one fits?
-            </h2>
-            <p className="mx-auto mt-3 max-w-md text-stone-600">
-              Tell me about your business and I&apos;ll tell you which package makes sense,
-              no pressure and no obligation.
-            </p>
+            <EditableField as="div" sectionKey="pricing" fieldKey="contactHeading" label="Contact callout heading" editing={editing} className="font-display text-2xl font-semibold tracking-tight sm:text-3xl">{content.contactHeading}</EditableField>
+            <EditableField as="p" sectionKey="pricing" fieldKey="contactBody" label="Contact callout text" editing={editing} className="mx-auto mt-3 max-w-md text-stone-600">{content.contactBody}</EditableField>
             <Link
               href="/contact"
               className="mt-8 inline-block rounded-full bg-terracotta px-7 py-3.5 text-sm font-semibold text-white transition hover:bg-terracotta-light"
             >
-              Start your project
+              <EditableField as="span" sectionKey="pricing" fieldKey="contactCta" label="Contact callout button" editing={editing}>{content.contactCta}</EditableField>
             </Link>
           </div>
         </section>
