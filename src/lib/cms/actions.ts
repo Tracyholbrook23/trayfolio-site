@@ -167,6 +167,32 @@ export async function publishSectionAction(
   }
 
   for (const draft of drafts) {
+    const [previousValue] = await db
+      .select({ value: contentValues.value })
+      .from(contentValues)
+      .where(
+        and(
+          eq(contentValues.sectionKey, draft.sectionKey),
+          eq(contentValues.fieldKey, draft.fieldKey),
+        ),
+      )
+      .limit(1);
+
+    // A field can be rendered from its schema default before it has ever
+    // had a content_values row. Preserve that default as version zero so
+    // the very first publish can still be undone from the history screen.
+    if (!previousValue) {
+      const field = section.fields.find((item) => item.key === draft.fieldKey);
+      if (field) {
+        await db.insert(contentVersions).values({
+          sectionKey: draft.sectionKey,
+          fieldKey: draft.fieldKey,
+          value: field.defaultValue,
+          publishedBy: null,
+        });
+      }
+    }
+
     await db
       .insert(contentValues)
       .values({
