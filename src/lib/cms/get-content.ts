@@ -1,9 +1,9 @@
 import "server-only";
 import { draftMode } from "next/headers";
 import { unstable_cache } from "next/cache";
-import { and, eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
-import { contentValues, contentDrafts } from "@/lib/db/schema";
+import { contentValues, contentDrafts, contentVersions } from "@/lib/db/schema";
 
 /**
  * Reads one editable field's current value for rendering the public site.
@@ -97,4 +97,47 @@ export async function getEditableValue(
 
   const value = rows[0]?.value;
   return { value: typeof value === "string" ? value : null, isDraft: false };
+}
+
+export interface FieldVersion {
+  id: number;
+  value: string;
+  publishedAt: Date;
+  publishedBy: string | null;
+}
+
+/**
+ * Dashboard-only read: every value this field has ever been published
+ * with, most recent first. Backs the version history/rollback view.
+ * Always fresh (no cache), same reasoning as getEditableValue, a client
+ * who just rolled back needs to see that show up immediately. Never used
+ * by the public site.
+ *
+ * content_versions is append-only (see schema.ts) and both
+ * publishSectionAction and rollbackFieldAction insert a row here every
+ * time they touch content_values, so the newest row returned is always
+ * what's currently live, that invariant is what lets the history page
+ * label versions[0] as "Current" without a separate lookup.
+ */
+export async function getFieldVersions(
+  sectionKey: string,
+  fieldKey: string,
+  limit = 50,
+): Promise<FieldVersion[]> {
+  const rows = await db
+    .select({
+      id: contentVersions.id,
+      value: contentVersions.value,
+      publishedAt: contentVersions.publishedAt,
+      publishedBy: contentVersions.publishedBy,
+    })
+    .from(contentVersions)
+    .where(and(eq(contentVersions.sectionKey, sectionKey), eq(contentVersions.fieldKey, fieldKey)))
+    .orderBy(desc(contentVersions.publishedAt))
+    .limit(limit);
+
+  return rows.map((row) => ({
+    ...row,
+    value: typeof row.value === "string" ? row.value : String(row.value),
+  }));
 }

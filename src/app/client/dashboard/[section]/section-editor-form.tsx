@@ -38,10 +38,18 @@ export function SectionEditorForm({
       <input type="hidden" name="sectionKey" value={sectionKey} />
       <input type="hidden" name="fieldKey" value={field.key} />
 
-      <label htmlFor={field.key} className="block text-sm font-medium text-stone-900">
-        {field.label}
-        {field.required && <span className="text-red-600"> *</span>}
-      </label>
+      <div className="flex items-start justify-between gap-4">
+        <label htmlFor={field.key} className="block text-sm font-medium text-stone-900">
+          {field.label}
+          {field.required && <span className="text-red-600"> *</span>}
+        </label>
+        <a
+          href={`/client/dashboard/${sectionKey}/${field.key}/history`}
+          className="shrink-0 text-xs text-stone-500 underline"
+        >
+          View history
+        </a>
+      </div>
       {field.helpText && <p className="mt-1 text-xs text-stone-500">{field.helpText}</p>}
 
       {field.type === "textarea" ? (

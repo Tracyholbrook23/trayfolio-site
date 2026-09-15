@@ -104,9 +104,9 @@ export interface PublishState {
 /**
  * Publishes every field in a section that currently has a draft: copies
  * each draft's value into content_values (what the public site reads),
- * logs the same value into content_versions (the publish history a later
- * rollback feature will read from), then clears the draft row so the next
- * edit starts fresh from the newly published baseline.
+ * logs the same value into content_versions (the publish history the
+ * version history/rollback view reads from), then clears the draft row so
+ * the next edit starts fresh from the newly published baseline.
  *
  * Re-checks the session itself, same defense-in-depth reasoning as
  * saveDraftAction, this is the action that actually changes what
@@ -175,6 +175,103 @@ export async function publishSectionAction(
         ),
       );
   }
+
+  updateTag(`content:${sectionKey}`);
+  redirect(`/client/dashboard/${sectionKey}`);
+}
+
+export interface RollbackState {
+  error?: string;
+}
+
+/**
+ * Rolls a single field back to an earlier published value. Deliberately
+ * not a separate mechanism from publishing, per the schema.ts note on
+ * content_versions: it just republishes an old version row's value,
+ * writing it into content_values and logging a NEW content_versions row
+ * for it, so a rollback shows up as its own entry in the history rather
+ * than rewriting the past. That also keeps the "newest row is always
+ * what's live" invariant getFieldVersions relies on intact.
+ *
+ * Also clears any pending draft for the field, so a half-finished edit
+ * sitting in content_drafts can't get mixed up with the version the
+ * client actually meant to restore.
+ *
+ * Re-validates the historical value against the field's CURRENT rules
+ * before writing it, same defense-in-depth reasoning as every other
+ * action here. A value that was valid when first published should still
+ * be valid, but the schema itself can change later (e.g. a tightened
+ * maxLength), and this must never write something the live schema would
+ * now reject.
+ */
+export async function rollbackFieldAction(
+  _prevState: RollbackState,
+  formData: FormData,
+): Promise<RollbackState> {
+  const session = await getSession();
+  if (!session.userId) {
+    redirect("/client/login");
+  }
+
+  const sectionKey = String(formData.get("sectionKey") || "");
+  const fieldKey = String(formData.get("fieldKey") || "");
+  const versionId = Number(formData.get("versionId"));
+
+  const section = contentSchema.find((s) => s.key === sectionKey);
+  const field = section?.fields.find((f) => f.key === fieldKey);
+  if (!section || !field) {
+    return { error: "That field doesn't exist." };
+  }
+
+  if (!Number.isInteger(versionId)) {
+    return { error: "Invalid version." };
+  }
+
+  const [version] = await db
+    .select()
+    .from(contentVersions)
+    .where(
+      and(
+        eq(contentVersions.id, versionId),
+        eq(contentVersions.sectionKey, sectionKey),
+        eq(contentVersions.fieldKey, fieldKey),
+      ),
+    )
+    .limit(1);
+
+  if (!version) {
+    return { error: "That version no longer exists." };
+  }
+
+  const rawValue = typeof version.value === "string" ? version.value : String(version.value);
+  const result = validateField(field, rawValue);
+  if (!result.valid) {
+    return { error: `That version is no longer valid: ${result.error}` };
+  }
+
+  await db
+    .insert(contentValues)
+    .values({
+      sectionKey,
+      fieldKey,
+      value: result.value,
+      updatedBy: session.email,
+    })
+    .onConflictDoUpdate({
+      target: [contentValues.sectionKey, contentValues.fieldKey],
+      set: { value: result.value, updatedAt: new Date(), updatedBy: session.email },
+    });
+
+  await db.insert(contentVersions).values({
+    sectionKey,
+    fieldKey,
+    value: result.value,
+    publishedBy: session.email,
+  });
+
+  await db
+    .delete(contentDrafts)
+    .where(and(eq(contentDrafts.sectionKey, sectionKey), eq(contentDrafts.fieldKey, fieldKey)));
 
   updateTag(`content:${sectionKey}`);
   redirect(`/client/dashboard/${sectionKey}`);
