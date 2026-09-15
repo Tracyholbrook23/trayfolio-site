@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { draftMode } from "next/headers";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 import { and, eq } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { contentDrafts, contentValues, contentVersions } from "@/lib/db/schema";
@@ -112,8 +112,11 @@ export interface PublishState {
  * saveDraftAction, this is the action that actually changes what
  * visitors see, it must never rely on proxy.ts alone.
  *
- * revalidateTag runs once at the end so a publish takes effect on the
- * live site immediately, no rebuild or redeploy, see get-content.ts.
+ * updateTag runs once at the end so a publish takes effect on the live
+ * site immediately: it's the Next.js 16 API built specifically for a
+ * Server Action that needs the very next request to see the change
+ * ("read-your-own-writes"), unlike revalidateTag's stale-while-revalidate
+ * default. See get-content.ts for the matching cache tag.
  * Redirecting back to this same section afterward (rather than returning
  * a success state) is what clears the "Unpublished draft" tags in the
  * UI, that state is fetched fresh on the page's next render.
@@ -173,6 +176,6 @@ export async function publishSectionAction(
       );
   }
 
-  revalidateTag(`content:${sectionKey}`);
+  updateTag(`content:${sectionKey}`);
   redirect(`/client/dashboard/${sectionKey}`);
 }
