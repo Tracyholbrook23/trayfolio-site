@@ -12,6 +12,7 @@ import DeferredShaderAnimation from "@/components/DeferredShaderAnimation";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 import PortfolioIntro from "@/components/PortfolioIntro";
 import { getContentValue } from "@/lib/cms/get-content";
+import { getSession } from "@/lib/auth/session";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -146,12 +147,20 @@ export default async function Home() {
     "Custom strategy, design, and development\u2014from the first idea to a site ready to win customers.",
   );
 
+  // Any logged-in dashboard user (owner or client) sees click-to-edit
+  // affordances over their own CMS-backed content, see EditableField.
+  // This is a UX convenience only, not an access check: every actual
+  // write is still independently gated by the Server Action it submits
+  // to.
+  const session = await getSession();
+  const editing = Boolean(session.userId);
+
   return (
     <div className="flex flex-col flex-1 bg-white text-stone-900">
       <SiteHeader />
 
       <main id="main-content" className="flex-1">
-        <PortfolioIntro heroLede={heroLede} />
+        <PortfolioIntro heroLede={heroLede} editing={editing} />
 
         {/* The remaining work follows the large selected-work sequence. */}
         <section id="work" className="deferred-render bg-stone-50">

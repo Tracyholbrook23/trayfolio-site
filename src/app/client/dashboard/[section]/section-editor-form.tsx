@@ -34,7 +34,11 @@ export function SectionEditorForm({
   const [value, setValue] = useState(initialValue);
 
   return (
-    <form action={formAction} className="rounded-lg border border-stone-200 bg-white p-4">
+    <form
+      action={formAction}
+      id={`field-${field.key}`}
+      className="scroll-mt-8 rounded-lg border border-stone-200 bg-white p-4"
+    >
       <input type="hidden" name="sectionKey" value={sectionKey} />
       <input type="hidden" name="fieldKey" value={field.key} />
 

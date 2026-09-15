@@ -6,6 +6,7 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
+import { EditableField } from "@/components/cms/EditableField";
 
 if (typeof window !== "undefined") gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -15,7 +16,13 @@ const featuredWork = [
   { name: "Valtier Media", eyebrow: "Creative studio · Austin", description: "A polished portfolio for an Austin photography and videography studio built to make every frame feel cinematic.", image: "/work/valtiermedia.jpg", href: "https://www.valtiermedia.com", tone: "portfolio-feature--valtier" },
 ];
 
-export default function PortfolioIntro({ heroLede }: { heroLede: string }) {
+export default function PortfolioIntro({
+  heroLede,
+  editing,
+}: {
+  heroLede: string;
+  editing: boolean;
+}) {
   const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const heroCopyRef = useRef<HTMLDivElement>(null);
@@ -54,7 +61,16 @@ export default function PortfolioIntro({ heroLede }: { heroLede: string }) {
           <div ref={heroCopyRef} className="portfolio-hero__copy">
             <p className="portfolio-kicker"><span /> Independent web design studio</p>
             <h1>Websites that make small businesses <em>impossible to ignore.</em></h1>
-            <p className="portfolio-hero__lede">{heroLede}</p>
+            <EditableField
+              as="p"
+              sectionKey="home"
+              fieldKey="heroLede"
+              label="Hero Subheading"
+              editing={editing}
+              className="portfolio-hero__lede"
+            >
+              {heroLede}
+            </EditableField>
             <div className="portfolio-hero__actions">
               <a href="#featured-work" className="portfolio-button portfolio-button--solid">See the work <span aria-hidden="true">↓</span></a>
               <a href="#demos" className="portfolio-button portfolio-button--text">Try live demos <span aria-hidden="true">↗</span></a>
