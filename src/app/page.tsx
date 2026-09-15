@@ -11,6 +11,7 @@ import SeeTheDifference from "@/components/SeeTheDifference";
 import DeferredShaderAnimation from "@/components/DeferredShaderAnimation";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 import PortfolioIntro from "@/components/PortfolioIntro";
+import { getContentValue } from "@/lib/cms/get-content";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -138,13 +139,19 @@ const services = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const heroLede = await getContentValue(
+    "home",
+    "heroLede",
+    "Custom strategy, design, and development\u2014from the first idea to a site ready to win customers.",
+  );
+
   return (
     <div className="flex flex-col flex-1 bg-white text-stone-900">
       <SiteHeader />
 
       <main id="main-content" className="flex-1">
-        <PortfolioIntro />
+        <PortfolioIntro heroLede={heroLede} />
 
         {/* The remaining work follows the large selected-work sequence. */}
         <section id="work" className="deferred-render bg-stone-50">

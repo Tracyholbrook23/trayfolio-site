@@ -15,7 +15,7 @@ const featuredWork = [
   { name: "Valtier Media", eyebrow: "Creative studio · Austin", description: "A polished portfolio for an Austin photography and videography studio built to make every frame feel cinematic.", image: "/work/valtiermedia.jpg", href: "https://www.valtiermedia.com", tone: "portfolio-feature--valtier" },
 ];
 
-export default function PortfolioIntro() {
+export default function PortfolioIntro({ heroLede }: { heroLede: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
   const heroRef = useRef<HTMLElement>(null);
   const heroCopyRef = useRef<HTMLDivElement>(null);
@@ -54,7 +54,7 @@ export default function PortfolioIntro() {
           <div ref={heroCopyRef} className="portfolio-hero__copy">
             <p className="portfolio-kicker"><span /> Independent web design studio</p>
             <h1>Websites that make small businesses <em>impossible to ignore.</em></h1>
-            <p className="portfolio-hero__lede">Custom strategy, design, and development—from the first idea to a site ready to win customers.</p>
+            <p className="portfolio-hero__lede">{heroLede}</p>
             <div className="portfolio-hero__actions">
               <a href="#featured-work" className="portfolio-button portfolio-button--solid">See the work <span aria-hidden="true">↓</span></a>
               <a href="#demos" className="portfolio-button portfolio-button--text">Try live demos <span aria-hidden="true">↗</span></a>
@@ -67,8 +67,7 @@ export default function PortfolioIntro() {
                   src={project.image}
                   alt=""
                   fill
-                  loading={index === 0 ? "eager" : "lazy"}
-                  fetchPriority={index === 0 ? "high" : "auto"}
+                  loading="lazy"
                   sizes="(max-width: 767px) 76vw, 48vw"
                 />
               </figure>
