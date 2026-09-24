@@ -169,7 +169,7 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
   const html = `
     <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:520px;color:#2a2118;line-height:1.6">
       <p style="margin:0 0 16px">Thanks for your order. Your demo landing page is paid for and I've started on it.</p>
-      <p style="margin:0 0 16px">I'll email you within 24 hours to ask about your business and what you want the page to do.</p>
+      <p style="margin:0 0 16px">I'll email you to collect the essentials about your business. Once I have what I need, your custom demo will be delivered within 48 hours.</p>
       <p style="margin:0 0 16px">
         Order reference: <strong>${code}</strong><br>
         This is also your $50 credit toward a full site. Enter it at checkout on
@@ -184,7 +184,7 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
   const text = [
     "Thanks for your order. Your demo landing page is paid for and I've started on it.",
     "",
-    "I'll email you within 24 hours to ask about your business and what you want the page to do.",
+    "I'll email you to collect the essentials about your business. Once I have what I need, your custom demo will be delivered within 48 hours.",
     "",
     `Order reference: ${code}`,
     "This is also your $50 credit toward a full site. Enter it at checkout on",

@@ -49,6 +49,12 @@ body {
   background-size: cover;
 }
 
+/* Skip below-the-fold layout and paint until a section approaches view. */
+.deferred-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
 .font-display {
   font-family: var(--font-display), var(--font-sans), sans-serif;
 }
@@ -559,3 +565,92 @@ body {
 }
 
 :focus-visible { outline: 3px solid #974419; outline-offset: 4px; }
+
+/* ------------------------------------------------------------------
+   Trayfolio V2 shared marketing language
+   ------------------------------------------------------------------ */
+
+.v2-container {
+  width: min(100% - 2rem, 80rem);
+  margin-inline: auto;
+}
+
+@media (min-width: 640px) {
+  .v2-container { width: min(100% - 3rem, 80rem); }
+}
+
+.v2-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.v2-home-title {
+  max-width: 69rem;
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-size: clamp(3.35rem, 9.2vw, 8.4rem);
+  font-weight: 700;
+  line-height: 0.87;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
+.v2-page-title {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-size: clamp(3rem, 7vw, 6.8rem);
+  font-weight: 700;
+  line-height: 0.92;
+  letter-spacing: -0.055em;
+  text-wrap: balance;
+}
+
+.v2-section-title {
+  font-family: var(--font-display), var(--font-sans), sans-serif;
+  font-size: clamp(2.5rem, 5.4vw, 5.25rem);
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.05em;
+  text-wrap: balance;
+}
+
+.v2-button {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.75rem 1.3rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.25rem;
+  transition: transform 180ms ease, background-color 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+
+.v2-button:hover { transform: translateY(-2px); }
+.v2-button--primary { background: var(--color-terracotta); color: white; box-shadow: 0 16px 35px -20px rgba(90, 34, 9, 0.8); }
+.v2-button--primary:hover { background: var(--color-terracotta-light); }
+.v2-button--secondary { border-color: rgb(120 113 108 / 45%); background: rgb(255 255 255 / 58%); color: #2a2118; }
+.v2-button--secondary:hover { border-color: #2a2118; background: white; }
+.v2-button--light { border-color: rgb(255 255 255 / 35%); color: white; }
+.v2-button--light:hover { background: rgb(255 255 255 / 10%); }
+
+.demo-button-on-dark > button {
+  background: white;
+  color: var(--color-terracotta);
+}
+
+.demo-button-on-dark > button:hover { background: #fff7ef; }
+.demo-button-on-dark > p { color: rgb(255 255 255 / 72%); }
+.demo-button-on-dark > p a { color: white; }
+
+@media (max-width: 359px) {
+  .v2-home-title { font-size: 3rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v2-button { transition: none; }
+  .v2-button:hover { transform: none; }
+}

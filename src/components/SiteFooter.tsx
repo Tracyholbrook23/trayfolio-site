@@ -11,18 +11,19 @@ const columns: {
   links: { label: string; href: string; external?: boolean }[];
 }[] = [
   {
-    heading: "Contact",
+    heading: "Start",
     links: [
-      { label: "tracyholbrook532@gmail.com", href: "mailto:tracyholbrook532@gmail.com" },
-      { label: "Start a project", href: "/contact" },
+      { label: "Book a free call", href: "/contact" },
+      { label: "Get a $50 demo", href: "/demo" },
+      { label: "Email Trayfolio", href: "mailto:tracyholbrook532@gmail.com" },
     ],
   },
   {
-    heading: "Company",
+    heading: "Explore",
     links: [
-      { label: "Work", href: "/#work" },
-      { label: "Demos", href: "/#demos" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "Work", href: "/work" },
+      { label: "Services", href: "/services" },
+      { label: "About", href: "/about" },
       { label: "FAQ", href: "/faq" },
     ],
   },
@@ -98,7 +99,7 @@ export default function SiteFooter() {
 
         <div className="mt-14 flex flex-col gap-4 border-t border-stone-200 pt-8 text-xs text-stone-600 sm:flex-row sm:items-center sm:justify-between">
           <span>© {new Date().getFullYear()} Trayfolio. All rights reserved.</span>
-          <span>Built by Tracy Holbrook.</span>
+          <span>Custom websites for small businesses nationwide. Founded by Tracy Holbrook.</span>
         </div>
 
         <div ref={wordmarkRef} className="mt-10 select-none overflow-hidden">

@@ -20,11 +20,11 @@ export default function DemoSuccess() {
             Demo ordered
           </p>
           <h1 className="font-display mt-3 text-4xl font-semibold tracking-tight sm:text-5xl">
-            I&apos;ll be in touch within 24 hours.
+            Your demo is officially in motion.
           </h1>
           <p className="mx-auto mt-6 max-w-md text-lg leading-8 text-stone-600">
-            I&apos;ll email you to ask about your business and what you want the page to
-            do, then start building it.
+            I&apos;ll email you to collect the essentials about your business. Once I have
+            what I need, your custom demo will be delivered within 48 hours.
           </p>
 
           <div className="mx-auto mt-10 max-w-md border border-stone-200 bg-peach p-6 text-left">

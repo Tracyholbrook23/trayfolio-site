@@ -7,9 +7,10 @@ const OWNER_EMAIL = "tracyholbrook532@gmail.com";
 const projectTypes = [
   "New website",
   "Redesign",
-  "E-commerce / Shopify",
-  "Ongoing care & support",
-  "Something else",
+  "Online store / payments",
+  "Booking or lead-generation site",
+  "Ongoing website support",
+  "Not sure yet",
 ];
 
 type Status = "idle" | "sending" | "sent" | "error";
@@ -101,8 +102,8 @@ export default function InquiryForm() {
           Got it, thank you.
         </p>
         <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-stone-600">
-          Your inquiry is in my inbox. I read every one myself and usually reply
-          within a business day.
+          Your request is in my inbox. I read every one myself and usually reply
+          within a business day to arrange the next step.
         </p>
         <button
           type="button"
@@ -193,7 +194,7 @@ export default function InquiryForm() {
       </div>
 
       <div>
-        <span className="text-sm font-medium text-stone-700">What do you need?</span>
+        <span className="text-sm font-medium text-stone-700">What would you like to discuss?</span>
         <div className="mt-2 flex flex-wrap gap-2">
           {projectTypes.map((type) => (
             <button
@@ -249,7 +250,7 @@ export default function InquiryForm() {
         disabled={sending}
         className="inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-terracotta/20 transition hover:bg-terracotta-light disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {sending ? "Sending..." : "Send inquiry"}
+        {sending ? "Sending..." : "Request my free call"}
       </button>
 
       {status === "error" ? (

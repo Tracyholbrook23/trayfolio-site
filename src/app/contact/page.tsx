@@ -1,60 +1,15 @@
 import type { Metadata } from "next";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
-import Reveal from "@/components/Reveal";
+import { Calendar, Clock, Mail, Video } from "lucide-react";
+import MarketingShell from "@/components/MarketingShell";
 import InquiryForm from "@/components/InquiryForm";
-import { EditableField } from "@/components/cms/EditableField";
-import { getSectionContent, getSectionDraftCount } from "@/lib/cms/get-content";
-import { getSession } from "@/lib/auth/session";
-import { draftMode } from "next/headers";
-import { VisualEditorToolbar } from "@/components/cms/VisualEditorToolbar";
+import Reveal from "@/components/Reveal";
+import { Eyebrow } from "@/components/V2Ui";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/contact" },
-  title: "Contact | Trayfolio",
-  description:
-    "Start a website project with Trayfolio. Tell me about your business and get a reply within one business day.",
-};
+export const metadata: Metadata = { title: "Book a Free Call | Trayfolio", description: "Book a free 15-minute phone or video call with Trayfolio, or send a website project inquiry.", alternates: { canonical: "/contact" } };
 
-export default async function ContactPage() {
-  const [content, session, draft, draftCount] = await Promise.all([getSectionContent("contact"), getSession(), draftMode(), getSectionDraftCount("contact")]);
-  const editing = Boolean(session.userId && draft.isEnabled);
-  return (
-    <div className="flex min-h-screen flex-col bg-white text-stone-900">
-      {session.userId ? <VisualEditorToolbar role={session.role} previewing={draft.isEnabled} draftCount={draftCount} /> : null}
-      <SiteHeader />
-      <main id="main-content" className="flex-1 pb-[var(--stack-overlap)]">
-        <section className="mx-auto max-w-5xl px-6 py-24 sm:py-28">
-          <div className="grid gap-12 lg:grid-cols-5">
-            <Reveal className="lg:col-span-2">
-              <EditableField as="div" sectionKey="contact" fieldKey="eyebrow" label="Page eyebrow" editing={editing} className="text-sm font-semibold uppercase tracking-wider text-stone-500">{content.eyebrow}</EditableField>
-              <EditableField as="p" sectionKey="contact" fieldKey="heading" label="Page heading" editing={editing} className="font-display mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{content.heading}</EditableField>
-              <EditableField as="p" sectionKey="contact" fieldKey="intro" label="Introduction" editing={editing} className="mt-4 max-w-sm text-stone-600">{content.intro}</EditableField>
-              <div className="mt-8 space-y-3 text-sm text-stone-600">
-                <p>
-                  <span className="font-semibold text-stone-900">Email: </span>
-                  <a
-                    href={`mailto:${content.email}`}
-                    className="underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
-                  >
-                    <EditableField as="span" sectionKey="contact" fieldKey="email" label="Contact email" editing={editing}>{content.email}</EditableField>
-                  </a>
-                </p>
-                <p>
-                  <span className="font-semibold text-stone-900">Response time: </span>
-                  <EditableField as="span" sectionKey="contact" fieldKey="responseTime" label="Response time" editing={editing}>{content.responseTime}</EditableField>
-                </p>
-              </div>
-            </Reveal>
-            <Reveal delay={150} className="lg:col-span-3">
-              <div className="rounded-3xl border border-stone-200 bg-stone-50 p-6 sm:p-10">
-                <InquiryForm />
-              </div>
-            </Reveal>
-          </div>
-        </section>
-      </main>
-      <SiteFooter />
-    </div>
-  );
+export default function ContactPage() {
+  return <MarketingShell>
+    <section className="paper-texture border-b border-stone-900/10"><div className="v2-container py-20 sm:py-28"><Reveal><Eyebrow>Book a free call</Eyebrow><h1 className="v2-page-title mt-5 max-w-4xl">Let&apos;s talk about what your website needs to do.</h1><p className="mt-7 max-w-2xl text-lg leading-8 text-stone-600">Start with a free 15-minute conversation about your business, goals, and what should happen next. Choose a phone or video call when scheduling is available.</p><div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">{[[Clock, "15 minutes"], [Video, "Phone or video"], [Calendar, "Free consultation"]].map(([Icon, label]) => { const ItemIcon = Icon as typeof Clock; return <div key={label as string} className="flex items-center gap-3 rounded-2xl border border-stone-900/10 bg-white/60 p-4 text-sm font-semibold"><ItemIcon className="text-terracotta" size={18} aria-hidden="true" />{label as string}</div>; })}</div></Reveal></div></section>
+    <section className="bg-white py-20 sm:py-28"><div className="v2-container grid gap-12 lg:grid-cols-[.75fr_1.25fr]"><Reveal><Eyebrow>Request your call</Eyebrow><h2 className="font-display mt-4 text-3xl tracking-tight sm:text-4xl">The scheduling calendar is coming next.</h2><p className="mt-5 leading-7 text-stone-600">Trayfolio is choosing the external scheduling provider that will handle real availability and the phone/video choice. For now, send your details here and Tracy will follow up to arrange the free call.</p><div className="mt-7 rounded-2xl bg-peach p-5"><p className="text-sm font-semibold">Prefer email?</p><a href="mailto:tracyholbrook532@gmail.com" className="mt-2 flex items-center gap-2 break-all text-sm text-terracotta underline underline-offset-4"><Mail size={16} aria-hidden="true" />tracyholbrook532@gmail.com</a></div></Reveal><Reveal delay={100}><div id="inquiry-form" className="rounded-[2rem] border border-stone-200 bg-stone-50 p-6 shadow-sm sm:p-10"><InquiryForm /></div></Reveal></div></section>
+  </MarketingShell>;
 }

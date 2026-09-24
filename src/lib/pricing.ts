@@ -32,7 +32,7 @@ export const DEMO = {
   label: "Trayfolio demo landing page",
   amount: 5000,
   description:
-    "One real landing page built for your business, live on a link you can click. The $50 comes off the price if you go on to buy a site. Non-refundable and applied as credit, not a deposit.",
+    "A custom website demo for your business, delivered within 48 hours after the required business information is received. The $50 comes off the price if you move forward with a full website. Non-refundable and applied as credit, not a deposit.",
 } as const;
 
 /** Name of the Stripe coupon the demo credit codes are generated from. */

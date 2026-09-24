@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import type { ReactNode } from "react";
 import ScrollProgress from "@/components/ScrollProgress";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
@@ -13,9 +14,9 @@ const clashDisplay = localFont({
 });
 
 const SITE_URL = "https://www.trayfolio.net";
-const SITE_TITLE = "Trayfolio: Websites for small businesses";
+const SITE_TITLE = "Trayfolio: Custom websites for small businesses";
 const SITE_DESCRIPTION =
-  "Trayfolio builds fast, clean, professional websites for small businesses, from first draft to launch, with support after.";
+  "Trayfolio designs and develops custom websites for small businesses nationwide. Book a free 15-minute call or get a $50 website demo.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -54,7 +55,7 @@ const organizationSchema = {
   areaServed: "US",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html
       lang="en"

@@ -1,287 +1,97 @@
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
+import { ArrowDown, ArrowRight, Check } from "lucide-react";
+import MarketingShell from "@/components/MarketingShell";
 import Reveal from "@/components/Reveal";
-import StackLayer from "@/components/StackLayer";
-import LayeredWord from "@/components/LayeredWord";
-import { CoverflowCarousel, type CoverflowSlide } from "@/components/ui/coverflow-carousel";
-import SiteHeader from "@/components/SiteHeader";
-import SiteFooter from "@/components/SiteFooter";
 import SeeTheDifference from "@/components/SeeTheDifference";
-import DeferredShaderAnimation from "@/components/DeferredShaderAnimation";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
-import PortfolioIntro from "@/components/PortfolioIntro";
-import { getSectionContent, getSectionDraftCount } from "@/lib/cms/get-content";
-import { getSession } from "@/lib/auth/session";
-import { draftMode } from "next/headers";
-import { VisualEditorToolbar } from "@/components/cms/VisualEditorToolbar";
-import { EditableField } from "@/components/cms/EditableField";
+import { Eyebrow, FinalCta, PrimaryCta, ProjectCard, SecondaryCta } from "@/components/V2Ui";
+import { featuredProjects } from "@/lib/projects";
 
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  title: "Trayfolio | Custom websites for small businesses",
+  description: "Trayfolio designs and develops custom websites for small businesses nationwide. Book a free 15-minute call or get a $50 website demo in 48 hours.",
+};
 
-const work = [
-  {
-    name: "Out of Jersey Creations",
-    descriptionKey: "recent1Description",
-    image: "/work/outofjerseycreations.jpg",
-    href: "https://www.outofjerseycreationshub.com",
-  },
-  {
-    name: "MØDE",
-    descriptionKey: "recent2Description",
-    image: "/work/mode.jpg",
-    href: "https://www.enterm0de.com",
-  },
-  {
-    name: "Shawnie's Loc Lab",
-    descriptionKey: "recent3Description",
-    image: "/work/shawniesloclab.jpg",
-    href: "https://www.shawniesloclab.com",
-  },
+const principles = [
+  { number: "01", title: "Built around your business", body: "Structure, messaging, and functionality begin with how your business actually works—not a template waiting for a logo." },
+  { number: "02", title: "Designed to earn trust", body: "Clear hierarchy, thoughtful details, and a professional experience make the business feel credible on every screen." },
+  { number: "03", title: "Made to move people", body: "Every page gives visitors a clear next step, whether that is calling, booking, buying, or visiting." },
 ];
 
-const demoSlides: CoverflowSlide[] = [
-  {
-    src: "/demos/construction/assets/construction-crane-modern-residential-complex-near-water-new-housing-by-lake.jpg",
-    alt: "STRUX construction demo site: modern residential build with crane",
-    title: "STRUX",
-    subtitle: "Construction & infrastructure demo",
-    href: "/demos/construction/",
-    linkLabel: "Scroll through the live demo",
-    meta: [
-      { label: "Industry", value: "Construction & trades" },
-      { label: "Signature move", value: "Scroll-scrubbed hero video" },
-    ],
-  },
-  {
-    src: "/demos/holiday-lighting/christmas-lights/3-house-lights-on.png",
-    alt: "Evergreen Holiday Lighting demo site: before and after house lighting reveal",
-    title: "Evergreen Holiday Lighting",
-    subtitle: "Seasonal home services demo",
-    href: "/demos/holiday-lighting/",
-    linkLabel: "Scroll through the live demo",
-    meta: [
-      { label: "Industry", value: "Home services" },
-      { label: "Signature move", value: "Before/after scroll reveal" },
-    ],
-  },
-  {
-    src: "/demos/image-reveal/front.jpg",
-    alt: "Hover reveal effect demo: powered exosuit, hover to reveal the operator inside",
-    title: "Hover Reveal",
-    subtitle: "Interactive effect: click to try it live",
-    href: "/demos/image-reveal/",
-    linkLabel: "Try the live effect",
-    meta: [{ label: "Effect", value: "Radial image reveal" }],
-    interactionHint: {
-      desktop: "Hover over the suit to see the effect",
-      mobile: "Best viewed on desktop. Hover isn't available on touchscreens.",
-    },
-  },
-  {
-    src: "/work/autodetailingatx.jpg",
-    alt: "ATX Auto Detailing landing-page demo",
-    title: "ATX Auto Detailing",
-    subtitle: "Mobile auto detailing landing-page demo",
-    href: "/demos/autodetailing/index.html",
-    linkLabel: "View the landing page",
-    meta: [
-      { label: "Industry", value: "Automotive services" },
-      { label: "Signature move", value: "High-impact service landing page" },
-    ],
-  },
-  {
-    src: "/demos/nu2u-moving/hero-preview.png",
-    alt: "Nu2U Moving and Delivery demo homepage hero",
-    title: "Nu2U Moving & Delivery",
-    subtitle: "Moving and delivery service demo",
-    href: "/demos/nu2u-moving/",
-    linkLabel: "Scroll through the live demo",
-    meta: [
-      { label: "Industry", value: "Moving & delivery" },
-      { label: "Signature move", value: "Scroll-scrubbed loading sequence" },
-    ],
-  },
+const process = [
+  ["Discover", "A free 15-minute conversation about your business, audience, goals, and immediate needs."],
+  ["Define", "Trayfolio recommends the right scope, timeline, and investment based on that conversation."],
+  ["Design & build", "The website takes shape through a focused process with clear review points."],
+  ["Launch & support", "Final checks, a confident launch, and the support agreed for what comes next."],
 ];
 
-const services = [
-  {
-    number: "01",
-    titleKey: "service1Title",
-    descriptionKey: "service1Description",
-  },
-  {
-    number: "02",
-    titleKey: "service2Title",
-    descriptionKey: "service2Description",
-  },
-  {
-    number: "03",
-    titleKey: "service3Title",
-    descriptionKey: "service3Description",
-  },
-];
-
-export default async function Home() {
-  const [homeContent, session, draft, draftCount] = await Promise.all([
-    getSectionContent("home"),
-    getSession(),
-    draftMode(),
-    getSectionDraftCount("home"),
-  ]);
-
-  // Any logged-in dashboard user (owner or client) sees click-to-edit
-  // affordances over their own CMS-backed content, see EditableField.
-  // This is a UX convenience only, not an access check: every actual
-  // write is still independently gated by the Server Action it submits
-  // to.
-  const editing = Boolean(session.userId && draft.isEnabled);
-
+export default function Home() {
   return (
-    <div className="flex flex-col flex-1 bg-white text-stone-900">
-      {session.userId ? <VisualEditorToolbar role={session.role} previewing={draft.isEnabled} draftCount={draftCount} /> : null}
-      <SiteHeader />
-
-      <main id="main-content" className="flex-1">
-        <PortfolioIntro content={homeContent} editing={editing} />
-
-        {/* The remaining work follows the large selected-work sequence. */}
-        <section id="work" className="deferred-render bg-stone-50">
-          <div className="mx-auto max-w-5xl px-6 py-24">
-            <EditableField as="div" sectionKey="home" fieldKey="recentWorkHeading" label="Recent work heading" editing={editing} value={homeContent.recentWorkHeading}><LayeredWord text={homeContent.recentWorkHeading} /></EditableField>
-            <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {work.map((project, i) => (
-                <Reveal key={project.name} delay={i * 75}>
-                  <Link
-                    href={project.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="group block overflow-hidden rounded-2xl bg-white shadow-sm transition-shadow hover:shadow-xl"
-                  >
-                    <div className="relative aspect-video w-full overflow-hidden bg-stone-100">
-                      <Image
-                        src={project.image}
-                        alt={`${project.name} website screenshot`}
-                        fill
-                        sizes="(max-width: 639px) calc(100vw - 3rem), (max-width: 1023px) 45vw, 320px"
-                        className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                      />
-                    </div>
-                    <div className="p-5">
-                      <h3 className="font-semibold">{project.name}</h3>
-                      <EditableField as="p" sectionKey="home" fieldKey={project.descriptionKey} label={`${project.name} description`} editing={editing} className="mt-1 text-sm text-stone-600">{homeContent[project.descriptionKey]}</EditableField>
-                    </div>
-                  </Link>
-                </Reveal>
-              ))}
+    <MarketingShell>
+      <section className="paper-texture relative min-h-[calc(100svh-72px)] overflow-hidden border-b border-stone-900/10">
+        <div className="grain-overlay pointer-events-none absolute inset-0" aria-hidden="true" />
+        <div className="v2-container relative flex min-h-[calc(100svh-72px)] flex-col justify-center py-16 sm:py-24">
+          <div className="max-w-5xl">
+            <Eyebrow>Web design & development for small businesses</Eyebrow>
+            <h1 className="v2-home-title mt-6">A better website for the business <span className="text-terracotta">you&apos;re building.</span></h1>
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-stone-600 sm:text-xl">Trayfolio designs and develops custom websites that help small businesses look credible, stand out, and make the next step clear.</p>
+            <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+              <PrimaryCta />
+              <SecondaryCta />
+              <Link href="#selected-work" className="inline-flex min-h-12 items-center justify-center gap-2 px-3 text-sm font-semibold text-stone-700 underline decoration-stone-400 underline-offset-4 transition hover:text-stone-950">View selected work <ArrowDown size={15} aria-hidden="true" /></Link>
             </div>
+            <p className="mt-5 text-sm text-stone-500">Free 15-minute phone or video call. Serving small businesses nationwide.</p>
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Live demo carousel */}
-        <StackLayer id="demos" noPad className="deferred-render bg-white">
-          <div className="mx-auto max-w-5xl px-6 py-24">
-            <Reveal>
-              <EditableField as="p" sectionKey="home" fieldKey="demosHeading" label="Live demos heading" editing={editing} className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">{homeContent.demosHeading}</EditableField>
-              <EditableField as="p" sectionKey="home" fieldKey="demosIntro" label="Live demos introduction" editing={editing} className="mx-auto mt-1.5 max-w-md text-center text-sm text-stone-600">{homeContent.demosIntro}</EditableField>
-            </Reveal>
-            <Reveal delay={150} className="mt-10">
-              <CoverflowCarousel
-                slides={demoSlides}
-                cardWidth="clamp(200px, 30vw, 360px)"
-                autoRotate
-                autoRotateInterval={3800}
-                showCaption
-                showPagination
-                showScrubber
-                showNavigation
-                label="Live website demos"
-              />
-            </Reveal>
-            <Reveal delay={250} className="mt-12 flex flex-col items-center gap-4 text-center">
-              <p className="max-w-sm text-sm text-stone-600">
-                Want something like this for your own business? Get a real, live demo of
-                your site for $50, credited back if you go on to buy.
-              </p>
-              <DemoCheckoutButton />
-            </Reveal>
+      <section id="selected-work" className="bg-stone-950 py-20 text-white sm:py-28">
+        <div className="v2-container">
+          <Reveal><div className="grid gap-5 lg:grid-cols-[1fr_.8fr] lg:items-end"><div><Eyebrow light>Selected client work</Eyebrow><h2 className="v2-section-title mt-4 max-w-3xl">Built around the business. Never around a template.</h2></div><p className="max-w-xl leading-7 text-stone-300 lg:justify-self-end">Three businesses with three different goals, audiences, and digital experiences. Select a project to explore it inside Trayfolio.</p></div></Reveal>
+          <div className="mt-12 grid gap-6 lg:grid-cols-2">
+            {featuredProjects.map((project, index) => <Reveal key={project.slug} delay={index * 75} className={index === 0 ? "lg:col-span-2" : ""}><ProjectCard project={project} /></Reveal>)}
           </div>
-        </StackLayer>
+          <Link href="/work" className="mt-10 inline-flex items-center gap-2 text-sm font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">Explore all work <ArrowRight size={16} aria-hidden="true" /></Link>
+        </div>
+      </section>
 
-        <SeeTheDifference />
-
-        {/* Services */}
-        <section id="services" className="paper-texture deferred-render">
-          <div className="mx-auto max-w-5xl px-6 py-28">
-            <EditableField as="div" sectionKey="home" fieldKey="servicesHeading" label="Services heading" editing={editing} value={homeContent.servicesHeading}><LayeredWord text={homeContent.servicesHeading} /></EditableField>
-            <Reveal>
-              <EditableField as="p" sectionKey="home" fieldKey="servicesIntro" label="Services introduction" editing={editing} className="mt-6 max-w-xl text-lg text-stone-600">{homeContent.servicesIntro}</EditableField>
-            </Reveal>
-            <div className="mt-12 grid gap-8 sm:grid-cols-3">
-              {services.map((service, i) => (
-                <Reveal key={service.number} delay={i * 100}>
-                  <span className="text-sm font-semibold text-terracotta">{service.number}</span>
-                  <EditableField as="div" sectionKey="home" fieldKey={service.titleKey} label={`Service ${i + 1} title`} editing={editing} className="mt-2 font-semibold">{homeContent[service.titleKey]}</EditableField>
-                  <EditableField as="p" sectionKey="home" fieldKey={service.descriptionKey} label={`Service ${i + 1} description`} editing={editing} className="mt-2 text-sm leading-6 text-stone-600">{homeContent[service.descriptionKey]}</EditableField>
-                </Reveal>
-              ))}
-            </div>
+      <section className="paper-texture py-20 sm:py-28">
+        <div className="v2-container">
+          <Reveal><Eyebrow>Why Trayfolio</Eyebrow><h2 className="v2-section-title mt-4 max-w-4xl">A website should feel like your business—not everyone else&apos;s.</h2></Reveal>
+          <div className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-stone-900/10 bg-stone-900/10 md:grid-cols-3">
+            {principles.map((item, index) => <Reveal key={item.number} delay={index * 80} className="bg-[#fffdf9] p-7 sm:p-9"><span className="text-xs font-bold tracking-[.14em] text-terracotta">{item.number}</span><h3 className="font-display mt-6 text-2xl tracking-tight">{item.title}</h3><p className="mt-4 leading-7 text-stone-600">{item.body}</p></Reveal>)}
           </div>
-        </section>
+        </div>
+      </section>
 
-        {/* Your site, your way */}
-        <StackLayer noPad className="deferred-render bg-stone-950 text-white">
-          <DeferredShaderAnimation />
-          <div className="relative z-10 mx-auto max-w-3xl px-6 py-28 text-center sm:py-36">
-            <Reveal>
-              <EditableField as="div" sectionKey="home" fieldKey="brandCtaHeading" label="Brand callout heading" editing={editing} className="font-display text-4xl font-semibold tracking-tight sm:text-6xl">{homeContent.brandCtaHeading}</EditableField>
-              <EditableField as="p" sectionKey="home" fieldKey="brandCtaBody" label="Brand callout text" editing={editing} className="mx-auto mt-6 max-w-xl text-lg text-stone-300">{homeContent.brandCtaBody}</EditableField>
-              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <Link
-                  href="/contact"
-                  className="rounded-full bg-terracotta px-7 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-light"
-                >
-                  <EditableField as="span" sectionKey="home" fieldKey="brandPrimaryCta" label="Brand callout primary button" editing={editing}>{homeContent.brandPrimaryCta}</EditableField>
-                </Link>
-                <Link
-                  href="/pricing"
-                  className="rounded-full border border-white/30 px-7 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
-                >
-                  <EditableField as="span" sectionKey="home" fieldKey="brandSecondaryCta" label="Brand callout secondary button" editing={editing}>{homeContent.brandSecondaryCta}</EditableField>
-                </Link>
-              </div>
-            </Reveal>
-          </div>
-        </StackLayer>
+      <SeeTheDifference />
 
-        {/* Contact CTA */}
-        <section id="contact" className="deferred-render bg-white">
-          <div className="mx-auto max-w-2xl px-6 pt-28 pb-[calc(7rem+var(--stack-overlap))] text-center">
-            <Reveal>
-              <EditableField as="div" sectionKey="home" fieldKey="contactEyebrow" label="Homepage contact eyebrow" editing={editing} className="text-sm font-semibold uppercase tracking-wider text-stone-500">{homeContent.contactEyebrow}</EditableField>
-              <EditableField as="p" sectionKey="home" fieldKey="contactHeading" label="Homepage contact heading" editing={editing} className="font-display mt-2 text-3xl font-semibold tracking-tight sm:text-4xl">{homeContent.contactHeading}</EditableField>
-              <EditableField as="p" sectionKey="home" fieldKey="contactBody" label="Homepage contact text" editing={editing} className="mx-auto mt-4 max-w-md text-stone-600">{homeContent.contactBody}</EditableField>
-              <Link
-                href="/contact"
-                className="mt-8 inline-block rounded-full bg-terracotta px-7 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-terracotta-light"
-              >
-                <EditableField as="span" sectionKey="home" fieldKey="contactCta" label="Homepage contact button" editing={editing}>{homeContent.contactCta}</EditableField>
-              </Link>
-              <p className="mt-6 text-sm text-stone-500">
-                <EditableField as="span" sectionKey="home" fieldKey="contactEmailPrompt" label="Homepage email prompt" editing={editing}>{homeContent.contactEmailPrompt}</EditableField>{" "}
-                <a
-                  href={`mailto:${homeContent.contactEmail}`}
-                  className="underline decoration-stone-300 underline-offset-4 hover:text-stone-900"
-                >
-                  <EditableField as="span" sectionKey="home" fieldKey="contactEmail" label="Homepage contact email" editing={editing}>{homeContent.contactEmail}</EditableField>
-                </a>
-              </p>
-            </Reveal>
-          </div>
-        </section>
-      </main>
+      <section className="bg-terracotta py-20 text-white sm:py-28">
+        <div className="v2-container grid gap-12 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
+          <Reveal><Eyebrow light>$50 website demo</Eyebrow><h2 className="v2-section-title mt-4 max-w-3xl">See your business as a custom website—in 48 hours.</h2><p className="mt-6 max-w-2xl text-lg leading-8 text-white/85">Trayfolio creates a custom website demo around your actual business. If you move forward with a full website, the $50 is credited toward the project.</p><div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center"><DemoCheckoutButton className="demo-button-on-dark" /><Link href="/demo" className="text-sm font-semibold underline decoration-white/50 underline-offset-4">How the demo works</Link></div></Reveal>
+          <Reveal delay={120}><ol className="grid gap-4">{["Purchase the $50 demo through secure Stripe checkout.", "Share the essentials about your business.", "Receive your custom demo within 48 hours."].map((step, index) => <li key={step} className="flex gap-4 rounded-2xl border border-white/20 bg-white/10 p-5"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white font-semibold text-terracotta">{index + 1}</span><p className="pt-1 leading-7 text-white/90">{step}</p></li>)}</ol></Reveal>
+        </div>
+      </section>
 
-      <SiteFooter />
-    </div>
+      <section className="bg-[#fffdf9] py-20 sm:py-28">
+        <div className="v2-container">
+          <Reveal><Eyebrow>The process</Eyebrow><h2 className="v2-section-title mt-4">Clear from first call to launch.</h2></Reveal>
+          <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">{process.map(([title, body], index) => <Reveal key={title} delay={index * 70}><li className="border-t border-stone-300 pt-5"><span className="text-sm font-semibold text-terracotta">0{index + 1}</span><h3 className="font-display mt-5 text-2xl tracking-tight">{title}</h3><p className="mt-3 leading-7 text-stone-600">{body}</p></li></Reveal>)}</ol>
+        </div>
+      </section>
+
+      <section className="paper-texture py-20 sm:py-28">
+        <div className="v2-container grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:items-center">
+          <Reveal><div className="grid aspect-square max-w-sm place-items-center rounded-[2rem] border border-stone-900/10 bg-stone-950 text-white shadow-2xl"><span className="font-display text-[clamp(5rem,14vw,9rem)] tracking-[-.08em]">TH</span></div></Reveal>
+          <Reveal delay={100}><Eyebrow>Behind Trayfolio</Eyebrow><h2 className="v2-section-title mt-4">One point of contact from first idea to launch.</h2><p className="mt-6 max-w-2xl text-lg leading-8 text-stone-600">Trayfolio was founded by Tracy Holbrook to give small businesses a more thoughtful, direct way to get a custom website. You work with the person designing and building the site—without layers of handoffs.</p><Link href="/about" className="mt-7 inline-flex items-center gap-2 font-semibold text-terracotta underline decoration-terracotta/30 underline-offset-4">More about Trayfolio <ArrowRight size={16} aria-hidden="true" /></Link></Reveal>
+        </div>
+      </section>
+
+      <section className="border-y border-stone-200 bg-white py-12"><div className="v2-container flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-display text-2xl tracking-tight">Custom scope. Clear next steps.</p><p className="mt-1 text-stone-600">Project requirements, timing, and pricing are discussed before work begins.</p></div><div className="flex items-center gap-2 text-sm font-semibold text-olive"><Check size={18} aria-hidden="true" /> No public package maze</div></div></section>
+
+      <FinalCta />
+    </MarketingShell>
   );
 }

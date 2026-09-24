@@ -1,5 +1,6 @@
 "use client";
 import * as React from "react";
+import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 const useIsoLayoutEffect =
@@ -433,10 +434,12 @@ export function CoverflowCarousel({
                 )}
                 style={{ width: "var(--cf-card)" }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={slide.src}
                   alt={slide.alt}
+                  fill
+                  sizes="(max-width: 767px) 70vw, 360px"
+                  loading="lazy"
                   draggable={false}
                   className="h-full w-full select-none object-cover"
                 />

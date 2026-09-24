@@ -128,6 +128,26 @@ function PremiumSitePanel() {
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const [showTitle, setShowTitle] = React.useState(false);
 
+  // Keep this below-the-fold reel out of the initial page payload. Start it
+  // shortly before it enters view and pause it again after it leaves.
+  React.useEffect(() => {
+    const video = videoRef.current;
+    if (!video || typeof IntersectionObserver === "undefined") return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => { /* Autoplay may be disabled. */ });
+        } else {
+          video.pause();
+        }
+      },
+      { rootMargin: "300px 0px", threshold: 0.01 },
+    );
+    observer.observe(video);
+    return () => observer.disconnect();
+  }, []);
+
   // Pop the title card up over the final beat of the loop — the way a real
   // business site's hero video settles on its wordmark before it repeats.
   React.useEffect(() => {
@@ -148,11 +168,11 @@ function PremiumSitePanel() {
         ref={videoRef}
         className="h-full w-full object-cover"
         src="/hero-previews/luxury-realestate-drone.mp4"
-        autoPlay
         loop
         muted
         playsInline
-        preload="auto"
+        preload="none"
+        poster="/demos/holiday-lighting/christmas-lights/1-house-before.jpg"
       />
       <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-transparent to-black/45" />
 
@@ -173,7 +193,7 @@ function PremiumSitePanel() {
 
 export default function SeeTheDifference() {
   return (
-    <section id="see-the-difference" className="bg-white">
+    <section id="see-the-difference" className="deferred-render bg-white">
       <div className="mx-auto max-w-5xl px-6 py-24">
         <Reveal>
           <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">

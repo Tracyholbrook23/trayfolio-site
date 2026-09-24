@@ -1,38 +1,41 @@
 "use client";
 
-import { useLenis } from "lenis/react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export default function ScrollProgress() {
-  const [progress, setProgress] = useState(0);
+  const barRef = useRef<HTMLDivElement>(null);
 
-  // When Lenis is active (SmoothScroll), this fires with interpolated
-  // scroll progress every frame.
-  const lenis = useLenis(({ progress }) => {
-    setProgress(progress * 100);
-  });
-
-  // If Lenis is disabled (prefers-reduced-motion), fall back to a plain
-  // native scroll listener so the bar still works.
   useEffect(() => {
-    if (lenis) return;
+    let frame = 0;
 
-    const onScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = document.documentElement;
-      const max = scrollHeight - clientHeight;
-      setProgress(max > 0 ? (scrollTop / max) * 100 : 0);
+    const update = () => {
+      frame = 0;
+      const root = document.documentElement;
+      const max = root.scrollHeight - root.clientHeight;
+      const progress = max > 0 ? root.scrollTop / max : 0;
+      if (barRef.current) barRef.current.style.transform = `scaleX(${progress})`;
     };
 
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, [lenis]);
+    const scheduleUpdate = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+
+    update();
+    window.addEventListener("scroll", scheduleUpdate, { passive: true });
+    window.addEventListener("resize", scheduleUpdate, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", scheduleUpdate);
+      window.removeEventListener("resize", scheduleUpdate);
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, []);
 
   return (
     <div className="fixed left-0 top-0 z-50 h-[3px] w-full">
       <div
-        className="h-full"
-        style={{ width: `${progress}%`, backgroundImage: "var(--gradient-brand)" }}
+        ref={barRef}
+        className="h-full origin-left scale-x-0"
+        style={{ backgroundImage: "var(--gradient-brand)" }}
       />
     </div>
   );

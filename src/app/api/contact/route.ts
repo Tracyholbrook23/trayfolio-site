@@ -5,9 +5,10 @@ const WEB3FORMS_URL = "https://api.web3forms.com/submit";
 const PROJECT_TYPES = new Set([
   "New website",
   "Redesign",
-  "E-commerce / Shopify",
-  "Ongoing care & support",
-  "Something else",
+  "Online store / payments",
+  "Booking or lead-generation site",
+  "Ongoing website support",
+  "Not sure yet",
 ]);
 const submissions = new Map<string, number[]>();
 const WINDOW_MS = 60_000;
