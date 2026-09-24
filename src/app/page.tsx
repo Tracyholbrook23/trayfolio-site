@@ -36,13 +36,13 @@ export default function Home() {
           <div className="max-w-5xl">
             <Eyebrow>Web design & development for small businesses</Eyebrow>
             <h1 className="v2-home-title mt-6">A better website for the business <span className="text-terracotta">you&apos;re building.</span></h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-stone-600 sm:text-xl">Trayfolio designs and develops custom websites that help small businesses look credible, stand out, and make the next step clear.</p>
+            <p className="v2-hero-lede mt-7 max-w-2xl text-lg text-stone-600 sm:text-xl">Trayfolio designs and develops custom websites that help small businesses look credible, stand out, and make the next step clear.</p>
             <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <PrimaryCta />
               <SecondaryCta />
               <Link href="#selected-work" className="inline-flex min-h-12 items-center justify-center gap-2 px-3 text-sm font-semibold text-stone-700 underline decoration-stone-400 underline-offset-4 transition hover:text-stone-950">View selected work <ArrowDown size={15} aria-hidden="true" /></Link>
             </div>
-            <p className="mt-5 text-sm text-stone-500">Free 15-minute phone or video call. Serving small businesses nationwide.</p>
+            <p className="v2-hero-note mt-5 text-sm text-stone-500">Free 15-minute phone or video call. Serving small businesses nationwide.</p>
           </div>
         </div>
       </section>

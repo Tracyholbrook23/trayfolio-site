@@ -591,8 +591,9 @@ body {
   font-family: var(--font-display), var(--font-sans), sans-serif;
   font-size: clamp(3.35rem, 9.2vw, 8.4rem);
   font-weight: 700;
-  line-height: 0.87;
-  letter-spacing: -0.065em;
+  line-height: 0.94;
+  letter-spacing: -0.035em;
+  word-spacing: 0.06em;
   text-wrap: balance;
 }
 
@@ -600,8 +601,9 @@ body {
   font-family: var(--font-display), var(--font-sans), sans-serif;
   font-size: clamp(3rem, 7vw, 6.8rem);
   font-weight: 700;
-  line-height: 0.92;
-  letter-spacing: -0.055em;
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+  word-spacing: 0.045em;
   text-wrap: balance;
 }
 
@@ -609,8 +611,9 @@ body {
   font-family: var(--font-display), var(--font-sans), sans-serif;
   font-size: clamp(2.5rem, 5.4vw, 5.25rem);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.05em;
+  line-height: 1;
+  letter-spacing: -0.025em;
+  word-spacing: 0.035em;
   text-wrap: balance;
 }
 
@@ -625,6 +628,8 @@ body {
   padding: 0.75rem 1.3rem;
   font-size: 0.875rem;
   font-weight: 700;
+  letter-spacing: 0.012em;
+  word-spacing: 0.045em;
   line-height: 1.25rem;
   transition: transform 180ms ease, background-color 180ms ease, color 180ms ease, border-color 180ms ease;
 }
@@ -645,6 +650,18 @@ body {
 .demo-button-on-dark > button:hover { background: #fff7ef; }
 .demo-button-on-dark > p { color: rgb(255 255 255 / 72%); }
 .demo-button-on-dark > p a { color: white; }
+
+.v2-hero-lede {
+  line-height: 1.75;
+  letter-spacing: 0.01em;
+  word-spacing: 0.09em;
+}
+
+.v2-hero-note {
+  line-height: 1.6;
+  letter-spacing: 0.012em;
+  word-spacing: 0.07em;
+}
 
 @media (max-width: 359px) {
   .v2-home-title { font-size: 3rem; }
