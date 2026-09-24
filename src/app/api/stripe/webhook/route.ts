@@ -142,7 +142,7 @@ async function alertOwner(
     html: `
       <div style="font-family:system-ui,sans-serif;line-height:1.6">
         <p><strong>${customer}</strong> paid for a demo, but the credit email did not send.</p>
-        <p>Their code is <strong>${code}</strong> — it exists in Stripe and is valid. Send it to them by hand.</p>
+        <p>Their code is <strong>${code}</strong>. It exists in Stripe and is valid. Send it to them by hand.</p>
         <p style="color:#6b6154;font-size:13px">Resend said: ${detail}</p>
       </div>`,
   });
@@ -173,7 +173,7 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
       <p style="margin:0 0 16px">
         Order reference: <strong>${code}</strong><br>
         This is also your $50 credit toward a full site. Enter it at checkout on
-        trayfolio.net &mdash; it works once, and is good for 90 days.
+        trayfolio.net. It works once and is good for 90 days.
       </p>
       <p style="margin:0 0 16px">Just reply to this email if you have any questions.</p>
       <p style="margin:0">Tracy<br>Trayfolio</p>
@@ -262,7 +262,7 @@ async function emailDepositReceipt(
 
   const html = `
     <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:520px;color:#2a2118;line-height:1.6">
-      <p style="margin:0 0 16px">Thanks — your deposit came through and your project is booked in.</p>
+      <p style="margin:0 0 16px">Thanks. Your deposit came through and your project is booked in.</p>
       <p style="margin:0 0 16px">
         ${amounts.summary}<br>
         Deposit paid: <strong>${formatUSD(amounts.paid)}</strong><br>
@@ -367,8 +367,8 @@ async function notifyOwner(order: {
 
   const subject =
     order.kind === "demo"
-      ? `New demo order — ${order.buyer}`
-      : `New project deposit ${formatUSD(order.paid)} — ${order.buyer}`;
+      ? `New demo order: ${order.buyer}`
+      : `New project deposit ${formatUSD(order.paid)}: ${order.buyer}`;
 
   const message: {
     from: string;

@@ -34,7 +34,7 @@ export const contentSchema: SectionDef[] = [
       text("heroKicker", "Hero eyebrow", "Independent web design studio", 60),
       text("heroHeading", "Hero heading", "Websites that make small businesses", 70),
       text("heroEmphasis", "Hero emphasized text", "impossible to ignore.", 45),
-      textarea("heroLede", "Hero subheading", "Custom strategy, design, and development—from the first idea to a site ready to win customers.", 160),
+      textarea("heroLede", "Hero subheading", "Custom strategy, design, and development, from the first idea to a site ready to win customers.", 160),
       text("heroPrimaryCta", "Primary button", "See the work", 30),
       text("heroSecondaryCta", "Secondary button", "Try live demos", 30),
       text("heroBadge", "Hero image badge", "Real sites · Live now", 40),

@@ -30,7 +30,7 @@
   --color-ring: #b5541f;
 }
 
-/* Light theme only, for now — no automatic dark-mode flip. */
+/* Light theme only for now; no automatic dark-mode flip. */
 
 body {
   background: var(--background);

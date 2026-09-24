@@ -5,6 +5,7 @@ import MarketingShell from "@/components/MarketingShell";
 import Reveal from "@/components/Reveal";
 import SeeTheDifference from "@/components/SeeTheDifference";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
+import { RevealText } from "@/components/ui/reveal-text";
 import { Eyebrow, FinalCta, PrimaryCta, ProjectCard, SecondaryCta } from "@/components/V2Ui";
 import { featuredProjects } from "@/lib/projects";
 
@@ -14,8 +15,11 @@ export const metadata: Metadata = {
   description: "Trayfolio designs and develops custom websites for small businesses nationwide. Book a free 15-minute call or get a $50 website demo in 48 hours.",
 };
 
+const heroText = "A better website for the business you're building.";
+const heroAccentStart = heroText.indexOf("you're");
+
 const principles = [
-  { number: "01", title: "Built around your business", body: "Structure, messaging, and functionality begin with how your business actually works—not a template waiting for a logo." },
+  { number: "01", title: "Built around your business", body: "Structure, messaging, and functionality begin with how your business actually works, not a template waiting for a logo." },
   { number: "02", title: "Designed to earn trust", body: "Clear hierarchy, thoughtful details, and a professional experience make the business feel credible on every screen." },
   { number: "03", title: "Made to move people", body: "Every page gives visitors a clear next step, whether that is calling, booking, buying, or visiting." },
 ];
@@ -35,7 +39,21 @@ export default function Home() {
         <div className="v2-container relative flex min-h-[calc(100svh-72px)] flex-col justify-center py-16 sm:py-24">
           <div className="max-w-5xl">
             <Eyebrow>Web design & development for small businesses</Eyebrow>
-            <h1 className="v2-home-title mt-6">A better website for the business <span className="text-terracotta">you&apos;re building.</span></h1>
+            <RevealText
+              as="h1"
+              text={heroText}
+              accentFrom={heroAccentStart}
+              accentColor="text-terracotta"
+              fontSize=""
+              letterClassName=""
+              align="left"
+              wrap
+              letterDelay={0.025}
+              overlayDelay={0.018}
+              introRevealStagger={0.02}
+              introRevealDuration={1.25}
+              className="v2-home-title mt-6"
+            />
             <p className="v2-hero-lede mt-7 max-w-2xl text-lg text-stone-600 sm:text-xl">Trayfolio designs and develops custom websites that help small businesses look credible, stand out, and make the next step clear.</p>
             <div className="mt-9 flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
               <PrimaryCta />
@@ -59,7 +77,7 @@ export default function Home() {
 
       <section className="paper-texture py-20 sm:py-28">
         <div className="v2-container">
-          <Reveal><Eyebrow>Why Trayfolio</Eyebrow><h2 className="v2-section-title mt-4 max-w-4xl">A website should feel like your business—not everyone else&apos;s.</h2></Reveal>
+          <Reveal><Eyebrow>Why Trayfolio</Eyebrow><h2 className="v2-section-title mt-4 max-w-4xl">A website should feel like your business, not everyone else&apos;s.</h2></Reveal>
           <div className="mt-12 grid gap-px overflow-hidden rounded-3xl border border-stone-900/10 bg-stone-900/10 md:grid-cols-3">
             {principles.map((item, index) => <Reveal key={item.number} delay={index * 80} className="bg-[#fffdf9] p-7 sm:p-9"><span className="text-xs font-bold tracking-[.14em] text-terracotta">{item.number}</span><h3 className="font-display mt-6 text-2xl tracking-tight">{item.title}</h3><p className="mt-4 leading-7 text-stone-600">{item.body}</p></Reveal>)}
           </div>
@@ -70,7 +88,7 @@ export default function Home() {
 
       <section className="bg-terracotta py-20 text-white sm:py-28">
         <div className="v2-container grid gap-12 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
-          <Reveal><Eyebrow light>$50 website demo</Eyebrow><h2 className="v2-section-title mt-4 max-w-3xl">See your business as a custom website—in 48 hours.</h2><p className="mt-6 max-w-2xl text-lg leading-8 text-white/85">Trayfolio creates a custom website demo around your actual business. If you move forward with a full website, the $50 is credited toward the project.</p><div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center"><DemoCheckoutButton className="demo-button-on-dark" /><Link href="/demo" className="text-sm font-semibold underline decoration-white/50 underline-offset-4">How the demo works</Link></div></Reveal>
+          <Reveal><Eyebrow light>$50 website demo</Eyebrow><h2 className="v2-section-title mt-4 max-w-3xl">See your business as a custom website in 48 hours.</h2><p className="mt-6 max-w-2xl text-lg leading-8 text-white/85">Trayfolio creates a custom website demo around your actual business. If you move forward with a full website, the $50 is credited toward the project.</p><div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:items-center"><DemoCheckoutButton className="demo-button-on-dark" /><Link href="/demo" className="text-sm font-semibold underline decoration-white/50 underline-offset-4">How the demo works</Link></div></Reveal>
           <Reveal delay={120}><ol className="grid gap-4">{["Purchase the $50 demo through secure Stripe checkout.", "Share the essentials about your business.", "Receive your custom demo within 48 hours."].map((step, index) => <li key={step} className="flex gap-4 rounded-2xl border border-white/20 bg-white/10 p-5"><span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white font-semibold text-terracotta">{index + 1}</span><p className="pt-1 leading-7 text-white/90">{step}</p></li>)}</ol></Reveal>
         </div>
       </section>
@@ -85,7 +103,7 @@ export default function Home() {
       <section className="paper-texture py-20 sm:py-28">
         <div className="v2-container grid gap-10 lg:grid-cols-[.7fr_1.3fr] lg:items-center">
           <Reveal><div className="grid aspect-square max-w-sm place-items-center rounded-[2rem] border border-stone-900/10 bg-stone-950 text-white shadow-2xl"><span className="font-display text-[clamp(5rem,14vw,9rem)] tracking-[-.08em]">TH</span></div></Reveal>
-          <Reveal delay={100}><Eyebrow>Behind Trayfolio</Eyebrow><h2 className="v2-section-title mt-4">One point of contact from first idea to launch.</h2><p className="mt-6 max-w-2xl text-lg leading-8 text-stone-600">Trayfolio was founded by Tracy Holbrook to give small businesses a more thoughtful, direct way to get a custom website. You work with the person designing and building the site—without layers of handoffs.</p><Link href="/about" className="mt-7 inline-flex items-center gap-2 font-semibold text-terracotta underline decoration-terracotta/30 underline-offset-4">More about Trayfolio <ArrowRight size={16} aria-hidden="true" /></Link></Reveal>
+          <Reveal delay={100}><Eyebrow>Behind Trayfolio</Eyebrow><h2 className="v2-section-title mt-4">One point of contact from first idea to launch.</h2><p className="mt-6 max-w-2xl text-lg leading-8 text-stone-600">Trayfolio was founded by Tracy Holbrook to give small businesses a more thoughtful, direct way to get a custom website. You work with the person designing and building the site, without layers of handoffs.</p><Link href="/about" className="mt-7 inline-flex items-center gap-2 font-semibold text-terracotta underline decoration-terracotta/30 underline-offset-4">More about Trayfolio <ArrowRight size={16} aria-hidden="true" /></Link></Reveal>
         </div>
       </section>
 

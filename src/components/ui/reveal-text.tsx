@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 interface RevealTextProps {
   text?: string;
   textColor?: string;
+  accentColor?: string;
+  accentFrom?: number;
   overlayColor?: string;
   fontSize?: string;
   letterDelay?: number;
@@ -20,6 +22,10 @@ interface RevealTextProps {
   introRevealDuration?: number;
   letterImages?: string[];
   className?: string;
+  letterClassName?: string;
+  align?: "left" | "center";
+  wrap?: boolean;
+  as?: "div" | "h1";
 }
 
 // Generic scenic stock photos (Unsplash) used for the per-letter hover
@@ -48,6 +54,8 @@ const DEFAULT_LETTER_IMAGES = [
 export function RevealText({
   text = "STUNNING",
   textColor = "text-stone-900",
+  accentColor,
+  accentFrom,
   overlayColor = "text-terracotta",
   fontSize = "text-5xl sm:text-7xl md:text-8xl lg:text-[9rem]",
   letterDelay = 0.08,
@@ -59,6 +67,10 @@ export function RevealText({
   introRevealDuration = 1.5,
   letterImages = DEFAULT_LETTER_IMAGES,
   className = "",
+  letterClassName = "tracking-tight",
+  align = "center",
+  wrap = false,
+  as: Tag = "div",
 }: RevealTextProps) {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [showOverlay, setShowOverlay] = useState(false);
@@ -97,14 +109,30 @@ export function RevealText({
     introRevealGap,
   ]);
 
+  const words = text.split(" ");
+
   return (
-    <div className={`flex items-center justify-center ${className}`}>
-      {text.split("").map((letter, index) => (
+    <Tag
+      className={`flex items-baseline ${wrap ? "flex-wrap" : ""} ${align === "left" ? "justify-start" : "justify-center"} ${className}`}
+      aria-label={text}
+    >
+      {words.map((word, wordIndex) => {
+        const wordStart = words.slice(0, wordIndex).join(" ").length + (wordIndex > 0 ? 1 : 0);
+
+        return (
+          <span key={`${word}-${wordIndex}`} className="inline-flex whitespace-nowrap" aria-hidden="true">
+            {word.split("").map((letter, letterIndex) => {
+              const index = wordStart + letterIndex;
+              const baseColor = accentColor && accentFrom !== undefined && index >= accentFrom
+                ? accentColor
+                : textColor;
+
+              return (
         <motion.span
           key={index}
           onMouseEnter={() => setHoveredIndex(index)}
           onMouseLeave={() => setHoveredIndex(null)}
-          className={`font-display ${fontSize} relative inline-block cursor-default overflow-hidden font-semibold tracking-tight`}
+          className={`font-display ${fontSize} relative inline-block cursor-default overflow-hidden font-semibold ${letterClassName}`}
           initial={{ scale: 0, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{
@@ -117,7 +145,7 @@ export function RevealText({
         >
           {/* Base text layer */}
           <motion.span
-            className={`absolute inset-0 ${textColor}`}
+            className={`absolute inset-0 ${baseColor}`}
             animate={{ opacity: hoveredIndex === index ? 0 : 1 }}
             transition={{ duration: 0.1 }}
           >
@@ -185,7 +213,12 @@ export function RevealText({
             </motion.span>
           )}
         </motion.span>
-      ))}
-    </div>
+              );
+            })}
+            {wordIndex < words.length - 1 ? <span className="whitespace-pre"> </span> : null}
+          </span>
+        );
+      })}
+    </Tag>
   );
 }
