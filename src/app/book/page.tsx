@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, Calendar, Clock, ShieldCheck, Video } from "lucide-react";
+import { ArrowUpRight, Calendar, Clock, Video } from "lucide-react";
 import MarketingShell from "@/components/MarketingShell";
 import Reveal from "@/components/Reveal";
 import { Eyebrow } from "@/components/V2Ui";
@@ -33,17 +33,20 @@ export default function BookPage() {
               Pick a time for a short, no-pressure conversation about your
               business, website goals, and the clearest next step.
             </p>
-            <div className="mt-8 grid max-w-2xl gap-3 sm:grid-cols-3">
+            <p className="mt-8 text-xs font-semibold uppercase tracking-[0.14em] text-stone-500">
+              Call details
+            </p>
+            <ul className="mt-4 flex max-w-2xl flex-wrap gap-x-7 gap-y-3" aria-label="Call details">
               {callDetails.map(([Icon, label]) => (
-                <div
+                <li
                   key={label}
-                  className="flex items-center gap-3 rounded-2xl border border-stone-900/10 bg-white/60 p-4 text-sm font-semibold"
+                  className="flex items-center gap-2 text-sm font-semibold text-stone-700"
                 >
                   <Icon className="text-terracotta" size={18} aria-hidden="true" />
                   {label}
-                </div>
+                </li>
               ))}
-            </div>
+            </ul>
           </Reveal>
         </div>
       </section>
@@ -69,10 +72,6 @@ export default function BookPage() {
                 View Available Times
                 <ArrowUpRight size={16} aria-hidden="true" />
               </a>
-              <p className="mt-5 inline-flex items-center gap-2 text-sm text-stone-400">
-                <ShieldCheck size={15} aria-hidden="true" />
-                Secure scheduling powered by Cal.com
-              </p>
             </div>
           </Reveal>
 

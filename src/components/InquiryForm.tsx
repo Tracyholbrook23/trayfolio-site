@@ -21,7 +21,6 @@ const inputClass =
 export default function InquiryForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
   const [business, setBusiness] = useState("");
   const [projectType, setProjectType] = useState<string[]>([]);
   const [message, setMessage] = useState("");
@@ -42,7 +41,6 @@ export default function InquiryForm() {
   function resetForm() {
     setName("");
     setEmail("");
-    setPhone("");
     setBusiness("");
     setProjectType([]);
     setMessage("");
@@ -69,7 +67,6 @@ export default function InquiryForm() {
           botcheck,
           name,
           email,
-          phone,
           business,
           projectType,
           message,
@@ -102,8 +99,8 @@ export default function InquiryForm() {
           Got it, thank you.
         </p>
         <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-stone-600">
-          Your request is in my inbox. I read every one myself and usually reply
-          within a business day to arrange the next step.
+          Your inquiry is in my inbox. I read every one myself and usually reply
+          by email within one business day.
         </p>
         <button
           type="button"
@@ -156,41 +153,20 @@ export default function InquiryForm() {
         </div>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-phone">
-            Phone{" "}
-            <span className="font-normal text-stone-600">(optional)</span>
-          </label>
-          <input
-            id="inquiry-phone"
-            name="phone"
-            maxLength={40}
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel"
-            disabled={sending}
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className={inputClass}
-            placeholder="(555) 123-4567"
-          />
-        </div>
-        <div>
-          <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-business">
-            Business / industry
-          </label>
-          <input
-            id="inquiry-business"
-            name="business"
-            maxLength={150}
-            disabled={sending}
-            value={business}
-            onChange={(e) => setBusiness(e.target.value)}
-            className={inputClass}
-            placeholder="e.g. home services, photography..."
-          />
-        </div>
+      <div>
+        <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-business">
+          Business / industry
+        </label>
+        <input
+          id="inquiry-business"
+          name="business"
+          maxLength={150}
+          disabled={sending}
+          value={business}
+          onChange={(e) => setBusiness(e.target.value)}
+          className={inputClass}
+          placeholder="e.g. home services, photography..."
+        />
       </div>
 
       <div>
@@ -250,7 +226,7 @@ export default function InquiryForm() {
         disabled={sending}
         className="inline-flex items-center justify-center rounded-full bg-terracotta px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-terracotta/20 transition hover:bg-terracotta-light disabled:cursor-not-allowed disabled:opacity-70"
       >
-        {sending ? "Sending..." : "Request my free call"}
+        {sending ? "Sending..." : "Send Inquiry"}
       </button>
 
       {status === "error" ? (
