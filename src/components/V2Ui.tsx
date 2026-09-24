@@ -9,7 +9,7 @@ export function Eyebrow({ children, light = false }: { children: ReactNode; ligh
   return <p className={`v2-eyebrow ${light ? "text-white/60" : "text-stone-500"}`}>{children}</p>;
 }
 
-export function PrimaryCta({ href = "/contact", children = "Book a Free Call", className = "" }: { href?: string; children?: ReactNode; className?: string }) {
+export function PrimaryCta({ href = "/book", children = "Book a Free Call", className = "" }: { href?: string; children?: ReactNode; className?: string }) {
   return <Link href={href} className={`v2-button v2-button--primary ${className}`}>{children}<ArrowRight aria-hidden="true" size={16} /></Link>;
 }
 

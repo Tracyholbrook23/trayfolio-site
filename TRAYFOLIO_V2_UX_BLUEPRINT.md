@@ -1,6 +1,6 @@
 # Trayfolio V2 — UX, Information Architecture, Conversion, and Content Blueprint
 
-**Status:** Final planning blueprint before implementation  
+**Status:** Approved conversion architecture; scheduling provider decision pending
 **Basis:** `TRAYFOLIO_V2_AUDIT.md`  
 **Scope:** UX and content planning only. This document does not authorize implementation, redesign, route deletion, dependency changes, deployment, or changes to the existing Stripe contract.
 
@@ -62,6 +62,11 @@ Required path: Hero or demo feature → $50 Demo page → Stripe checkout.
 Primary need: Understand services, project fit, process, and breadth of work.  
 Required path: Services/Work/About → case study or FAQ → call booking.
 
+### Audience E — Prefers a written inquiry
+
+Primary need: Ask a detailed question, communicate by email, or make contact when no call time works.
+Required path: Contact page → concise inquiry form → confirmation with an optional Book a Free Call link.
+
 ## 3. Final Information Architecture
 
 ### Primary public routes
@@ -74,12 +79,13 @@ Required path: Services/Work/About → case study or FAQ → call booking.
 | `/services` | Services | Explain capabilities and fit without package pricing | Book a Free Call |
 | `/demo` | $50 Demo | Explain the offer, reduce objections, and start existing Stripe checkout | Get My $50 Demo |
 | `/about` | About | Build trust in Trayfolio and briefly introduce Tracy | Book a Free Call |
-| `/contact` | Book a Call | Fast scheduling path plus contact fallback | View Available Times |
+| `/book` | Book a Call | Dedicated external-scheduler experience for a free 15-minute phone or video call | Book a Free Call |
+| `/contact` | Contact | Written inquiry path for detailed questions, email preference, or unavailable call times | Send Inquiry |
 | `/faq` | Footer/supporting link | Answer cross-site objections without package pricing | Book a Free Call |
 | `/privacy` | Footer | Privacy policy | None |
 | `/terms` | Footer | Service and demo terms | None |
 
-`/contact` is recommended over introducing `/book` because it already exists, has a working inquiry system, and can serve both scheduling and non-scheduling needs. The page title and navigation label can still be “Book a Call.” This avoids splitting two closely related actions across `/book` and `/contact`.
+The three conversion routes are intentionally distinct: `/book` owns scheduling, `/demo` owns the paid demo path, and `/contact` owns written inquiries. Do not recombine booking and inquiry into one primary experience.
 
 ### Transactional and system routes
 
@@ -90,7 +96,7 @@ Required path: Services/Work/About → case study or FAQ → call booking.
 ### Legacy route policy to decide during implementation planning
 
 - `/pricing`: recommended eventual 301/308 redirect to `/services`, not immediate deletion.
-- `/start`: recommended removal from public navigation first; eventual redirect to `/contact` unless it remains a private/manual project-deposit tool.
+- `/start`: recommended removal from public navigation first; eventual redirect to `/book` unless it remains a private/manual project-deposit tool.
 - `/start/success`: retain while any project-deposit checkout remains operable.
 - Existing demo static URLs: retain to avoid broken portfolio links; continue `noindex` treatment.
 
@@ -109,7 +115,7 @@ Recommended order:
 - About
 - Primary button: **Book a Free Call**
 
-Contact/FAQ do not need equal visual weight in the main navigation. Contact is represented by the booking CTA; FAQ can live in the footer and contextual links.
+Contact/FAQ do not need equal visual weight in the desktop main navigation. Contact remains available in the footer and mobile menu; FAQ can live in the footer and contextual links.
 
 ### Mobile header
 
@@ -125,7 +131,7 @@ The open menu should contain:
 - Services
 - $50 Demo
 - About
-- Contact / Email Trayfolio
+- Send an Inquiry
 - Full-width **Book a Free Call** button
 
 The booking action should remain reachable without opening the menu. The demo offer should be prominent inside the menu but should not compete visually with the primary booking button in the closed header.
@@ -134,7 +140,7 @@ The booking action should remain reachable without opening the menu. The demo of
 
 Recommended columns:
 
-- **Start:** Book a Free Call, Get a $50 Demo, Contact by Email
+- **Start:** Book a Free Call, Get a $50 Demo, Send an Inquiry
 - **Explore:** Work, Services, About, FAQ
 - **Social:** Instagram
 - **Legal:** Terms, Privacy, Cookie Settings
@@ -147,7 +153,8 @@ Footer closing line: “Custom websites for small businesses nationwide.” A re
 
 1. **Primary:** Book a Free Call
 2. **Secondary:** Get a $50 Demo
-3. **Exploratory:** View Our Work
+3. **Fallback:** Send an Inquiry
+4. **Exploratory:** View Our Work
 
 These labels should remain consistent across the site. Contextual variations are acceptable, but the underlying action should never be ambiguous.
 
@@ -161,31 +168,53 @@ Supporting microcopy: **A custom website demo for your business, delivered withi
 
 Tertiary default: **View Selected Work**
 
+Fallback default: **Send an Inquiry**
+
 Avoid “Get started,” “Learn more,” and “Let's talk” as the only label; they conceal what happens next.
 
 ### Scheduling integration boundary
 
 The website should provide a stable UI shell for a future external scheduler. It should not define or build scheduling logic.
 
-Recommended `/contact` behavior after a provider is chosen:
+Recommended `/book` behavior after a provider is chosen:
 
 1. Explain the call in one sentence.
 2. Show three facts: free, 15 minutes, phone or video.
 3. Present **View Available Times**.
 4. Hand off to the external provider in a mobile-friendly way.
-5. Keep “Prefer email?” and the existing inquiry form as fallbacks.
+5. Keep a clearly visible **Send an Inquiry** link for unavailable times or written communication.
 
 Phone/video selection should occur inside the scheduling provider when supported. Do not make a local selection that can drift from the provider's availability or event configuration.
 
 Before a provider is selected, designs should use a clearly labeled scheduler placeholder/state rather than a fake calendar.
 
+The scheduling event should be free, 15 minutes, and offer attendee choice between phone and video. Intake is limited to name, email, business name, optional current website or Instagram, a short help prompt, meeting type, and a phone number only when needed. Do not ask for budget or a long project questionnaire.
+
+### Scheduling provider recommendation pending approval
+
+Recommend **Cal.com** for Trayfolio's initial scheduling setup. Its individual plan is a strong fit for a one-person studio: unlimited event types and calendar connections, automatic timezone/conflict handling, attendee-selected meeting locations, configurable booking questions, default confirmations, cancellation/rescheduling links, and inline or pop-up embeds. It also preserves a clean path to custom email/SMS workflows if Trayfolio later chooses a paid team plan.
+
+Proposed integration pattern after approval:
+
+1. Create one 15-minute event called **Free Website Call**.
+2. Offer two provider-controlled locations: phone and video, with the attendee selecting one.
+3. Connect Tracy's working calendar and define availability, notice, buffers, and booking horizon inside Cal.com.
+4. Use a full-width inline embed on `/book` with a prominent hosted-scheduler fallback link.
+5. Test the inline flow in Safari, Chrome, and Instagram's in-app browser. If the embedded mobile experience proves less reliable, use the hosted Cal.com booking page on small screens without changing the site architecture.
+6. Use Cal.com's booking lifecycle for confirmation, cancellation, rescheduling, and reminders. Do not mirror or recreate those records locally.
+7. Add privacy-safe provider callbacks only for `booking_started` and `booking_completed`; never forward booking answers or attendee identifiers to analytics.
+
+Free-plan expectation, verified against Cal.com's published plans on September 24, 2026: the core 15-minute booking flow, unlimited event types and connected calendars, locations, timezone handling, standard confirmation, embed, cancellation/rescheduling, and default email/SMS notifications are available to an individual account. Free workflows use Cal.com's default message content. Customizable email/SMS notifications, removal of Cal.com branding, and team features require the Teams plan, currently listed at $12 per user/month when billed annually. SMS reminders consume Cal.com credits, so verify credit cost and availability in the configured account before launch. Start on the free Individual plan; upgrade only if Trayfolio needs branded/custom reminder copy, removed provider branding, or team scheduling.
+
 ### $50 demo conversion boundary
 
-The existing client action remains conceptually:
+The approved demo journey is:
 
-`Get My $50 Demo` → existing `DemoCheckoutButton` behavior → `POST /api/checkout` with `kind=demo` → Stripe-hosted payment → existing webhook fulfillment.
+`Get My $50 Demo` → existing `DemoCheckoutButton` behavior → `POST /api/checkout` with `kind=demo` → Stripe-hosted payment → demo intake → intake complete → confirmation → existing fulfillment.
 
 V2 may change presentation, placement, and surrounding copy. It must not plan a new price source, checkout payload, fulfillment service, coupon mechanism, or webhook contract.
+
+The 48-hour delivery clock begins only after Trayfolio receives the required intake information and assets, not when Stripe payment succeeds. The intake connection must not be implemented until the existing checkout, webhook, success page, email, and fulfillment behavior have been traced and a safe extension point is documented.
 
 ### Conversion reassurance
 
@@ -560,11 +589,13 @@ Explain why Trayfolio exists, how the studio works, and who the prospect will wo
 
 Founder content should answer “Who will I work with?” rather than “Here is everything about me.”
 
-## 11. Book a Call / Contact Page Blueprint
+## 11. Book and Contact Page Blueprints
+
+### `/book`: Book a Free Call
 
 ### Page goal
 
-Give high-intent visitors the shortest possible path to an appointment while keeping a reliable alternative for people who prefer email.
+Give high-intent visitors the shortest possible path to a free 15-minute appointment.
 
 ### Recommended structure
 
@@ -580,12 +611,42 @@ Give high-intent visitors the shortest possible path to an appointment while kee
 
 3. **External scheduler integration area**
    - Provider-controlled availability.
+   - Automatic attendee timezone handling.
    - Phone/video choice inside provider.
-   - Loading, error, privacy, and fallback states planned.
+   - Provider confirmation, approximately 24-hour and 1-hour reminders, and cancellation/rescheduling controls.
+   - Loading, error, privacy, and fallback states planned without fake availability.
 
-4. **Contact fallback**
-   - Existing inquiry form, revised to match V2 terminology.
-   - Direct email address.
+4. **Written fallback**
+   - “Can’t find a time that works? Send an Inquiry.”
+   - Link to `/contact`; do not place the full inquiry form beside the calendar.
+
+### `/contact`: Send an Inquiry
+
+### Page goal
+
+Provide a dependable written path for detailed questions, people who prefer email, visitors who cannot find a suitable call time, and people who are not ready to schedule.
+
+### Recommended structure
+
+1. **Hero**
+   - H1: **Tell Trayfolio what you’re working on.**
+   - Explain that Tracy usually replies within one business day.
+
+2. **Inquiry form**
+   - Preserve and evolve the existing `/api/contact` infrastructure.
+   - Required: name, email, and concise project message.
+   - Optional: phone, business/industry, current website, and project type.
+   - Primary submit label: **Send Inquiry**.
+
+3. **Alternative**
+   - Secondary link: **Book a Free Call** → `/book`.
+   - Keep the direct email address available.
+
+4. **Success state and acknowledgment**
+   - Confirm receipt and expected response time.
+   - Offer: “Want to talk sooner? Book a Free 15-Minute Call.”
+   - Include the same `/book` option in the acknowledgment email.
+   - Do not add an “I’d also like to schedule a call” checkbox.
 
 Recommended form project choices:
 
@@ -595,6 +656,28 @@ Recommended form project choices:
 - Booking or lead-generation site
 - Ongoing website support
 - Not sure yet
+
+### Demo intake boundary
+
+The post-purchase intake should be short and clearly separate required from optional information.
+
+Required candidates:
+
+- Business name and contact information.
+- What the business offers and its primary product or service.
+- Ideal customer.
+- Main action website visitors should take.
+- Enough approved content or context for Trayfolio to create the demo.
+
+Optional candidates:
+
+- Current website and social links.
+- Logo, brand assets, photos, or additional copy.
+- Preferred visual direction.
+- Inspiration or example sites.
+- Anything the customer wants Trayfolio to avoid.
+
+The final required fields, upload/storage method, customer identity handoff, retry behavior, and fulfillment status transition must be decided only after inspecting the existing Stripe demo lifecycle. Payment alone must never mark the intake complete or start the 48-hour clock.
 
 ## 12. FAQ Blueprint
 
@@ -758,7 +841,8 @@ Mobile requirements:
 - Services: custom websites, redesigns, integrations, and support.
 - Demo: $50 custom website demo and 48-hour offer.
 - About: Trayfolio studio and founder trust.
-- Contact: free website consultation.
+- Book: free 15-minute website consultation.
+- Contact: written website inquiry.
 - Case studies: business/industry-specific project stories.
 
 Page titles and descriptions should describe the page accurately rather than repeat one generic site description. Case-study metadata must include the correct classification.
@@ -766,14 +850,18 @@ Page titles and descriptions should describe the page accurately rather than rep
 ### Conversion events to plan
 
 - `book_call_click` with page/section context.
-- `scheduler_open`.
-- `scheduler_complete` only if the provider supports a privacy-safe callback.
-- `demo_cta_click` with page/section context.
-- `demo_checkout_start` after a valid checkout URL is returned.
-- `contact_form_submit_success` without form contents or personal data.
+- `scheduler_view` when the scheduling interface is actually shown.
+- `booking_started` when the provider exposes a reliable privacy-safe event.
+- `booking_completed` only when the provider exposes a reliable privacy-safe completion callback.
+- `inquiry_started` on first meaningful interaction with the inquiry form.
+- `inquiry_submitted` after the site receives a successful form response.
+- `demo_page_view`.
+- `demo_checkout_started` after a valid Stripe checkout URL is returned.
+- `demo_purchase_completed` on a verified success path without sending the Stripe session identifier.
+- `demo_intake_completed` after required intake is successfully stored and accepted.
 - `case_study_view` and optional `live_site_click`.
 
-Do not send names, email addresses, phone numbers, messages, Stripe session IDs, or full destination URLs containing sensitive queries.
+Attach only controlled context values such as page, section, CTA placement, and device category where useful. Do not send names, email addresses, phone numbers, inquiry contents, booking answers, Stripe session IDs, uploaded asset identifiers, or full destination URLs containing sensitive queries.
 
 ### Primary success measures
 
@@ -789,6 +877,7 @@ Do not send names, email addresses, phone numbers, messages, Stripe session IDs,
 
 - Scheduling provider.
 - Exact phone/video configuration.
+- Free versus paid reminder requirements, including whether SMS is necessary at launch.
 - Operational definition of the 48-hour demo deadline.
 - Demo intake process and precise deliverable boundary.
 - Refund, credit-expiry, and revision language confirmed against existing Terms/Stripe behavior.
@@ -814,14 +903,14 @@ Do not send names, email addresses, phone numbers, messages, Stripe session IDs,
 
 Approve these items explicitly before code changes begin:
 
-1. Route map and `/contact` recommendation.
+1. Approved route map: `/book` for scheduling, `/demo` for the paid demo, and `/contact` for written inquiries.
 2. Header/footer navigation.
 3. Homepage section order.
 4. Hero copy direction.
 5. Three verified flagship projects.
 6. Work classification for every listed project.
 7. Services scope and exclusions.
-8. Scheduling provider and call configuration.
+8. Scheduling provider, plan, embed/handoff method, and call configuration.
 9. Final demo promise and policy language.
 10. Testimonials and founder content.
 11. Legacy pricing/start route behavior.

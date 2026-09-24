@@ -18,7 +18,7 @@ export default function SiteHeader() {
           {navigation.map((item) => <Link key={item.href} href={item.href} className="transition hover:text-stone-950">{item.label}</Link>)}
         </div>
         <Link
-          href="/contact"
+          href="/book"
           className="ml-auto inline-flex min-h-11 items-center justify-center rounded-full bg-terracotta px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-terracotta-light md:ml-2"
         >
           <span className="sm:hidden">Book a Call</span><span className="hidden sm:inline">Book a Free Call</span>
@@ -28,7 +28,8 @@ export default function SiteHeader() {
           <div className="absolute right-0 top-full z-50 mt-3 grid min-w-64 gap-1 rounded-2xl border border-stone-200 bg-white p-2 text-sm text-stone-800 shadow-2xl">
             {navigation.map((item) => <Link key={item.href} className="rounded-xl px-4 py-3 font-semibold hover:bg-stone-100" href={item.href}>{item.label}</Link>)}
             <Link className="rounded-xl px-4 py-3 font-semibold hover:bg-stone-100" href="/faq">FAQ</Link>
-            <Link className="mt-1 rounded-xl bg-stone-950 px-4 py-3 text-center font-semibold text-white" href="/contact">Book a Free Call</Link>
+            <Link className="rounded-xl px-4 py-3 font-semibold hover:bg-stone-100" href="/contact">Send an Inquiry</Link>
+            <Link className="mt-1 rounded-xl bg-stone-950 px-4 py-3 text-center font-semibold text-white" href="/book">Book a Free Call</Link>
           </div>
         </details>
       </nav>

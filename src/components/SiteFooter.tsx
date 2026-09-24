@@ -13,9 +13,9 @@ const columns: {
   {
     heading: "Start",
     links: [
-      { label: "Book a free call", href: "/contact" },
+      { label: "Book a free call", href: "/book" },
       { label: "Get a $50 demo", href: "/demo" },
-      { label: "Email Trayfolio", href: "mailto:tracyholbrook532@gmail.com" },
+      { label: "Send an inquiry", href: "/contact" },
     ],
   },
   {
