@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpRight, Calendar, Clock, Video } from "lucide-react";
+import { ArrowUpRight, Calendar, Clock, Phone } from "lucide-react";
 import MarketingShell from "@/components/MarketingShell";
 import Reveal from "@/components/Reveal";
 import { Eyebrow } from "@/components/V2Ui";
-import { CAL_BOOKING_URL } from "@/lib/booking";
+import { BOOKING_URL } from "@/lib/booking";
 
 export const metadata: Metadata = {
   title: "Book a Free Call | Trayfolio",
   description:
-    "Book a free 15-minute phone or video call with Trayfolio to talk about your business and website goals.",
+    "Book a free 15-minute phone call with Trayfolio to talk about your business and website goals.",
   alternates: { canonical: "/book" },
 };
 
 const callDetails = [
   [Clock, "15 minutes"],
-  [Video, "Phone or video"],
+  [Phone, "Phone call"],
   [Calendar, "Free consultation"],
 ] as const;
 
@@ -54,24 +54,34 @@ export default function BookPage() {
       <section className="bg-white py-16 sm:py-24">
         <div className="v2-container max-w-5xl">
           <Reveal>
-            <div className="rounded-[2rem] bg-stone-950 px-6 py-12 text-center text-white shadow-[0_30px_90px_-55px_rgba(42,33,24,.55)] sm:px-12 sm:py-16">
-              <Calendar className="mx-auto text-gold" size={34} aria-hidden="true" />
-              <Eyebrow light>Live availability</Eyebrow>
-              <h2 className="font-display mx-auto mt-4 max-w-2xl text-4xl leading-tight tracking-[-.04em] sm:text-5xl">
-                Choose the time that works for you.
-              </h2>
-              <p className="mx-auto mt-5 max-w-xl text-lg leading-8 text-stone-300">
-                View Tracy&apos;s current calendar, select phone or video, and receive your confirmation instantly.
+            <div className="rounded-[2rem] border border-stone-200 bg-stone-50 p-4 shadow-[0_30px_90px_-55px_rgba(42,33,24,.35)] sm:p-8">
+              <div className="px-2 pb-6 pt-2 text-center sm:px-4">
+                <Eyebrow>Live availability</Eyebrow>
+                <h2 className="font-display mx-auto mt-4 max-w-2xl text-3xl leading-tight tracking-[-.04em] sm:text-4xl">
+                  Choose the time that works for you.
+                </h2>
+                <p className="mx-auto mt-4 max-w-xl leading-7 text-stone-600">
+                  Pick a day and time below. You&apos;ll get a confirmation right away and a reminder before the call.
+                </p>
+              </div>
+              <iframe
+                src={BOOKING_URL}
+                title="Book a free 15-minute call with Trayfolio"
+                loading="lazy"
+                className="h-[760px] w-full rounded-2xl border-0 bg-white"
+              />
+              <p className="mt-5 text-center text-sm text-stone-600">
+                Calendar not loading?{" "}
+                <a
+                  href={BOOKING_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 font-semibold text-terracotta underline underline-offset-4"
+                >
+                  Open it in a new tab
+                  <ArrowUpRight size={14} aria-hidden="true" />
+                </a>
               </p>
-              <a
-                href={CAL_BOOKING_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="v2-button v2-button--primary mt-8"
-              >
-                View Available Times
-                <ArrowUpRight size={16} aria-hidden="true" />
-              </a>
             </div>
           </Reveal>
 

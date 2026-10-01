@@ -1,2 +1,4 @@
-export const CAL_BOOKING_URL =
-  "https://cal.com/tracy-holbrook-02flue/free-website-call";
+// HighLevel "Free 15-Minute Call" calendar. Booking here triggers the
+// Appointment Reminders and No Show Follow Up workflows in HighLevel.
+export const BOOKING_URL =
+  "https://api.leadconnectorhq.com/widget/booking/qttOTbEsQZy1Hjxj6yXk";
