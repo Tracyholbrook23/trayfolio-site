@@ -1,3 +1,4 @@
+import { highLevelConfigured, pushLead, type Lead } from "@/lib/highlevel";
 import { readSubmission } from "@/lib/submission";
 import { NextResponse } from "next/server";
 
@@ -63,57 +64,89 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid project type." }, { status: 400 });
   }
 
-  const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
-  const resendKey = process.env.RESEND_API_KEY;
-  const from = process.env.DEMO_EMAIL_FROM;
-  if (!accessKey && !(resendKey && from)) {
+  const projectTypes = rawTypes as string[];
+  const smsConsent = input.smsConsent === true;
+  const lead: Lead = {
+    name,
+    email,
+    phone: phone || "",
+    business: business || "",
+    projectTypes,
+    message,
+    smsConsent,
+  };
+
+  const emailReady = Boolean(process.env.WEB3FORMS_ACCESS_KEY || (process.env.RESEND_API_KEY && process.env.DEMO_EMAIL_FROM));
+  const crmReady = highLevelConfigured();
+  if (!emailReady && !crmReady) {
     return NextResponse.json({ error: "Contact form is not configured." }, { status: 503 });
   }
 
-  try {
-    // Prefer the verified transactional email path when both providers exist.
-    if (resendKey && from) {
-      const response = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        signal: AbortSignal.timeout(10_000),
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendKey}` },
-        body: JSON.stringify({
-          from,
-          to: process.env.ALERT_EMAIL || "tracyholbrook532@gmail.com",
-          reply_to: email,
-          subject: "New Trayfolio website inquiry",
-          text: [
-            `Name: ${name}`, `Email: ${email}`, `Phone: ${phone || "Not given"}`,
-            `Business: ${business || "Not given"}`,
-            `Project: ${rawTypes.join(", ") || "Not specified"}`, "", message,
-          ].join("\n"),
-        }),
-      });
-      const result = await response.json();
-      if (!response.ok || !result.id) throw new Error("Email provider rejected the submission.");
-      return NextResponse.json({ success: true });
-    }
-    const response = await fetch(WEB3FORMS_URL, {
+  // Email Tracy and push the lead into HighLevel at the same time. Either one landing
+  // counts as delivered, so a HighLevel outage never loses an inquiry and vice versa.
+  const [emailResult, crmResult] = await Promise.allSettled([
+    emailReady ? sendInquiryEmail(lead) : Promise.resolve(false),
+    crmReady ? pushLead(lead) : Promise.resolve(null),
+  ]);
+  if (emailResult.status === "rejected") console.error("Inquiry email failed:", emailResult.reason);
+  if (crmResult.status === "rejected") console.error("HighLevel lead push failed:", crmResult.reason);
+
+  const emailed = emailResult.status === "fulfilled" && emailResult.value === true;
+  const synced = crmResult.status === "fulfilled" && Boolean(crmResult.value);
+  if (!emailed && !synced) {
+    return NextResponse.json({ error: "Could not send your inquiry. Please try again." }, { status: 502 });
+  }
+  return NextResponse.json({ success: true });
+}
+
+async function sendInquiryEmail(lead: Lead) {
+  const accessKey = process.env.WEB3FORMS_ACCESS_KEY;
+  const resendKey = process.env.RESEND_API_KEY;
+  const from = process.env.DEMO_EMAIL_FROM;
+  const projectLine = lead.projectTypes.length ? lead.projectTypes.join(", ") : "Not specified";
+
+  // Prefer the verified transactional email path when both providers exist.
+  if (resendKey && from) {
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       signal: AbortSignal.timeout(10_000),
-      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${resendKey}` },
       body: JSON.stringify({
-        access_key: accessKey,
-        subject: `New website inquiry: ${business || name}`,
-        from_name: "Trayfolio website",
-        replyto: email,
-        name,
-        email,
-        phone: phone || "Not given",
-        business: business || "Not given",
-        project_type: rawTypes.length ? rawTypes.join(", ") : "Not specified",
-        message,
+        from,
+        to: process.env.ALERT_EMAIL || "tracyholbrook532@gmail.com",
+        reply_to: lead.email,
+        subject: "New Trayfolio website inquiry",
+        text: [
+          `Name: ${lead.name}`, `Email: ${lead.email}`, `Phone: ${lead.phone || "Not given"}`,
+          `Business: ${lead.business || "Not given"}`,
+          `Project: ${projectLine}`, `SMS consent: ${lead.smsConsent ? "Yes" : "No"}`, "", lead.message,
+        ].join("\n"),
       }),
     });
     const result = await response.json();
-    if (!response.ok || !result.success) throw new Error("Web3Forms rejected the submission.");
-    return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Could not send your inquiry. Please try again." }, { status: 502 });
+    if (!response.ok || !result.id) throw new Error("Email provider rejected the submission.");
+    return true;
   }
+  if (!accessKey) return false;
+  const response = await fetch(WEB3FORMS_URL, {
+    method: "POST",
+    signal: AbortSignal.timeout(10_000),
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    body: JSON.stringify({
+      access_key: accessKey,
+      subject: `New website inquiry: ${lead.business || lead.name}`,
+      from_name: "Trayfolio website",
+      replyto: lead.email,
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone || "Not given",
+      business: lead.business || "Not given",
+      project_type: projectLine,
+      sms_consent: lead.smsConsent ? "Yes" : "No",
+      message: lead.message,
+    }),
+  });
+  const result = await response.json();
+  if (!response.ok || !result.success) throw new Error("Web3Forms rejected the submission.");
+  return true;
 }

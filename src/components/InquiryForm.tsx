@@ -21,6 +21,8 @@ const inputClass =
 export default function InquiryForm() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [smsConsent, setSmsConsent] = useState(false);
   const [business, setBusiness] = useState("");
   const [projectType, setProjectType] = useState<string[]>([]);
   const [message, setMessage] = useState("");
@@ -41,6 +43,8 @@ export default function InquiryForm() {
   function resetForm() {
     setName("");
     setEmail("");
+    setPhone("");
+    setSmsConsent(false);
     setBusiness("");
     setProjectType([]);
     setMessage("");
@@ -67,6 +71,8 @@ export default function InquiryForm() {
           botcheck,
           name,
           email,
+          phone,
+          smsConsent: smsConsent && phone.trim().length > 0,
           business,
           projectType,
           message,
@@ -153,6 +159,24 @@ export default function InquiryForm() {
         </div>
       </div>
 
+      <div className="grid gap-5 sm:grid-cols-2">
+      <div>
+        <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-phone">
+          Phone <span className="font-normal text-stone-500">(optional)</span>
+        </label>
+        <input
+          id="inquiry-phone"
+          name="phone"
+          type="tel"
+          maxLength={40}
+          autoComplete="tel"
+          disabled={sending}
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className={inputClass}
+          placeholder="(512) 555-0123"
+        />
+      </div>
       <div>
         <label className="text-sm font-medium text-stone-700" htmlFor="inquiry-business">
           Business / industry
@@ -167,6 +191,7 @@ export default function InquiryForm() {
           className={inputClass}
           placeholder="e.g. home services, photography..."
         />
+      </div>
       </div>
 
       <div>
@@ -209,6 +234,23 @@ export default function InquiryForm() {
         />
       </div>
 
+      <label className="flex items-start gap-3 text-xs leading-5 text-stone-600" htmlFor="inquiry-sms-consent">
+        <input
+          id="inquiry-sms-consent"
+          name="smsConsent"
+          type="checkbox"
+          disabled={sending}
+          checked={smsConsent}
+          onChange={(e) => setSmsConsent(e.target.checked)}
+          className="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300 accent-stone-900"
+        />
+        <span>
+          Text me about my inquiry. By checking this box, I agree to receive text messages from
+          Trayfolio at the number above. Message frequency varies. Msg &amp; data rates may apply.
+          Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.
+        </span>
+      </label>
+
       {/* Honeypot. Hidden from people and from screen readers; bots fill it in. */}
       <input
         type="checkbox"
@@ -242,7 +284,7 @@ export default function InquiryForm() {
         </p>
       ) : (
         <p className="text-xs text-stone-500">
-          Your inquiry is delivered to my inbox through an email service so I can reply. No account needed. Read the{" "}
+          Your inquiry goes to my inbox and my client system so I can follow up. Texts are only sent if you check the box above. Read the{" "}
           <a href="/privacy" className="underline underline-offset-4">privacy policy</a>
           {" "}for how your information is handled.
         </p>
