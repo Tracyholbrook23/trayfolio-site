@@ -245,9 +245,13 @@ export default function InquiryForm() {
           className="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300 accent-stone-900"
         />
         <span>
-          Text me about my inquiry. By checking this box, I agree to receive text messages from
-          Trayfolio at the number above. Message frequency varies. Msg &amp; data rates may apply.
-          Reply STOP to opt out or HELP for help. Consent is not a condition of purchase.
+          By checking this box, I agree to receive text messages from Trayfolio at the number
+          above, including replies to my inquiry, appointment confirmations and reminders,
+          project updates, and occasional offers. Message frequency varies. Msg &amp; data rates
+          may apply. Reply STOP to opt out or HELP for help. Consent is not a condition of
+          purchase. See our{" "}
+          <a href="/terms#sms" className="underline underline-offset-2">Terms</a> and{" "}
+          <a href="/privacy" className="underline underline-offset-2">Privacy Policy</a>.
         </span>
       </label>
 
