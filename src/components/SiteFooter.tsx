@@ -102,6 +102,16 @@ export default function SiteFooter() {
           <span>Custom websites for small businesses nationwide. Founded by Tracy Holbrook.</span>
         </div>
 
+        <address className="mt-5 flex flex-col gap-2 text-xs not-italic text-stone-600 sm:flex-row sm:flex-wrap sm:gap-x-5">
+          <span>Trayfolio · 7711 O&apos;Connor Dr, Round Rock, TX 78681</span>
+          <a className="transition hover:text-terracotta" href="tel:+15129202344">
+            (512) 920-2344
+          </a>
+          <a className="break-all transition hover:text-terracotta" href="mailto:tracyholbrook532@gmail.com">
+            tracyholbrook532@gmail.com
+          </a>
+        </address>
+
         <div ref={wordmarkRef} className="mt-10 select-none overflow-hidden">
           {showWordmark && <RevealText text="Trayfolio" />}
         </div>
