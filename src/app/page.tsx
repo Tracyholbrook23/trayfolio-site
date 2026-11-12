@@ -3,10 +3,11 @@ import Link from "next/link";
 import { ArrowDown, ArrowRight, Check } from "lucide-react";
 import MarketingShell from "@/components/MarketingShell";
 import Reveal from "@/components/Reveal";
+import ClientWorkDeck from "@/components/ClientWorkDeck";
 import SeeTheDifference from "@/components/SeeTheDifference";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 import { RevealText } from "@/components/ui/reveal-text";
-import { Eyebrow, FinalCta, PrimaryCta, ProjectCard, SecondaryCta } from "@/components/V2Ui";
+import { Eyebrow, FinalCta, PrimaryCta, SecondaryCta } from "@/components/V2Ui";
 import { featuredProjects } from "@/lib/projects";
 
 export const metadata: Metadata = {
@@ -67,10 +68,12 @@ export default function Home() {
 
       <section id="selected-work" className="bg-stone-950 py-20 text-white sm:py-28">
         <div className="v2-container">
-          <Reveal><div className="grid gap-5 lg:grid-cols-[1fr_.8fr] lg:items-end"><div><Eyebrow light>Selected client work</Eyebrow><h2 className="v2-section-title mt-4 max-w-3xl">Built around the business. Never around a template.</h2></div><p className="max-w-xl leading-7 text-stone-300 lg:justify-self-end">Three businesses with three different goals, audiences, and digital experiences. Select a project to explore it inside Trayfolio.</p></div></Reveal>
-          <div className="mt-12 grid gap-6 lg:grid-cols-2">
-            {featuredProjects.map((project, index) => <Reveal key={project.slug} delay={index * 75} className={index === 0 ? "lg:col-span-2" : ""}><ProjectCard project={project} /></Reveal>)}
-          </div>
+          <Reveal><div className="grid gap-5 lg:grid-cols-[1fr_.8fr] lg:items-end"><div><Eyebrow light>Selected client work</Eyebrow><h2 className="v2-section-title mt-4 max-w-3xl">Built around the business. Never around a template.</h2></div><p className="max-w-xl leading-7 text-stone-300 lg:justify-self-end">Three businesses with three different goals, audiences, and digital experiences. Scroll to flip through them, then select a project to explore it inside Trayfolio.</p></div></Reveal>
+        </div>
+        <div className="mt-6">
+          <ClientWorkDeck projects={featuredProjects} tone="dark" showIndex={false} />
+        </div>
+        <div className="v2-container">
           <Link href="/work" className="mt-10 inline-flex items-center gap-2 text-sm font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">Explore all work <ArrowRight size={16} aria-hidden="true" /></Link>
         </div>
       </section>
