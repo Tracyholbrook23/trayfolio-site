@@ -169,7 +169,7 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
   const html = `
     <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:520px;color:#2a2118;line-height:1.6">
       <p style="margin:0 0 16px">Thanks for your order. Your demo landing page is paid for and I've started on it.</p>
-      <p style="margin:0 0 16px">I'll email you to collect the essentials about your business. Once I have what I need, your custom demo will be delivered within 48 hours.</p>
+      <p style="margin:0 0 16px">I have what you told me about your business and I'll reach out if I need anything else, like your logo or photos. Your custom demo will be delivered within 48 hours of having everything I need.</p>
       <p style="margin:0 0 16px">
         Order reference: <strong>${code}</strong><br>
         This is also your $50 credit toward a full site. Enter it at checkout on
@@ -184,7 +184,7 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
   const text = [
     "Thanks for your order. Your demo landing page is paid for and I've started on it.",
     "",
-    "I'll email you to collect the essentials about your business. Once I have what I need, your custom demo will be delivered within 48 hours.",
+    "I have what you told me about your business and I'll reach out if I need anything else, like your logo or photos. Your custom demo will be delivered within 48 hours of having everything I need.",
     "",
     `Order reference: ${code}`,
     "This is also your $50 credit toward a full site. Enter it at checkout on",
@@ -342,6 +342,7 @@ async function notifyOwner(order: {
   total?: number;
   balance?: number;
   summary?: string;
+  intake?: [string, string][];
   buyerEmailDelivered: boolean;
 }): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
@@ -352,6 +353,10 @@ async function notifyOwner(order: {
   const lines: string[] = [`Buyer: ${order.buyer}`, `Paid: ${formatUSD(order.paid)}`];
   if (order.kind === "demo") {
     lines.push(`Credit code: ${order.code ?? "none"}`);
+    if (order.intake?.length) {
+      lines.push("", "What they told us:");
+      for (const [label, value] of order.intake) lines.push(`${label}: ${value}`);
+    }
   } else {
     if (order.summary) lines.push(`Ordered: ${order.summary}`);
     if (typeof order.total === "number") lines.push(`Project total: ${formatUSD(order.total)}`);
@@ -386,7 +391,7 @@ async function notifyOwner(order: {
         <p style="margin:0 0 16px">${
           order.kind === "demo" ? "Someone ordered a demo." : "Someone paid a project deposit."
         }</p>
-        <p style="margin:0 0 16px">${lines.join("<br>")}</p>
+        <p style="margin:0 0 16px">${lines.map(escapeHtml).join("<br>")}</p>
         <p style="margin:0;font-size:14px;color:#6b6154">Reply to this email to reach them directly.</p>
       </div>`,
     text: [
@@ -404,6 +409,30 @@ async function notifyOwner(order: {
   if (!result.ok) {
     console.error(`Owner notification failed: ${result.detail}`);
   }
+}
+
+/** Buyer-typed text goes into an HTML email, so it must not be able to inject markup. */
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+const INTAKE_LABELS: [string, string][] = [
+  ["intake_name", "Name"],
+  ["intake_business", "Business"],
+  ["intake_about", "What they do"],
+  ["intake_goals", "Wants the demo to show"],
+  ["intake_website", "Current site or Instagram"],
+  ["intake_style", "Styles they like"],
+];
+
+/** Pulls the pre-checkout intake answers off the session metadata. */
+function demoIntake(metadata: Record<string, string>): [string, string][] {
+  return INTAKE_LABELS.filter(([key]) => metadata[key]).map(([key, label]) => [label, metadata[key]]);
 }
 
 export async function POST(request: Request) {
@@ -494,6 +523,7 @@ export async function POST(request: Request) {
       buyer: email,
       code,
       paid: Number(session.amount_total ?? 0),
+      intake: demoIntake(metadata),
       buyerEmailDelivered: sent,
     });
   } catch (error) {

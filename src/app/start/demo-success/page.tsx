@@ -23,8 +23,9 @@ export default function DemoSuccess() {
             Your demo is officially in motion.
           </h1>
           <p className="mx-auto mt-6 max-w-md text-lg leading-8 text-stone-600">
-            I&apos;ll email you to collect the essentials about your business. Once I have
-            what I need, your custom demo will be delivered within 48 hours.
+            I have what you told me about your business and I&apos;ll reach out if I need
+            anything else, like your logo or photos. Your custom demo will be delivered within
+            48 hours of having everything I need.
           </p>
 
           <div className="mx-auto mt-10 max-w-md border border-stone-200 bg-peach p-6 text-left">

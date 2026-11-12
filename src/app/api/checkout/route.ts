@@ -48,6 +48,54 @@ function isAddOnId(value: unknown): value is AddOnId {
   return typeof value === "string" && Object.hasOwn(ADD_ONS, value);
 }
 
+type DemoIntake = {
+  name: string;
+  email: string;
+  business: string;
+  about: string;
+  goals: string;
+  website: string;
+  style: string;
+};
+
+/** Field name, max length, and whether it must be filled in. Stripe caps a
+ *  metadata value at 500 characters, so nothing here may go past that. */
+const INTAKE_FIELDS: [keyof DemoIntake, number, boolean][] = [
+  ["name", 100, true],
+  ["email", 254, true],
+  ["business", 150, true],
+  ["about", 300, true],
+  ["goals", 500, true],
+  ["website", 200, false],
+  ["style", 300, false],
+];
+
+/* *************************
+ * readDemoIntake
+ * Checks the business details a buyer filled in before paying for a demo.
+ *
+ * @param raw : the intake object from the request body
+ * @exception none
+ * @return the cleaned intake, or an error message to show the buyer
+ **************************/
+function readDemoIntake(raw: unknown): { ok: true; data: DemoIntake } | { ok: false; error: string } {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    return { ok: false, error: "Tell me a little about your business first." };
+  }
+  const input = raw as Record<string, unknown>;
+  const data = {} as DemoIntake;
+  for (const [key, max, required] of INTAKE_FIELDS) {
+    const value = typeof input[key] === "string" ? (input[key] as string).trim() : "";
+    if (value.length > max) return { ok: false, error: "One of your answers is too long. Please shorten it." };
+    if (required && !value) return { ok: false, error: "Please fill in the required fields." };
+    data[key] = value;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+    return { ok: false, error: "Please enter a valid email." };
+  }
+  return { ok: true, data };
+}
+
 export async function POST(request: Request) {
   const secretKey = process.env.STRIPE_SECRET_KEY;
   if (!secretKey) {
@@ -74,7 +122,7 @@ export async function POST(request: Request) {
   if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
     return NextResponse.json({ error: "Invalid request." }, { status: 400 });
   }
-  const body = payload as { kind?: unknown; packageId?: unknown; addOns?: unknown };
+  const body = payload as { kind?: unknown; packageId?: unknown; addOns?: unknown; intake?: unknown; embedded?: unknown; botcheck?: unknown };
   if (body.kind !== undefined && body.kind !== "demo") {
     return NextResponse.json({ error: "Invalid checkout type." }, { status: 400 });
   }
@@ -82,11 +130,26 @@ export async function POST(request: Request) {
 
   // --- The $50 demo: one fixed item, no configuration, no deposit split. ---
   if (body.kind === "demo") {
+    if (body.botcheck) {
+      return NextResponse.json({ error: "Invalid submission." }, { status: 400 });
+    }
+    const intake = readDemoIntake(body.intake);
+    if (!intake.ok) return NextResponse.json({ error: intake.error }, { status: 400 });
+    const embedded = body.embedded === true;
+
     const form = new URLSearchParams();
     form.set("mode", "payment");
-    form.set("success_url", `${origin}/start/demo-success`);
-    form.set("cancel_url", `${origin}/start/canceled`);
+    if (embedded) {
+      // Payment happens in a form on trayfolio, then Stripe sends the buyer
+      // to the success page itself.
+      form.set("ui_mode", "embedded_page");
+      form.set("return_url", `${origin}/start/demo-success?session_id={CHECKOUT_SESSION_ID}`);
+    } else {
+      form.set("success_url", `${origin}/start/demo-success`);
+      form.set("cancel_url", `${origin}/start/canceled`);
+    }
     form.set("billing_address_collection", "auto");
+    form.set("customer_email", intake.data.email);
     form.set("line_items[0][quantity]", "1");
     form.set("line_items[0][price_data][currency]", "usd");
     form.set("line_items[0][price_data][unit_amount]", String(DEMO.amount));
@@ -94,7 +157,12 @@ export async function POST(request: Request) {
     form.set("line_items[0][price_data][product_data][description]", DEMO.description);
     // The webhook reads this to know it should issue a credit code.
     form.set("metadata[kind]", "demo");
-    return createSession(secretKey, form);
+    // What the buyer told us about their business rides along with the
+    // payment, so the order email has everything needed to start the demo.
+    for (const [key, value] of Object.entries(intake.data)) {
+      if (value) form.set(`metadata[intake_${key}]`, value);
+    }
+    return createSession(secretKey, form, embedded);
   }
 
   if (!isPackageId(body.packageId)) {
@@ -163,7 +231,7 @@ export async function POST(request: Request) {
   return createSession(secretKey, form);
 }
 
-async function createSession(secretKey: string, form: URLSearchParams) {
+async function createSession(secretKey: string, form: URLSearchParams, embedded = false) {
   try {
     const response = await fetch(STRIPE_API, {
       method: "POST",
@@ -173,6 +241,17 @@ async function createSession(secretKey: string, form: URLSearchParams) {
     });
 
     const session = await response.json();
+
+    if (embedded) {
+      if (!response.ok || !session?.client_secret) {
+        console.error("Stripe embedded checkout session failed", session?.error?.message);
+        return NextResponse.json(
+          { error: "Could not start checkout. Please email me and I'll sort it out." },
+          { status: 502 }
+        );
+      }
+      return NextResponse.json({ clientSecret: session.client_secret });
+    }
 
     if (!response.ok || !session?.url) {
       // Log for us, stay vague for the visitor.
