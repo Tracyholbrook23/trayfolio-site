@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import type { CSSProperties } from "react";
+import { Check, X } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import { CompareReveal } from "@/components/ui/compare-reveal";
 
@@ -191,6 +192,22 @@ function PremiumSitePanel() {
   );
 }
 
+/** What a typical drag-and-drop builder site gives a business. */
+const TEMPLATE_POINTS = [
+  "A layout picked from a theme library and shared with thousands of other sites",
+  "Stock photos and filler copy that could fit any business",
+  "Limited to whatever blocks and features the builder allows",
+  "Looks like every other business in your industry",
+];
+
+/** What every Trayfolio build gives a business instead. */
+const CUSTOM_POINTS = [
+  "A layout designed around your business, your customers, and your goals",
+  "Your real photos, video, and brand voice from top to bottom",
+  "Custom code, so features fit how you actually work",
+  "A site people remember, built to turn visitors into customers",
+];
+
 export default function SeeTheDifference() {
   return (
     <section id="see-the-difference" className="deferred-render bg-white">
@@ -199,12 +216,17 @@ export default function SeeTheDifference() {
           <p className="text-center text-sm font-semibold uppercase tracking-wider text-stone-500">
             Same business, two different sites
           </p>
-          <h2 className="font-display mx-auto mt-2 max-w-xl text-center text-2xl font-semibold tracking-tight sm:text-3xl">
-            See the Difference
+          <h2 className="font-display mx-auto mt-2 max-w-2xl text-center text-2xl font-semibold tracking-tight sm:text-3xl">
+            Built from scratch, not dragged and dropped.
           </h2>
-          <p className="mx-auto mt-3 max-w-md text-center text-sm text-stone-600">
-            Drag the divider to compare a generic template site with the kind of custom build
-            you get from Trayfolio.
+          <p className="mx-auto mt-4 max-w-2xl text-center leading-7 text-stone-600">
+            Most small business websites start as a drag-and-drop template. It&apos;s the same
+            layout thousands of other businesses use, with a new logo dropped on top. We don&apos;t
+            work that way. Every Trayfolio site is designed and coded from scratch around your
+            business, your customers, and what you want them to do next.
+          </p>
+          <p className="mx-auto mt-3 max-w-md text-center text-sm font-semibold text-stone-500">
+            Drag the divider to see the difference.
           </p>
         </Reveal>
 
@@ -225,6 +247,37 @@ export default function SeeTheDifference() {
               } as CSSProperties
             }
           />
+        </Reveal>
+
+        <Reveal delay={200} className="mt-12">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl border border-stone-200 bg-stone-50 p-6 sm:p-7">
+              <p className="text-sm font-semibold uppercase tracking-wider text-stone-500">
+                Drag-and-drop template
+              </p>
+              <ul className="mt-4 space-y-3 text-stone-600">
+                {TEMPLATE_POINTS.map((point) => (
+                  <li key={point} className="flex gap-3">
+                    <X aria-hidden="true" size={18} className="mt-1 shrink-0 text-stone-400" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-2xl border border-[#e7ded0] bg-[#fbf3ea] p-6 sm:p-7">
+              <p className="text-sm font-semibold uppercase tracking-wider text-terracotta">
+                Custom Trayfolio build
+              </p>
+              <ul className="mt-4 space-y-3 text-stone-800">
+                {CUSTOM_POINTS.map((point) => (
+                  <li key={point} className="flex gap-3">
+                    <Check aria-hidden="true" size={18} className="mt-1 shrink-0 text-terracotta" />
+                    <span>{point}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </Reveal>
       </div>
     </section>
