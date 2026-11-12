@@ -109,3 +109,37 @@ export const auditLog = pgTable(
   },
   (table) => [index("audit_log_created_at_idx").on(table.createdAt)],
 );
+
+/**
+ * A visitor who started the $50 demo form. A row is created once they give
+ * their email, updated as they answer, and marked paid by the Stripe webhook.
+ * Rows that never get paid drive the reminder emails in
+ * /api/cron/demo-reminders, and are deleted after 30 days.
+ *
+ * `token` is a long random string that doubles as the key for the visitor's
+ * "finish your order" and "stop reminders" links, so it is never shown
+ * anywhere but their own email.
+ */
+export const demoLeads = pgTable(
+  "demo_leads",
+  {
+    id: serial("id").primaryKey(),
+    token: text("token").notNull().unique(),
+    email: text("email").notNull(),
+    name: text("name"),
+    business: text("business"),
+    answers: jsonb("answers").notNull(),
+    /** The furthest question they reached, or "review" / "checkout". */
+    step: text("step").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    remindersSent: integer("reminders_sent").notNull().default(0),
+    lastReminderAt: timestamp("last_reminder_at", { withTimezone: true }),
+    unsubscribedAt: timestamp("unsubscribed_at", { withTimezone: true }),
+  },
+  (table) => [
+    index("demo_leads_email_idx").on(table.email),
+    index("demo_leads_open_idx").on(table.paidAt, table.updatedAt),
+  ],
+);

@@ -23,10 +23,25 @@ export default function DemoSuccess() {
             Your demo is officially in motion.
           </h1>
           <p className="mx-auto mt-6 max-w-md text-lg leading-8 text-stone-600">
-            I have what you told me about your business and I&apos;ll reach out if I need
-            anything else, like your logo or photos. Your custom demo will be delivered within
-            48 hours of having everything I need.
+            Your answers came through with your order, so I&apos;m already getting started.
+            Here&apos;s what happens next.
           </p>
+
+          <ol className="mx-auto mt-10 max-w-md space-y-4 text-left">
+            {[
+              ["Right now", "A confirmation email with your order reference is on its way to you."],
+              ["Within 1 business day", "I email you personally to confirm the details. Reply with your logo and a few photos of your work if you have them."],
+              ["Within 48 hours", "Your demo link lands in your inbox. If I'm waiting on something from you, I'll let you know and the clock starts once I have it."],
+            ].map(([when, what], index) => (
+              <li key={when} className="flex gap-4">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-terracotta text-sm font-semibold text-white">{index + 1}</span>
+                <div>
+                  <p className="font-semibold text-stone-900">{when}</p>
+                  <p className="mt-1 leading-7 text-stone-600">{what}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
 
           <div className="mx-auto mt-10 max-w-md border border-stone-200 bg-peach p-6 text-left">
             <h2 className="text-sm font-semibold uppercase tracking-wider text-stone-600">

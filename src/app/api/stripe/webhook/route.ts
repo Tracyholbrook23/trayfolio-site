@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
 import { DEMO_COUPON_NAME, formatUSD } from "@/lib/pricing";
 import { STRIPE_API_VERSION, stripeHeaders } from "@/lib/stripe";
+import { DEMO_FIELDS } from "@/lib/demo-intake";
 
 export const runtime = "nodejs";
 
@@ -152,7 +153,7 @@ async function alertOwner(
   }
 }
 
-async function emailCredit(to: string, code: string): Promise<boolean> {
+async function emailCredit(to: string, code: string, hasBrand = true): Promise<boolean> {
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.DEMO_EMAIL_FROM;
   if (!apiKey || !from) {
@@ -166,31 +167,43 @@ async function emailCredit(to: string, code: string): Promise<boolean> {
   // Promotions -- big coloured code block, "$50", buy-a-site language all
   // read as marketing. This is a receipt for something already paid for,
   // so it is written and styled like one.
+  const steps = [
+    hasBrand
+      ? "Within 1 business day, I'll email you personally to confirm the details. Reply to this email with your logo and a few photos of your work whenever you can."
+      : "Within 1 business day, I'll email you personally to confirm the details. If you have photos of your work, reply to this email with a few.",
+    "Your demo link lands in this inbox within 48 hours of your order. If I'm waiting on something from you, I'll say so, and the 48 hours start once I have it.",
+    "Like what you see? Your order reference below takes $50 off a full website.",
+  ];
+
   const html = `
     <div style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;max-width:520px;color:#2a2118;line-height:1.6">
-      <p style="margin:0 0 16px">Thanks for your order. Your demo landing page is paid for and I've started on it.</p>
-      <p style="margin:0 0 16px">I have what you told me about your business and I'll reach out if I need anything else, like your logo or photos. Your custom demo will be delivered within 48 hours of having everything I need.</p>
+      <p style="margin:0 0 16px">Thanks for your order. Your demo is paid for and I already have your answers, so I'm getting started.</p>
+      <p style="margin:0 0 8px">Here's what happens next:</p>
+      <ol style="margin:0 0 16px;padding-left:20px">
+        ${steps.map((step) => `<li style="margin:0 0 6px">${step}</li>`).join("")}
+      </ol>
       <p style="margin:0 0 16px">
         Order reference: <strong>${code}</strong><br>
         This is also your $50 credit toward a full site. Enter it at checkout on
         trayfolio.net. It works once and is good for 90 days.
       </p>
-      <p style="margin:0 0 16px">Just reply to this email if you have any questions.</p>
+      <p style="margin:0 0 16px">Questions in the meantime? Just reply. It comes straight to me.</p>
       <p style="margin:0">Tracy<br>Trayfolio</p>
     </div>`;
 
   // A plain-text alternative alongside the HTML. Mail with only an HTML part
   // looks more like bulk mail to filters than a real one-to-one message.
   const text = [
-    "Thanks for your order. Your demo landing page is paid for and I've started on it.",
+    "Thanks for your order. Your demo is paid for and I already have your answers, so I'm getting started.",
     "",
-    "I have what you told me about your business and I'll reach out if I need anything else, like your logo or photos. Your custom demo will be delivered within 48 hours of having everything I need.",
+    "Here's what happens next:",
+    ...steps.map((step, i) => `${i + 1}. ${step}`),
     "",
     `Order reference: ${code}`,
     "This is also your $50 credit toward a full site. Enter it at checkout on",
     "trayfolio.net - it works once, and is good for 90 days.",
     "",
-    "Just reply to this email if you have any questions.",
+    "Questions in the meantime? Just reply. It comes straight to me.",
     "",
     "Tracy",
     "Trayfolio",
@@ -421,14 +434,39 @@ function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-const INTAKE_LABELS: [string, string][] = [
-  ["intake_name", "Name"],
-  ["intake_business", "Business"],
-  ["intake_about", "What they do"],
-  ["intake_goals", "Wants the demo to show"],
-  ["intake_website", "Current site or Instagram"],
-  ["intake_style", "Styles they like"],
-];
+const INTAKE_LABELS: [string, string][] = DEMO_FIELDS.filter((field) => field.key !== "email").map(
+  (field) => [`intake_${field.key}`, field.label],
+);
+
+/* *************************
+ * markLeadPaid
+ * Marks the saved demo form as paid so no "finish your order" reminders go
+ * out. Matches on the token passed through checkout, or failing that, on the
+ * buyer's email. Loaded lazily so a database hiccup can never stop the
+ * credit code and confirmation email from going out.
+ *
+ * @param token : the saved form's token from session metadata, if any
+ * @param email : the buyer's email from Stripe
+ * @exception none (errors are logged)
+ * @return nothing
+ **************************/
+async function markLeadPaid(token: string | undefined, email: string): Promise<void> {
+  try {
+    const [{ db }, { demoLeads }, { and, eq, isNull }] = await Promise.all([
+      import("@/lib/db/client"),
+      import("@/lib/db/schema"),
+      import("drizzle-orm"),
+    ]);
+    const paidAt = new Date();
+    if (token) await db.update(demoLeads).set({ paidAt, step: "paid" }).where(eq(demoLeads.token, token));
+    await db
+      .update(demoLeads)
+      .set({ paidAt, step: "paid" })
+      .where(and(eq(demoLeads.email, email), isNull(demoLeads.paidAt)));
+  } catch (error) {
+    console.error("Could not mark demo lead paid", error);
+  }
+}
 
 /** Pulls the pre-checkout intake answers off the session metadata. */
 function demoIntake(metadata: Record<string, string>): [string, string][] {
@@ -499,6 +537,8 @@ export async function POST(request: Request) {
     return new Response("OK", { status: 200 });
   }
 
+  await markLeadPaid(metadata.lead_token, email);
+
   try {
     const couponId = await findDemoCoupon(secretKey);
     if (!couponId) {
@@ -512,7 +552,7 @@ export async function POST(request: Request) {
       return new Response("OK", { status: 200 });
     }
 
-    const sent = await emailCredit(email, code);
+    const sent = await emailCredit(email, code, metadata.intake_brand !== "Not yet, surprise me");
     if (!sent) {
       // Not fatal: the code exists in Stripe and can be sent by hand.
       console.error(`Demo credit ${code} created for ${email} but the email did not send`);
