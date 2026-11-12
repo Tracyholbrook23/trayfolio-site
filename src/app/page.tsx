@@ -8,7 +8,7 @@ import SeeTheDifference from "@/components/SeeTheDifference";
 import DemoCheckoutButton from "@/components/DemoCheckoutButton";
 import { RevealText } from "@/components/ui/reveal-text";
 import { Eyebrow, FinalCta, PrimaryCta, SecondaryCta } from "@/components/V2Ui";
-import { featuredProjects } from "@/lib/projects";
+import { clientProjects } from "@/lib/projects";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -68,10 +68,10 @@ export default function Home() {
 
       <section id="selected-work" className="bg-stone-950 py-20 text-white sm:py-28">
         <div className="v2-container">
-          <Reveal><div className="grid gap-5 lg:grid-cols-[1fr_.8fr] lg:items-end"><div><Eyebrow light>Selected client work</Eyebrow><h2 className="v2-section-title mt-4 max-w-3xl">Built around the business. Never around a template.</h2></div><p className="max-w-xl leading-7 text-stone-300 lg:justify-self-end">Three businesses with three different goals, audiences, and digital experiences. Scroll to flip through them, then select a project to explore it inside Trayfolio.</p></div></Reveal>
+          <Reveal><div className="grid gap-5 lg:grid-cols-[1fr_.8fr] lg:items-end"><div><Eyebrow light>Selected client work</Eyebrow><h2 className="v2-section-title mt-4 max-w-3xl">Built around the business. Never around a template.</h2></div><p className="max-w-xl leading-7 text-stone-300 lg:justify-self-end">Real businesses with different goals, audiences, and digital experiences. Scroll to flip through them, then select a project to explore it inside Trayfolio.</p></div></Reveal>
         </div>
         <div className="mt-6">
-          <ClientWorkDeck projects={featuredProjects} tone="dark" showIndex={false} />
+          <ClientWorkDeck projects={clientProjects} tone="dark" showIndex={false} />
         </div>
         <div className="v2-container">
           <Link href="/work" className="mt-10 inline-flex items-center gap-2 text-sm font-semibold text-white underline decoration-white/40 underline-offset-4 hover:decoration-white">Explore all work <ArrowRight size={16} aria-hidden="true" /></Link>
